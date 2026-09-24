@@ -8,6 +8,7 @@ import { Arrow } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 const NAV = [
+  { href: "/", label: "Home" },
   { href: "/locations", label: "Locations" },
   { href: "/vision", label: "Vision" },
   { href: "/events", label: "Events" },
@@ -42,9 +43,9 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
           <span className="display text-xl leading-none">Dominion House</span>
         </Link>
 
-        <nav aria-label="Main" className="hidden items-center gap-7 lg:flex">
+        <nav aria-label="Main" className="hidden items-center gap-5 xl:gap-7 lg:flex">
           {NAV.map((item) => {
-            const active = pathname.startsWith(item.href);
+            const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}

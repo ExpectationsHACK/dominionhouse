@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 import { registerForCamp, type RegisterState } from "./actions";
-import { Arrow, ArrowLeft, Button, ButtonLink, Eyebrow } from "@/components/ui";
+import { Arrow, ArrowLeft, Button, Eyebrow } from "@/components/ui";
 import {
   Checkbox,
   Field,
@@ -320,7 +320,6 @@ export function RegisterForm({
             <Checkbox
               name="isFirstCamp"
               label="This is my first Dominion House camp"
-              description="We'll pair you with someone who knows the ropes."
             />
           </fieldset>
 
@@ -538,20 +537,27 @@ export function RegisterForm({
               <Button type="button" variant="ghost" onClick={goBack}>
                 <ArrowLeft /> Back
               </Button>
-            ) : (
-              <ButtonLink href="/camp">
-                <ArrowLeft /> Back to camp
-              </ButtonLink>
-            )}
+            ) : null}
 
             {step < 4 ? (
               <Button type="button" onClick={goNext} className="ml-auto">
                 Continue <Arrow />
               </Button>
             ) : (
-              <SubmitButton className="ml-auto" pendingLabel="Registering…">
-                Register
-              </SubmitButton>
+              <div className="ml-auto flex flex-wrap items-center gap-2.5">
+                {/* Registers exactly the same way, then lands on the camp profile
+                    instead of the payment page. */}
+                <SubmitButton
+                  name="payLater"
+                  value="1"
+                  variant="outline"
+                  withArrow={false}
+                  pendingLabel="Registering…"
+                >
+                  Pay later
+                </SubmitButton>
+                <SubmitButton pendingLabel="Registering…">Register and pay</SubmitButton>
+              </div>
             )}
           </div>
 

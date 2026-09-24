@@ -25,15 +25,15 @@ export function LighthouseCards({ campuses }: { campuses: readonly Campus[] }) {
             >
               {campus.region === "Lagos" ? "Lagos" : campus.country}
             </p>
-            <h3 className="display mt-2 text-4xl">{campus.name}</h3>
-            <p className={cn("mt-3 text-sm leading-relaxed", BODY_TONE[variant])}>
+            <h3 className="display mt-1 text-3xl sm:mt-2 sm:text-4xl">{campus.name}</h3>
+            <p className={cn("mt-2 text-[13px] leading-relaxed sm:mt-3 sm:text-sm", BODY_TONE[variant])}>
               {campus.address}
             </p>
             {phone ? (
               <a
                 href={`tel:${phone.replace(/[^\d+]/g, "")}`}
                 className={cn(
-                  "mt-3 font-mono text-xs underline-offset-4 hover:underline",
+                  "mt-2 font-mono text-xs underline-offset-4 hover:underline sm:mt-3",
                   BODY_TONE[variant],
                 )}
               >
@@ -43,7 +43,7 @@ export function LighthouseCards({ campuses }: { campuses: readonly Campus[] }) {
 
             <Link
               href={`/locations?campus=${campus.slug}`}
-              className="mt-auto inline-flex items-center gap-2 pt-6 text-[12px] font-semibold uppercase tracking-[0.1em] underline underline-offset-4"
+              className="mt-auto inline-flex items-center gap-2 pt-4 text-[12px] sm:pt-6 font-semibold uppercase tracking-[0.1em] underline underline-offset-4"
             >
               Plan a visit <Arrow />
             </Link>

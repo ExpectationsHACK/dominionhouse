@@ -105,7 +105,7 @@ export function MissionCards({ steps }: { steps: readonly Step[] }) {
           <li
             key={step.key}
             className={cn(
-              "relative flex min-h-[30rem] flex-col overflow-hidden xl:min-h-[36rem]",
+              "relative flex flex-col overflow-hidden sm:min-h-[30rem] xl:min-h-[36rem]",
               // With two columns the fifth card would sit alone, let it span.
               index === steps.length - 1 && steps.length % 2 === 1 && "sm:col-span-2 xl:col-span-1",
               CARD[variant],
@@ -117,24 +117,24 @@ export function MissionCards({ steps }: { steps: readonly Step[] }) {
             }
           >
             {/* Capped so a card that spans two columns doesn't blow the squares up. */}
-            <div className="w-full max-w-[20rem]">
+            <div className="h-14 w-full max-w-[20rem] overflow-hidden sm:h-auto">
               <PixelDissolve seed={index + 1} className={PIXEL_TONE[variant]} />
             </div>
 
-            <div className="flex flex-1 flex-col p-6 pt-8">
+            <div className="flex flex-1 flex-col p-5 pt-4 sm:p-6 sm:pt-8">
               <p className={cn("font-mono text-sm font-semibold", KEY_TONE[variant])}>{step.key}</p>
-              <h3 className="display mt-3 text-4xl">{step.name}</h3>
+              <h3 className="display mt-2 text-3xl sm:mt-3 sm:text-4xl">{step.name}</h3>
               <p
                 className={cn(
-                  "mt-3 text-xs uppercase tracking-[0.08em]",
+                  "mt-2 text-xs uppercase tracking-[0.08em] sm:mt-3",
                   SUMMARY_TONE[variant],
                 )}
               >
                 {step.summary}
               </p>
-              <p className={cn("mt-4 text-sm leading-relaxed", BODY_TONE[variant])}>{step.body}</p>
+              <p className={cn("mt-3 text-[13px] leading-relaxed sm:mt-4 sm:text-sm", BODY_TONE[variant])}>{step.body}</p>
               {step.scripture ? (
-                <p className={cn("mt-auto pt-5 font-mono text-[11px] uppercase tracking-[0.14em]", KEY_TONE[variant])}>
+                <p className={cn("mt-auto pt-3 font-mono sm:pt-5  text-[11px] uppercase tracking-[0.14em]", KEY_TONE[variant])}>
                   {step.scripture}
                 </p>
               ) : null}

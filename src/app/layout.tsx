@@ -4,19 +4,19 @@ import "./globals.css";
 
 const anton = Anton({
   weight: "400",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-anton",
   display: "swap",
 });
 
 const interTight = Inter_Tight({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-inter-tight",
   display: "swap",
 });
 
 const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-jetbrains",
   display: "swap",
 });

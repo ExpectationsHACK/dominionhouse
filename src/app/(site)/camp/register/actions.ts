@@ -181,5 +181,8 @@ export async function registerForCamp(
   // separate sign-in needed until the cookie expires or they switch profiles.
   await createPortalSession({ registrantId: registrant.id, email: registrant.email });
 
+  // "Pay later" registers the same way but goes straight to the camp profile.
+  if (formData.get("payLater") === "1") redirect("/portal");
+
   redirect(`/camp/payment?email=${encodeURIComponent(registrant.email)}&welcome=1`);
 }
