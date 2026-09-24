@@ -1,0 +1,539 @@
+// Dominion House. Camp Meeting Operating System
+// Money is stored in KOBO (minor units) as Int. 1 NGN = 100 kobo.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────────────────────── enums ────────
+
+enum AgeCategory {
+  ADULT
+  STUDENT
+  TEEN
+  CHILD
+}
+
+/// Listed lowest to highest. The order is the seniority ladder that room
+/// allocation ranks by, so keep it ordered if you add to it.
+enum Position {
+  DISCIPLE
+  POWER_4_LEADER
+  TEAM_LEADER
+  TEAM_COORDINATOR
+  CAPTAIN
+  DIRECTOR
+  MINISTER
+  CAMPUS_PASTOR
+  PASTOR
+  LIGHTHOUSE_PASTOR
+  DIRECTOR_OF_MISSION
+  SENIOR_PASTOR
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum PaymentPlan {
+  FULL
+  INSTALLMENT
+}
+
+enum RegistrationStatus {
+  PENDING
+  PARTIALLY_PAID
+  PAID
+  CANCELLED
+  WAITLISTED
+}
+
+enum PaymentMethod {
+  PAYSTACK
+  BANK_TRANSFER
+  CASH
+  POS
+  WAIVER
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REVERSED
+}
+
+enum TicketStatus {
+  VALID
+  CHECKED_IN
+  REVOKED
+}
+
+enum RoomGender {
+  MALE
+  FEMALE
+  MIXED
+}
+
+enum RoomType {
+  DORMITORY
+  SHARED
+  PRIVATE
+  FAMILY
+}
+
+enum AssignmentMethod {
+  AUTO
+  MANUAL
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  FINANCE
+  REGISTRATION
+  LOGISTICS
+  USHER
+}
+
+enum EmailStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+enum ScheduleType {
+  SERVICE
+  SESSION
+  PRAYER
+  MEAL
+  ACTIVITY
+  BREAKOUT
+  LOGISTICS
+}
+
+enum VisitorStatus {
+  NEW
+  CONTACTED
+  CONNECTED
+  CLOSED
+}
+
+// ─────────────────────────────────────────────────────────────── camp ─────────
+
+model Camp {
+  id                    String   @id @default(cuid())
+  slug                  String   @unique
+  name                  String
+  theme                 String?
+  tagline               String?
+  description           String?
+  venue                 String
+  venueAddress          String?
+  startsAt              DateTime
+  endsAt                DateTime
+  currency              String   @default("NGN")
+  isActive              Boolean  @default(true)
+  registrationOpensAt   DateTime?
+  registrationClosesAt  DateTime?
+  capacity              Int?
+
+  // Payment policy
+  installmentsEnabled   Boolean  @default(true)
+  /// Flat floor on the first payment, in kobo. A percentage cannot express a
+  /// single amount that applies across tiers priced differently.
+  minFirstInstallmentKobo Int    @default(1000000)
+  paymentDeadline       DateTime?
+
+  // Accommodation policy
+  accommodationEnabled  Boolean  @default(true)
+  requireFullPayForRoom Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  priceTiers    PriceTier[]
+  registrants   Registrant[]
+  rooms         Room[]
+  scheduleItems ScheduleItem[]
+  announcements Announcement[]
+
+  @@index([isActive])
+}
+
+model PriceTier {
+  id          String      @id @default(cuid())
+  campId      String
+  camp        Camp        @relation(fields: [campId], references: [id], onDelete: Cascade)
+  category    AgeCategory
+  label       String
+  description String?
+  amountKobo  Int
+  ageMin      Int?
+  ageMax      Int?
+  isActive    Boolean     @default(true)
+  sortOrder   Int         @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  registrants Registrant[]
+
+  @@unique([campId, category])
+  @@index([campId])
+}
+
+// ────────────────────────────────────────────────────────── registrant ────────
+
+model Registrant {
+  id     String @id @default(cuid())
+  campId String
+  camp   Camp   @relation(fields: [campId], references: [id], onDelete: Cascade)
+
+  // Identity
+  registrationCode String   @unique
+  firstName        String
+  lastName         String
+  email            String
+  phone            String
+  gender           Gender
+  dateOfBirth      DateTime?
+  age              Int?
+
+  // Church context
+  position     Position @default(DISCIPLE)
+  positionNote String?
+  department   String?
+  branch       String?
+  /// Which Lighthouse (campus) they belong to, adults, teenagers and children.
+  lighthouse   String?
+  /// Campus-fellowship region, asked of campus students instead of a Lighthouse.
+  region       String?
+  isFirstCamp  Boolean  @default(false)
+
+  // Location
+  address String?
+  city    String?
+  state   String?
+  country String? @default("Nigeria")
+
+  // Emergency + care
+  emergencyName     String
+  emergencyPhone    String
+  emergencyRelation String?
+  medicalNotes      String?
+  allergies         String?
+
+  // Logistics
+  category            AgeCategory
+  priceTierId         String?
+  priceTier           PriceTier?  @relation(fields: [priceTierId], references: [id])
+  /// Everyone who pays gets a bed; this is a request for a personal room.
+  wantsPersonalAccommodation Boolean @default(false)
+  arrivalDate         DateTime?
+  departureDate       DateTime?
+  transportNeeded     Boolean     @default(false)
+
+  // Money (kobo)
+  paymentPlan   PaymentPlan        @default(FULL)
+  /// How many instalments they opted for (2–5). Null when paying in full, or
+  /// when they named their own first amount instead of an even split.
+  installmentCount     Int?
+  /// A specific first instalment they asked for, in kobo.
+  firstInstallmentKobo Int?
+  status        RegistrationStatus @default(PENDING)
+  amountDueKobo Int                @default(0)
+
+  consentPhoto Boolean @default(true)
+  notes        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  payments       Payment[]
+  ticket         Ticket?
+  roomAssignment RoomAssignment?
+  emailLogs      EmailLog[]
+
+  @@unique([campId, email])
+  @@index([campId, status])
+  @@index([campId, position])
+  @@index([campId, category])
+  @@index([email])
+  @@index([lastName, firstName])
+}
+
+// ───────────────────────────────────────────────────────────── payments ───────
+
+model Payment {
+  id           String     @id @default(cuid())
+  registrantId String
+  registrant   Registrant @relation(fields: [registrantId], references: [id], onDelete: Cascade)
+
+  reference    String        @unique
+  amountKobo   Int
+  method       PaymentMethod @default(PAYSTACK)
+  status       PaymentStatus @default(PENDING)
+  channel      String?
+  paidAt       DateTime?
+  gatewayRef   String?
+  gatewayRaw   Json?
+  note         String?
+
+  // Offline payments recorded by staff
+  recordedById String?
+  recordedBy   AdminUser? @relation(fields: [recordedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([registrantId])
+  @@index([status])
+  @@index([paidAt])
+}
+
+// ────────────────────────────────────────────────────────────── tickets ───────
+
+model Ticket {
+  id           String     @id @default(cuid())
+  registrantId String     @unique
+  registrant   Registrant @relation(fields: [registrantId], references: [id], onDelete: Cascade)
+
+  code        String       @unique
+  qrPayload   String       @unique
+  status      TicketStatus @default(VALID)
+  issuedAt    DateTime     @default(now())
+  emailSentAt DateTime?
+
+  checkedInAt   DateTime?
+  checkedInById String?
+  checkedInBy   AdminUser? @relation(fields: [checkedInById], references: [id])
+
+  revokedAt     DateTime?
+  revokedReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// ──────────────────────────────────────────────────────────────── rooms ───────
+
+model Room {
+  id     String @id @default(cuid())
+  campId String
+  camp   Camp   @relation(fields: [campId], references: [id], onDelete: Cascade)
+
+  block    String
+  name     String
+  capacity Int
+  gender   RoomGender @default(MIXED)
+  type     RoomType   @default(SHARED)
+  floor    String?
+  notes    String?
+  isActive Boolean    @default(true)
+
+  // Reserve for a rank of leadership, e.g. PASTOR-only block
+  minPosition Position?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignments RoomAssignment[]
+
+  @@unique([campId, block, name])
+  @@index([campId, gender])
+}
+
+model RoomAssignment {
+  id           String     @id @default(cuid())
+  roomId       String
+  room         Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  registrantId String     @unique
+  registrant   Registrant @relation(fields: [registrantId], references: [id], onDelete: Cascade)
+
+  bedLabel     String?
+  method       AssignmentMethod @default(AUTO)
+  assignedAt   DateTime         @default(now())
+  assignedById String?
+  assignedBy   AdminUser?       @relation(fields: [assignedById], references: [id])
+  locked       Boolean          @default(false)
+
+  @@index([roomId])
+}
+
+// ─────────────────────────────────────────────────────────────── people ───────
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         AdminRole @default(REGISTRATION)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  paymentsRecorded Payment[]
+  ticketsScanned   Ticket[]
+  roomsAssigned    RoomAssignment[]
+  auditLogs        AuditLog[]
+}
+
+/// One-time 6-digit codes for passwordless registrant portal login.
+model LoginCode {
+  id         String   @id @default(cuid())
+  email      String
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  attempts   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([email, expiresAt])
+}
+
+// ───────────────────────────────────────────────────────────── programme ──────
+
+model ScheduleItem {
+  id     String @id @default(cuid())
+  campId String
+  camp   Camp   @relation(fields: [campId], references: [id], onDelete: Cascade)
+
+  day         DateTime
+  startsAt    DateTime
+  endsAt      DateTime?
+  title       String
+  description String?
+  speaker     String?
+  location    String?
+  type        ScheduleType @default(SESSION)
+  isPublished Boolean      @default(true)
+  sortOrder   Int          @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campId, day])
+}
+
+model Announcement {
+  id     String @id @default(cuid())
+  campId String
+  camp   Camp   @relation(fields: [campId], references: [id], onDelete: Cascade)
+
+  title       String
+  body        String
+  isPinned    Boolean   @default(false)
+  publishedAt DateTime?
+  emailedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campId, publishedAt])
+}
+
+// ───────────────────────────────────────────────────────── church site ────────
+
+/// First-timer / plan-a-visit submissions from the public church site.
+model Visitor {
+  id             String        @id @default(cuid())
+  firstName      String
+  lastName       String
+  email          String
+  phone          String?
+  campus         String?
+  visitDate      DateTime?
+  howHeard       String?
+  prayerRequest  String?
+  wantsFollowUp  Boolean       @default(true)
+  status         VisitorStatus @default(NEW)
+  staffNote      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([email])
+}
+
+// ─────────────────────────────────────────────────────────────── system ───────
+
+model EmailLog {
+  id           String      @id @default(cuid())
+  to           String
+  subject      String
+  template     String
+  status       EmailStatus @default(QUEUED)
+  providerId   String?
+  error        String?
+  sentAt       DateTime?
+  registrantId String?
+  registrant   Registrant? @relation(fields: [registrantId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id       String  @id @default(cuid())
+  actorId  String?
+  actor    AdminUser? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorLabel String
+  action   String
+  entity   String
+  entityId String?
+  meta     Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entity, entityId])
+}
+
+enum MediaPlacement {
+  /// Rotating video cards in the homepage hero.
+  HERO_GALLERY
+  /// Depth cards in the Fresh Fire carousel on /camp.
+  CAMP_CARDS
+}
+
+/// Editable media used across the public site. Managed at /admin/content.
+/// Mapped to the original table name so the rename cost no data.
+model SiteMedia {
+  id        String         @id @default(cuid())
+  placement MediaPlacement @default(HERO_GALLERY)
+  title     String
+  subtitle  String?
+  videoUrl  String?
+  imageUrl  String?
+  /// Where this card sends people, e.g. the message on YouTube.
+  linkUrl   String?
+  posterUrl String?
+  sortOrder Int            @default(0)
+  isActive  Boolean        @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([placement, isActive, sortOrder])
+  @@map("HeroMedia")
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}

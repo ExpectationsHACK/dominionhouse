@@ -1,26 +1,141 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ─────────────────────────────────────────────────────────────────────────────
+   DOMINION HOUSE — design tokens
+   Four colors carry the whole site: black (ink), white (paper), the logo's
+   blue and red. Everything else is a very light blue. Variable names are
+   legacy: "brass" is the logo blue, "meridian" is now black, and "bone",
+   "*-soft" are the very light blues.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  --color-ink: #0b0b0c;
+  --color-ink-70: #3d3d42;
+  --color-ink-45: #74747c;
+  --color-ink-20: #c2c2c7;
+  --color-bone: #eef7ff;
+  --color-bone-deep: #d9ecfd;
+  --color-paper: #ffffff;
+
+  /* Was a deep teal. Dark surfaces and accent text can't be a very light blue
+     and stay readable, so this is black; the soft variant is the light blue. */
+  --color-meridian: #0b0b0c;
+  --color-meridian-deep: #0b0b0c;
+  --color-meridian-soft: #e0f0ff;
+
+  --color-brass: #21a1ff;
+  --color-brass-soft: #d3eaff;
+
+  /* Fresh Fire — was orange fire, now the same blue family as everything else. */
+  --color-ember: #21a1ff;
+  --color-ember-deep: #0b0b0c;
+  --color-flame: #eef7ff;
+
+  /* "Success" text sits on light surfaces, so it is black on a light-blue tint. */
+  --color-success: #0b0b0c;
+  --color-success-soft: #e0f0ff;
+  --color-danger: #a62b1f;
+  --color-danger-soft: #f6e0dd;
+  /* Warnings, failures and "you missed something" are all red. */
+  --color-warn: #a62b1f;
+  --color-warn-soft: #f6e0dd;
+
+  --font-display: var(--font-anton), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --radius-none: 0px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  * {
+    border-color: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-bone);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-brass);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brass);
+    outline-offset: 2px;
+  }
+
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Poster type — the house voice. Anton, uppercase, optically large.
+     Anton's caps nearly fill its em box, so leading below ~0.95 makes stacked
+     lines collide. This keeps the poster feel while the lines stay separate. */
+  .display {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    font-weight: 400;
+  }
+
+  /* Opt-in for the few single-line marks that want to sit tight in a bar. */
+  .display-tight {
+    line-height: 1;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.6875rem;
+    font-weight: 500;
+  }
+
+  .rule {
+    border-top: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
+  }
+
+  /* Ticket stub — the signature element. Perforation is a real repeating mask. */
+  .perforation {
+    background-image: radial-gradient(
+      circle at center,
+      transparent 0 4px,
+      currentColor 4px 5px,
+      transparent 5px
+    );
+    background-size: 14px 14px;
+    background-repeat: repeat-x;
+    background-position: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
