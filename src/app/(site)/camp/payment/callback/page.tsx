@@ -3,8 +3,9 @@ import Link from "next/link";
 import { Arrow, ArrowLeft, ButtonLink, DataRow, Eyebrow, Notice, Panel } from "@/components/ui";
 import { db } from "@/lib/db";
 import { formatKobo } from "@/lib/money";
-import { verifyTransaction } from "@/lib/paystack";
-import { settlePayment } from "@/lib/registration";
+import { isMockPayments, verifyTransaction } from "@/lib/paystack";
+import { classifyGatewayOutcome } from "@/lib/payment-outcome";
+import { recordUnsuccessfulPayment, settlePayment } from "@/lib/registration";
 
 export const metadata: Metadata = {
   title: "Payment result",
@@ -50,12 +51,22 @@ export default async function PaymentCallbackPage({
   }
 
   let failure: string | null = null;
+  let processing: string | null = null;
 
-  if (payment.status !== "SUCCESS") {
+  // Simulated checkout has nothing to re-check with: a recorded decline stays one.
+  const mockAlreadyDecided = isMockPayments && payment.status !== "PENDING";
+  if (mockAlreadyDecided && payment.status !== "SUCCESS") failure = payment.note;
+
+  if (payment.status !== "SUCCESS" && !mockAlreadyDecided) {
     try {
       const verified = await verifyTransaction(reference);
 
-      if (verified.status === "success") {
+      const outcome = classifyGatewayOutcome({
+        status: verified.status,
+        gatewayResponse: verified.gatewayResponse,
+      });
+
+      if (outcome.kind === "success") {
         await settlePayment({
           reference,
           paidAt: verified.paidAt,
@@ -63,12 +74,17 @@ export default async function PaymentCallbackPage({
           gatewayRaw: verified.raw,
           verifiedAmountKobo: verified.amountKobo,
         });
-      } else {
-        await db.payment.update({
-          where: { id: payment.id },
-          data: { status: "FAILED", gatewayRaw: verified.raw as never },
+      } else if (outcome.kind === "recorded") {
+        // Kept on the payment history with the reason, so it shows up there.
+        await recordUnsuccessfulPayment({
+          reference,
+          status: outcome.status,
+          note: outcome.note,
+          gatewayRaw: verified.raw,
         });
-        failure = "The payment didn't go through.";
+        failure = outcome.note;
+      } else {
+        processing = outcome.note;
       }
     } catch (error) {
       failure =
@@ -142,19 +158,30 @@ export default async function PaymentCallbackPage({
         </>
       ) : (
         <>
-          <Eyebrow className="text-danger">Payment not completed</Eyebrow>
-          <h1 className="display mt-3 text-[clamp(2.5rem,8vw,6rem)]">That didn&apos;t go through</h1>
+          <Eyebrow className={processing ? undefined : "text-danger"}>
+            {processing ? "Payment processing" : "Payment not completed"}
+          </Eyebrow>
+          <h1 className="display mt-3 text-[clamp(2.5rem,8vw,6rem)]">
+            {processing ? "Still processing" : "That didn’t go through"}
+          </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-70">
-            {failure ?? "The payment wasn't completed."} Nothing has been charged, and your place is
-            still held. You can try again whenever you&apos;re ready.
+            {processing
+              ? `${processing} Check your payment history in a few minutes. If it succeeds, your balance and ticket update on their own.`
+              : `${failure ?? "The payment wasn't completed."} This attempt is saved in your payment history, and your place is still held. You can try again whenever you're ready.`}
           </p>
           <div className="mt-8 flex flex-wrap gap-2.5">
-            <ButtonLink
-              href={`/camp/payment?email=${encodeURIComponent(registrant.email)}`}
-              size="lg"
-            >
-              Try again <Arrow />
-            </ButtonLink>
+            {processing ? (
+              <ButtonLink href="/portal/payments" size="lg">
+                See my payment history <Arrow />
+              </ButtonLink>
+            ) : (
+              <ButtonLink
+                href={`/camp/payment?email=${encodeURIComponent(registrant.email)}`}
+                size="lg"
+              >
+                Try again <Arrow />
+              </ButtonLink>
+            )}
             <Link
               href="mailto:dominionhs@gmail.com"
               className="inline-flex items-center px-2 text-sm font-semibold underline underline-offset-4"
@@ -171,12 +198,9 @@ export default async function PaymentCallbackPage({
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
-      <Link
-        href="/camp"
-        className="mb-8 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-ink-45 transition-colors hover:text-ink"
-      >
+      <ButtonLink href="/camp" size="sm" className="mb-8">
         <ArrowLeft /> Back to camp
-      </Link>
+      </ButtonLink>
       {children}
     </div>
   );

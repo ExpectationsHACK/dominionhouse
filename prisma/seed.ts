@@ -258,15 +258,13 @@ async function main() {
   }
 
   // ── camp depth cards ───────────────────────────────────────────────────────
-  // Titles come from the seeded programme. No images: drop artwork into
-  // public/camp/ (or paste any URL) at /admin/content and they appear here.
+  // Photos live in public/camp/, optimised to 1200x1600. No captions are shown.
   const campCards = [
-    { title: "Teaching", subtitle: "Mornings in the Word, taken slowly and taken seriously." },
-    { title: "Worship", subtitle: "Nights that finish when they finish." },
-    { title: "Prayer", subtitle: "Early, corporate, and the reason everything else works." },
-    { title: "Breakouts", subtitle: "Leaders, students and teenagers, each in their own room." },
-    { title: "Communion", subtitle: "The whole house at one table." },
-    { title: "Impartation", subtitle: "What you came for, and what you carry home." },
+    { title: "Teaching", imageUrl: "/camp/teaching.jpg" },
+    { title: "Worship", imageUrl: "/camp/worship.jpg" },
+    { title: "Prayer", imageUrl: "/camp/prayer.jpg" },
+    { title: "Breakouts", imageUrl: "/camp/breakouts.jpg" },
+    { title: "Impartation", imageUrl: "/camp/impartation.jpg" },
   ];
 
   if ((await db.siteMedia.count({ where: { placement: "CAMP_CARDS" } })) === 0) {
@@ -275,7 +273,7 @@ async function main() {
         data: {
           placement: "CAMP_CARDS",
           title: card.title,
-          subtitle: card.subtitle,
+          imageUrl: card.imageUrl,
           sortOrder: index,
         },
       });

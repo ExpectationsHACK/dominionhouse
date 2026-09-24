@@ -40,7 +40,10 @@ export default async function SimulateCheckoutPage({
 
   async function decline() {
     "use server";
-    await db.payment.update({ where: { reference: reference! }, data: { status: "FAILED" } });
+    await db.payment.update({
+      where: { reference: reference! },
+      data: { status: "DECLINED", note: "Declined: simulated decline (test mode)." },
+    });
     redirect(`/camp/payment/callback?reference=${encodeURIComponent(reference!)}`);
   }
 

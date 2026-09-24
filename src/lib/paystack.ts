@@ -41,7 +41,10 @@ export type InitialiseArgs = {
 };
 
 export type VerifiedTransaction = {
-  status: "success" | "failed" | "abandoned" | "pending";
+  /** Paystack's own status: success, failed, abandoned, ongoing, pending, … */
+  status: string;
+  /** Paystack's human reason for the outcome, e.g. "Declined". */
+  gatewayResponse: string | null;
   amountKobo: number;
   reference: string;
   channel: string | null;
@@ -93,6 +96,7 @@ export async function verifyTransaction(reference: string): Promise<VerifiedTran
     assertNotMockInProduction();
     return {
       status: "success",
+      gatewayResponse: "Approved",
       amountKobo: -1, // caller falls back to the expected amount on the Payment row
       reference,
       channel: "mock",
@@ -115,6 +119,7 @@ export async function verifyTransaction(reference: string): Promise<VerifiedTran
       reference: string;
       channel?: string;
       paid_at?: string;
+      gateway_response?: string;
     };
   };
 
@@ -124,7 +129,8 @@ export async function verifyTransaction(reference: string): Promise<VerifiedTran
 
   const data = payload.data;
   return {
-    status: data.status as VerifiedTransaction["status"],
+    status: data.status,
+    gatewayResponse: data.gateway_response ?? null,
     amountKobo: data.amount,
     reference: data.reference,
     channel: data.channel ?? null,

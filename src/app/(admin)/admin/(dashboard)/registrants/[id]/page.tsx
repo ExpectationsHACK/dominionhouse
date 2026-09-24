@@ -33,6 +33,7 @@ import { FINANCE_ROLES, OPS_ROLES, can, requireAdmin } from "@/lib/auth";
 import { requireActiveCamp } from "@/lib/camp";
 import { db } from "@/lib/db";
 import { campDateRange, dateTimeLabel } from "@/lib/dates";
+import { PAYMENT_STATUS } from "@/lib/payment-outcome";
 import { formatKobo, percentPaid, perInstallmentKobo, toNaira } from "@/lib/money";
 import { CATEGORY_LABEL } from "@/lib/pricing";
 import { POSITION_LABEL, POSITION_OPTIONS } from "@/lib/positions";
@@ -154,16 +155,8 @@ export default async function RegistrantDetailPage({
                       ) : null}
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge
-                        tone={
-                          payment.status === "SUCCESS"
-                            ? "success"
-                            : payment.status === "PENDING"
-                              ? "warn"
-                              : "danger"
-                        }
-                      >
-                        {payment.status.toLowerCase()}
+                      <Badge tone={PAYMENT_STATUS[payment.status].tone}>
+                        {PAYMENT_STATUS[payment.status].label}
                       </Badge>
                       <p className="font-mono text-sm font-semibold">
                         {formatKobo(payment.amountKobo)}

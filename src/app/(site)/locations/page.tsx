@@ -30,18 +30,18 @@ export default async function LocationsPage({
   return (
     <>
       {/* ── hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-ink/12">
-        <HillContours className="absolute inset-x-0 bottom-0 h-[80%] w-full text-ink" lines={10} />
-        <div className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-14 sm:px-8 sm:pb-20 sm:pt-20">
-          <Eyebrow>
+      <section className="relative overflow-hidden border-b border-ink/12 bg-meridian text-white">
+        <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={16} />
+        <div className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
+          <Eyebrow className="text-brass">
             {CAMPUSES.length} lighthouses · {COUNTRY_COUNT} countries
           </Eyebrow>
-          <h1 className="display mt-5 text-[clamp(3rem,11vw,9rem)]">
+          <h1 className="display mt-5 text-[clamp(2.5rem,9vw,7.5rem)]">
             Find your
             <br />
             lighthouse
           </h1>
-          <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-70">
+          <p className="mt-8 max-w-xl text-lg leading-relaxed text-white/70">
             Come as you are. Tell us you&apos;re coming and someone from that lighthouse will be looking
             out for you, no forms at the door, no spotlight.
           </p>

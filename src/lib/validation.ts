@@ -162,10 +162,10 @@ const mediaUrl = (label: string) =>
     .optional()
     .or(z.literal(""));
 
-/** A card in the hero gallery or the Fresh Fire carousel. */
+/** A card in the hero gallery, the Fresh Fire carousel or the pastors carousel. */
 export const siteMediaSchema = z
   .object({
-    placement: z.enum(["HERO_GALLERY", "CAMP_CARDS"]),
+    placement: z.enum(["HERO_GALLERY", "CAMP_CARDS", "PASTORS"]),
     title: z.string().trim().min(2, "Give the card a label").max(40),
     subtitle: z.string().trim().max(160).optional().or(z.literal("")),
     videoUrl: mediaUrl("The video URL"),

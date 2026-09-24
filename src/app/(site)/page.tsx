@@ -1,6 +1,11 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DepthCardCarousel, type DepthCardItem } from "@/components/site/depth-card-carousel";
 import { HillContours } from "@/components/site/hill-contours";
+import { LighthouseCards } from "@/components/site/lighthouse-cards";
+import { MissionCards } from "@/components/site/mission-cards";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { campLockup, getActiveCamp } from "@/lib/camp";
 import { daysUntil } from "@/lib/dates";
@@ -9,9 +14,9 @@ import {
   CAMPUSES,
   CHURCH,
   COUNTRY_COUNT,
-  LAGOS_CAMPUSES,
   STRATEGY,
 } from "@/lib/church";
+import { db } from "@/lib/db";
 import { formatKobo } from "@/lib/money";
 
 export const metadata: Metadata = {
@@ -47,12 +52,53 @@ const NEXT_STEPS = [
   },
 ] as const;
 
+/**
+ * The Senior Pastors. A photo is picked up automatically when a file with the
+ * matching name is dropped into public/pastors/ (see the README there), and
+ * Admin, Website content can replace the whole list.
+ */
+const SENIOR_PASTORS = [
+  { slug: "dotun-arifalo", name: "Rev Dotun Arifalo", role: "Founder / Senior Pastor" },
+  { slug: "vincent-arifalo", name: "Pastor Vincent Arifalo", role: "Senior Pastor" },
+  { slug: "isoa-okojie", name: "Pastor Isoa Okojie", role: "Senior Pastor" },
+  { slug: "ayomide-olofinjana", name: "Pastor Ayomide Olofinjana", role: "Senior Pastor" },
+] as const;
+
+const PHOTO_EXTENSIONS = ["jpg", "jpeg", "png", "webp"] as const;
+
+function seniorPastorCards(): DepthCardItem[] {
+  return SENIOR_PASTORS.map((pastor) => {
+    const found = PHOTO_EXTENSIONS.find((extension) =>
+      existsSync(join(process.cwd(), "public", "pastors", `${pastor.slug}.${extension}`)),
+    );
+    return {
+      id: pastor.slug,
+      title: pastor.name,
+      subtitle: pastor.role,
+      imageUrl: found ? `/pastors/${pastor.slug}.${found}` : null,
+    };
+  });
+}
+
 export default async function HomePage() {
   const camp = await getActiveCamp();
   const cheapest = camp?.priceTiers.length
     ? Math.min(...camp.priceTiers.map((tier) => tier.amountKobo))
     : null;
   const daysAway = camp ? daysUntil(camp.startsAt) : null;
+
+  const pastorRows = await db.siteMedia.findMany({
+    where: { placement: "PASTORS", isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+  });
+  const pastors: DepthCardItem[] = pastorRows.length
+    ? pastorRows.map((row) => ({
+        id: row.id,
+        title: row.title,
+        subtitle: row.subtitle,
+        imageUrl: row.imageUrl,
+      }))
+    : seniorPastorCards();
 
   return (
     <>
@@ -98,32 +144,6 @@ export default async function HomePage() {
               A missional movement, {CAMPUSES.length} lighthouses across {COUNTRY_COUNT} countries,
               reaching the world one person and one community at a time.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── the 5D strategy ──────────────────────────────────────────────── */}
-      <section className="border-b border-ink/12">
-        <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <Eyebrow>Our mission</Eyebrow>
-          <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">
-            Discover · Develop · Deploy
-            <br />
-            Duplicate · Dominate
-          </h2>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">{ABOUT}</p>
-
-          <div className="mt-14 grid gap-px bg-ink/12 sm:grid-cols-2 lg:grid-cols-5">
-            {STRATEGY.map((step) => (
-              <div key={step.key} className="flex flex-col bg-bone p-6">
-                <p className="font-mono text-sm font-semibold text-brass">{step.key}</p>
-                <h3 className="display mt-3 text-3xl">{step.name}</h3>
-                <p className="mt-3 text-xs uppercase tracking-[0.08em] text-ink-45">
-                  {step.summary}
-                </p>
-                <p className="mt-4 text-sm leading-relaxed text-ink-70">{step.body}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -184,35 +204,43 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* ── campuses ─────────────────────────────────────────────────────── */}
+      {/* ── the mission, D1 to D5 ────────────────────────────────────────── */}
       <section className="border-b border-ink/12">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <Eyebrow>Where we gather</Eyebrow>
-              <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">
-                A Lighthouse in {COUNTRY_COUNT} countries
-              </h2>
-            </div>
-            <Link
-              href="/locations"
-              className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] underline underline-offset-4"
-            >
-              All {CAMPUSES.length} lighthouses <Arrow />
-            </Link>
-          </div>
+          <Eyebrow>Our mission</Eyebrow>
+          <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">
+            Discover · Develop · Deploy
+            <br />
+            Duplicate · Dominate
+          </h2>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">{ABOUT}</p>
 
-          <ul className="mt-12 grid gap-px bg-ink/12 sm:grid-cols-2 lg:grid-cols-3">
-            {LAGOS_CAMPUSES.slice(0, 6).map((campus) => (
-              <li key={campus.slug} className="bg-bone p-6">
-                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-brass">
-                  Lagos
-                </p>
-                <h3 className="display mt-2 text-2xl">{campus.name}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-70">{campus.address}</p>
-              </li>
-            ))}
-          </ul>
+          <MissionCards steps={STRATEGY} />
+        </div>
+      </section>
+
+      {/* ── meet our pastors ─────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden border-b border-white/10 bg-ink text-white">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 60% at 15% 0%, rgba(33,161,255,.28), transparent 70%)",
+          }}
+        />
+        <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+          <Eyebrow className="text-brass">The leadership of the house</Eyebrow>
+          <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5.5rem)]">
+            Meet our Senior Pastors
+          </h2>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/70">
+            The Senior Pastors who carry the vision and shepherd the house.
+          </p>
+
+          <div className="mt-12">
+            <DepthCardCarousel items={pastors} label="Our Senior Pastors" numbered={false} />
+          </div>
         </div>
       </section>
 
@@ -242,6 +270,29 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+      {/* ── campuses ─────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden border-t border-white/10 bg-meridian text-white">
+        <HillContours className="absolute inset-x-0 top-0 h-[60%] w-full text-brass" lines={16} />
+        <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <Eyebrow className="text-brass">Where we gather</Eyebrow>
+              <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">
+                A Lighthouse in {COUNTRY_COUNT} countries
+              </h2>
+            </div>
+            <Link
+              href="/locations"
+              className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] underline underline-offset-4"
+            >
+              All {CAMPUSES.length} lighthouses <Arrow />
+            </Link>
+          </div>
+
+          <LighthouseCards campuses={CAMPUSES} />
+        </div>
+      </section>
+
     </>
   );
 }

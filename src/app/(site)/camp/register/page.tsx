@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { RegisterForm } from "./register-form";
-import Link from "next/link";
-import { ArrowLeft, Eyebrow, Notice } from "@/components/ui";
+import { ArrowLeft, ButtonLink, Eyebrow, Notice } from "@/components/ui";
 import { registrationIsOpen, requireActiveCamp } from "@/lib/camp";
 import { campDateRange } from "@/lib/dates";
 
@@ -26,12 +25,9 @@ export default async function RegisterPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-5 py-12 sm:px-8 sm:py-16">
-      <Link
-        href="/camp"
-        className="mb-8 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-ink-45 transition-colors hover:text-ink"
-      >
+      <ButtonLink href="/camp" size="sm" className="mb-8">
         <ArrowLeft /> Back to camp
-      </Link>
+      </ButtonLink>
 
       <header className="max-w-3xl">
         <Eyebrow>{campDateRange(camp.startsAt, camp.endsAt)} · {camp.venue}</Eyebrow>

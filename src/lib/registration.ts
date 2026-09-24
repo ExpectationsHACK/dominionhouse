@@ -5,9 +5,10 @@ import { appUrl } from "@/lib/camp";
 import { qrPayload, ticketCode } from "@/lib/codes";
 import { sendEmail } from "@/lib/email/send";
 import { paymentReceiptEmail, ticketEmail } from "@/lib/email/templates";
+import { SETTLEABLE_STATUSES } from "@/lib/payment-outcome";
 import { CATEGORY_LABEL } from "@/lib/pricing";
 import { effectiveMinimumKobo, perInstallmentKobo } from "@/lib/money";
-import type { RegistrationStatus } from "@/generated/prisma/enums";
+import type { PaymentStatus, RegistrationStatus } from "@/generated/prisma/enums";
 
 export type Totals = {
   dueKobo: number;
@@ -166,11 +167,14 @@ export async function settlePayment(args: {
       : payment.amountKobo;
 
   // Atomic compare-and-swap: only succeeds for whichever concurrent caller
-  // gets here first while the row is still PENDING. A transaction wrapper
+  // gets here first while the row is still open. "Open" includes FAILED,
+  // DECLINED and ABANDONED: a browser callback can record one of those a
+  // moment before the gateway's success webhook arrives, and a payment the
+  // provider confirms as successful must still settle. A transaction wrapper
   // around a read-then-write wouldn't close this race under READ COMMITTED;
   // a single conditional UPDATE is itself the lock.
   const claim = await db.payment.updateMany({
-    where: { reference: args.reference, status: "PENDING" },
+    where: { reference: args.reference, status: { in: SETTLEABLE_STATUSES } },
     data: {
       status: "SUCCESS",
       amountKobo,
@@ -209,6 +213,32 @@ export async function settlePayment(args: {
   }
 
   return { ok: true as const, alreadySettled: false, totals };
+}
+
+/**
+ * Keep a record of an attempt that did not succeed, with the reason.
+ *
+ * Never touches a SUCCESS row, and never a REVERSED one, so a late or repeated
+ * failure notice can't overwrite money that actually landed.
+ */
+export async function recordUnsuccessfulPayment(args: {
+  reference: string;
+  status: Extract<PaymentStatus, "FAILED" | "DECLINED" | "ABANDONED" | "REVERSED">;
+  note: string;
+  gatewayRaw?: unknown;
+}) {
+  const from: PaymentStatus[] =
+    args.status === "REVERSED" ? ["SUCCESS", ...SETTLEABLE_STATUSES] : SETTLEABLE_STATUSES;
+
+  const result = await db.payment.updateMany({
+    where: { reference: args.reference, status: { in: from } },
+    data: {
+      status: args.status,
+      note: args.note,
+      gatewayRaw: (args.gatewayRaw as never) ?? undefined,
+    },
+  });
+  return result.count > 0;
 }
 
 async function sendReceipt(

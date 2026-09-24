@@ -72,19 +72,13 @@ export default async function PaymentPage({ searchParams }: { searchParams: Sear
         <div className="relative mx-auto max-w-[1400px] px-5 py-14 sm:px-8 sm:py-20">
           <Eyebrow className="text-brass">{camp.name}</Eyebrow>
           <h1 className="display mt-4 text-[clamp(2.75rem,9vw,7rem)]">Make a payment</h1>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/65">
-            Tell us who you are and we&apos;ll pull up your camp account.
-          </p>
         </div>
       </section>
 
       <div className="mx-auto max-w-[1400px] px-5 py-12 sm:px-8 sm:py-16">
-        <Link
-          href="/camp"
-          className="mb-8 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-ink-45 transition-colors hover:text-ink"
-        >
+        <ButtonLink href="/camp" size="sm" className="mb-8">
           <ArrowLeft /> Back to camp
-        </Link>
+        </ButtonLink>
 
         {params.welcome ? (
           <Notice tone="success" title="You're registered." className="mb-8">

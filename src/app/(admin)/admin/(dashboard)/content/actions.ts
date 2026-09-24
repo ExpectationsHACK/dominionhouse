@@ -103,7 +103,7 @@ export async function moveHeroMedia(
 
   const placement = String(formData.get("placement") ?? "HERO_GALLERY");
   const all = await db.siteMedia.findMany({
-    where: { placement: placement as "HERO_GALLERY" | "CAMP_CARDS" },
+    where: { placement: placement as "HERO_GALLERY" | "CAMP_CARDS" | "PASTORS" },
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
   });
 

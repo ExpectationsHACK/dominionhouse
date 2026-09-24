@@ -110,17 +110,30 @@ export async function startPayment(_previous: PayState, formData: FormData): Pro
     },
   });
 
-  const { authorizationUrl } = await initialiseTransaction({
-    email: registrant.email,
-    amountKobo,
-    reference,
-    callbackUrl: appUrl("/camp/payment/callback"),
-    metadata: {
-      registrationCode: registrant.registrationCode,
-      campId: camp.id,
-      name: `${registrant.firstName} ${registrant.lastName}`,
-    },
-  });
+  let authorizationUrl: string;
+  try {
+    ({ authorizationUrl } = await initialiseTransaction({
+      email: registrant.email,
+      amountKobo,
+      reference,
+      callbackUrl: appUrl("/camp/payment/callback"),
+      metadata: {
+        registrationCode: registrant.registrationCode,
+        campId: camp.id,
+        name: `${registrant.firstName} ${registrant.lastName}`,
+      },
+    }));
+  } catch (error) {
+    // The attempt is still part of the record: keep it, with the reason.
+    await db.payment.update({
+      where: { reference },
+      data: {
+        status: "FAILED",
+        note: `Could not start checkout: ${error instanceof Error ? error.message : "unknown error"}`,
+      },
+    });
+    return { error: "We couldn't reach the payment provider. Nothing was charged, please try again." };
+  }
 
   redirect(authorizationUrl);
 }

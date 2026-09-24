@@ -539,7 +539,7 @@ export function RegisterForm({
                 <ArrowLeft /> Back
               </Button>
             ) : (
-              <ButtonLink href="/camp" variant="ghost">
+              <ButtonLink href="/camp">
                 <ArrowLeft /> Back to camp
               </ButtonLink>
             )}

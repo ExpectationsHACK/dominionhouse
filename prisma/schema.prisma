@@ -66,6 +66,8 @@ enum PaymentStatus {
   PENDING
   SUCCESS
   FAILED
+  DECLINED
+  ABANDONED
   REVERSED
 }
 
@@ -508,6 +510,8 @@ enum MediaPlacement {
   HERO_GALLERY
   /// Depth cards in the Fresh Fire carousel on /camp.
   CAMP_CARDS
+  /// Pastor cards in the "Meet our pastors" carousel on the homepage.
+  PASTORS
 }
 
 /// Editable media used across the public site. Managed at /admin/content.

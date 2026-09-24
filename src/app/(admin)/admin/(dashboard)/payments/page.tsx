@@ -7,6 +7,7 @@ import { FINANCE_ROLES, requireAdmin } from "@/lib/auth";
 import { requireActiveCamp } from "@/lib/camp";
 import { db } from "@/lib/db";
 import { dateTimeLabel } from "@/lib/dates";
+import { PAYMENT_STATUS } from "@/lib/payment-outcome";
 import { formatKobo } from "@/lib/money";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -15,7 +16,7 @@ export const metadata: Metadata = { title: "Payments", robots: { index: false } 
 const PAGE_SIZE = 40;
 
 const METHODS = new Set(["PAYSTACK", "BANK_TRANSFER", "CASH", "POS", "WAIVER"]);
-const STATUSES = new Set(["SUCCESS", "PENDING", "FAILED", "REVERSED"]);
+const STATUSES = new Set(["SUCCESS", "PENDING", "FAILED", "DECLINED", "ABANDONED", "REVERSED"]);
 
 type Filters = { q?: string; method?: string; status?: string; page?: string };
 
@@ -127,6 +128,8 @@ export default async function PaymentsPage({
             { value: "SUCCESS", label: "Successful" },
             { value: "PENDING", label: "Pending" },
             { value: "FAILED", label: "Failed" },
+            { value: "DECLINED", label: "Declined" },
+            { value: "ABANDONED", label: "Not completed" },
             { value: "REVERSED", label: "Reversed" },
           ]}
         />
@@ -171,16 +174,8 @@ export default async function PaymentsPage({
                   ) : null}
                 </Td>
                 <Td>
-                  <Badge
-                    tone={
-                      payment.status === "SUCCESS"
-                        ? "success"
-                        : payment.status === "PENDING"
-                          ? "warn"
-                          : "danger"
-                    }
-                  >
-                    {payment.status.toLowerCase()}
+                  <Badge tone={PAYMENT_STATUS[payment.status].tone}>
+                    {PAYMENT_STATUS[payment.status].label}
                   </Badge>
                 </Td>
                 <Td align="right">

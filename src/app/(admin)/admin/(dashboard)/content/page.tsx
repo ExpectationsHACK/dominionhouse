@@ -45,7 +45,15 @@ const SECTIONS = [
     title: "Fresh Fire cards",
     where: "Camp page, the depth-card carousel",
     description:
-      "Still images with a label and a line of copy. A card with no image falls back to a blue wash.",
+      "Still images with a label; captions are not shown on these cards. A card with no image falls back to a blue wash.",
+    needs: "image" as const,
+  },
+  {
+    placement: "PASTORS" as const,
+    title: "Meet our Senior Pastors",
+    where: "Homepage, the pastors carousel",
+    description:
+      "One card per pastor: the card label is their name, the line under it their role, and the image their photo (portrait, roughly 3:4). Until you add cards here, the homepage shows the four Senior Pastors already set up; adding any card here replaces that list, so re-add all of them.",
     needs: "image" as const,
   },
 ];

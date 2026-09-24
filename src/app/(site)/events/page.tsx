@@ -51,13 +51,14 @@ export default async function EventsPage() {
 
   return (
     <>
-      <section className="border-b border-ink/12">
-        <div className="mx-auto max-w-[1400px] px-5 pb-12 pt-14 sm:px-8 sm:pb-16 sm:pt-20">
-          <Eyebrow>
+      <section className="relative overflow-hidden border-b border-ink/12 bg-meridian text-white">
+        <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={16} />
+        <div className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
+          <Eyebrow className="text-brass">
             {CAMPUSES.length} lighthouses · {COUNTRY_COUNT} countries
           </Eyebrow>
-          <h1 className="display mt-5 text-[clamp(3rem,11vw,9rem)]">What&apos;s on</h1>
-          <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-70">
+          <h1 className="display mt-5 text-[clamp(2.5rem,9vw,7.5rem)]">What&apos;s on</h1>
+          <p className="mt-8 max-w-xl text-lg leading-relaxed text-white/70">
             Four gatherings carry the week, from Monday morning prayer to Sunday worship. Every one
             of them is open to you.
           </p>

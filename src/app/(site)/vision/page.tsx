@@ -23,24 +23,24 @@ export default function VisionPage() {
   return (
     <>
       {/* ── hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-ink/12">
-        <HillContours className="absolute inset-x-0 bottom-0 h-[80%] w-full text-meridian" lines={12} />
+      <section className="relative overflow-hidden border-b border-ink/12 bg-meridian text-white">
+        <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
-          <Eyebrow>{CHURCH.descriptor}</Eyebrow>
-          <h1 className="display mt-5 max-w-5xl text-[clamp(2.75rem,9vw,7.5rem)]">
+          <Eyebrow className="text-brass">{CHURCH.descriptor}</Eyebrow>
+          <h1 className="display mt-5 max-w-5xl text-[clamp(2.5rem,9vw,7.5rem)]">
             A disciple-making movement
           </h1>
-          <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-70">{ABOUT}</p>
+          <p className="mt-8 max-w-2xl text-lg leading-relaxed text-white/70">{ABOUT}</p>
         </div>
       </section>
 
       {/* ── vision ───────────────────────────────────────────────────────── */}
-      <section className="border-b border-ink/12 bg-ink text-white">
+      <section className="border-b border-ink/12 bg-brass-soft text-ink">
         <div className="mx-auto grid max-w-[1400px] gap-10 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[280px_1fr]">
-          <Eyebrow className="text-brass lg:pt-3">Our vision</Eyebrow>
+          <Eyebrow className="lg:pt-3">Our vision</Eyebrow>
           <div>
             <p className="text-[clamp(1.375rem,3vw,2rem)] font-medium leading-[1.35]">{VISION}</p>
-            <p className="mt-8 max-w-2xl text-lg leading-relaxed text-white/60">
+            <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-70">
               {VISION_SUPPORT}
             </p>
           </div>

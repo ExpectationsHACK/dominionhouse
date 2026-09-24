@@ -3,6 +3,7 @@ import Image from "next/image";
 import flyer from "../../../../public/fresh-fire-camp.jpeg";
 import { DepthCardCarousel } from "@/components/site/depth-card-carousel";
 import { HillContours } from "@/components/site/hill-contours";
+import { TicketCards } from "@/components/site/ticket-cards";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { db } from "@/lib/db";
 import { campLockup, requireActiveCamp } from "@/lib/camp";
@@ -153,11 +154,6 @@ export default async function CampOverviewPage() {
           </div>
           <div className="space-y-6 text-lg leading-relaxed text-ink-70">
             <p>{camp.description}</p>
-            <p>
-              Mornings start with prayer. Teaching runs through the day, with breakouts where
-              leaders, students and teenagers each have their own room. Nights are worship, and they
-              finish when they finish.
-            </p>
             <p className="text-ink">
               Every lighthouse, one gathering, days of unhurried attention on one thing. That is the
               whole point.
@@ -180,19 +176,14 @@ export default async function CampOverviewPage() {
           <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
             <Eyebrow className="text-brass">What camp feels like</Eyebrow>
             <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
-              Fresh fire, and the people who carry it
+              Fresh Fire, Fresh Convictions and Fresh Impartation
             </h2>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/65">
-              Teaching in the morning, breakouts at noon, worship at night, and the ordinary hours
-              in between, where most of it actually happens.
-            </p>
 
             <div className="mt-14">
               <DepthCardCarousel
                 items={cards.map((card) => ({
                   id: card.id,
                   title: card.title,
-                  subtitle: card.subtitle,
                   imageUrl: card.imageUrl,
                 }))}
               />
@@ -219,23 +210,10 @@ export default async function CampOverviewPage() {
             ) : null}
           </div>
 
-          <div className="mt-14 grid gap-px bg-ink/12 sm:grid-cols-2 lg:grid-cols-4">
-            {camp.priceTiers.map((tier) => (
-              <div key={tier.id} className="flex flex-col justify-between bg-bone p-7 sm:p-8">
-                <div>
-                  <p className="eyebrow text-brass">{tier.label}</p>
-                  <p className="display mt-4 text-5xl">{formatKobo(tier.amountKobo)}</p>
-                  <p className="mt-4 text-sm leading-relaxed text-ink-70">{tier.description}</p>
-                </div>
-                {camp.installmentsEnabled ? (
-                  <p className="mt-8 border-t border-ink/12 pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-45">
-                    From{" "}
-                    {formatKobo(Math.min(camp.minFirstInstallmentKobo, tier.amountKobo))} to hold
-                  </p>
-                ) : null}
-              </div>
-            ))}
-          </div>
+          <TicketCards
+            tiers={camp.priceTiers}
+            holdFromKobo={camp.installmentsEnabled ? camp.minFirstInstallmentKobo : null}
+          />
 
           <div className="mt-10">
             <ButtonLink href="/camp/register" size="lg">

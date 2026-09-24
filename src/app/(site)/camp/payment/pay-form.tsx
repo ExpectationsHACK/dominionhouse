@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { startPayment, type PayState } from "./actions";
+import { ButtonLink } from "@/components/ui";
 import { FormError, Input, RadioCard } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { formatKobo, toNaira } from "@/lib/money";
@@ -92,6 +93,10 @@ export function PayForm({
       <SubmitButton pendingLabel="Opening checkout…" className="w-full" size="lg">
         Continue to payment
       </SubmitButton>
+
+      <ButtonLink href="/portal" variant="outline" size="lg" className="w-full">
+        Pay later
+      </ButtonLink>
 
       <p className="text-center text-xs text-ink-45">
         Card, bank transfer or USSD. You&apos;ll come straight back here when it&apos;s done.

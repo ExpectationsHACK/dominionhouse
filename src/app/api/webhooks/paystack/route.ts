@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { settlePayment } from "@/lib/registration";
+import { classifyGatewayOutcome } from "@/lib/payment-outcome";
+import { getTotals, recordUnsuccessfulPayment, settlePayment, statusFor } from "@/lib/registration";
 import { verifyWebhookSignature } from "@/lib/paystack";
 import { db } from "@/lib/db";
 
@@ -51,19 +52,43 @@ export async function POST(request: Request) {
       }
 
       case "charge.failed": {
-        await db.payment.updateMany({
-          where: { reference, status: "PENDING" },
-          data: { status: "FAILED", gatewayRaw: data as never },
+        const outcome = classifyGatewayOutcome({
+          status: "failed",
+          gatewayResponse: typeof data.gateway_response === "string" ? data.gateway_response : null,
         });
+        if (outcome.kind === "recorded") {
+          await recordUnsuccessfulPayment({
+            reference,
+            status: outcome.status,
+            note: outcome.note,
+            gatewayRaw: data,
+          });
+        }
         break;
       }
 
       case "refund.processed":
       case "charge.reversed": {
-        await db.payment.updateMany({
-          where: { reference },
-          data: { status: "REVERSED", gatewayRaw: data as never },
+        const changed = await recordUnsuccessfulPayment({
+          reference,
+          status: "REVERSED",
+          note: "Payment was reversed by the provider.",
+          gatewayRaw: data,
         });
+        if (changed) {
+          // Money left the account, so the balance and status must follow.
+          const payment = await db.payment.findUnique({
+            where: { reference },
+            include: { registrant: true },
+          });
+          if (payment) {
+            const totals = await getTotals(payment.registrantId);
+            await db.registrant.update({
+              where: { id: payment.registrantId },
+              data: { status: statusFor(totals, payment.registrant.status) },
+            });
+          }
+        }
         break;
       }
 

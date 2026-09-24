@@ -13,6 +13,7 @@ import {
 import { requireRegistrant } from "@/lib/auth";
 import { dateTimeLabel } from "@/lib/dates";
 import { formatKobo, percentPaid } from "@/lib/money";
+import { PAYMENT_STATUS } from "@/lib/payment-outcome";
 import { CATEGORY_LABEL } from "@/lib/pricing";
 import { totalsFor } from "@/lib/registration";
 
@@ -32,18 +33,19 @@ const METHOD_LABEL: Record<string, string> = {
 export default async function PortalPaymentsPage() {
   const registrant = await requireRegistrant();
   const totals = totalsFor(registrant);
-  const visible = registrant.payments.filter((payment) => payment.status !== "PENDING");
+  // Every attempt is shown, successful or not, so the history is the full story.
+  const visible = registrant.payments;
   const payUrl = `/camp/payment?email=${encodeURIComponent(registrant.email)}`;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
       <Panel>
-        <PanelHeader title="Payment history" description="Every payment on your camp account." />
+        <PanelHeader title="Payment history" description="Every payment attempt on your camp account, successful or not." />
         {visible.length === 0 ? (
           <div className="p-5">
             <EmptyState
-              title="Nothing paid yet"
-              description="Your camp account opens as soon as your first payment lands."
+              title="No payments yet"
+              description="Every payment you make, and any that don't go through, will be listed here."
               action={
                 <ButtonLink href={payUrl} className="mt-4">
                   Make a payment <Arrow />
@@ -64,19 +66,11 @@ export default async function PortalPaymentsPage() {
                     {dateTimeLabel.format(payment.paidAt ?? payment.createdAt)} ·{" "}
                     {METHOD_LABEL[payment.method] ?? payment.method}
                   </p>
-                  {payment.note ? <p className="mt-1 text-xs text-ink-45">{payment.note}</p> : null}
+                  {payment.note ? <p className={payment.status === "SUCCESS" ? "mt-1 text-xs text-ink-45" : "mt-1 text-xs text-danger"}>{payment.note}</p> : null}
                 </div>
                 <div className="flex items-center gap-3">
-                  <Badge
-                    tone={
-                      payment.status === "SUCCESS"
-                        ? "success"
-                        : payment.status === "REVERSED"
-                          ? "danger"
-                          : "neutral"
-                    }
-                  >
-                    {payment.status.toLowerCase()}
+                  <Badge tone={PAYMENT_STATUS[payment.status].tone}>
+                    {PAYMENT_STATUS[payment.status].label}
                   </Badge>
                   <p className="font-mono text-sm font-semibold">{formatKobo(payment.amountKobo)}</p>
                 </div>

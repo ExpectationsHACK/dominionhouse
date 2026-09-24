@@ -1,0 +1,3 @@
+-- AlterEnum
+ALTER TYPE "PaymentStatus" ADD VALUE 'DECLINED';
+ALTER TYPE "PaymentStatus" ADD VALUE 'ABANDONED';

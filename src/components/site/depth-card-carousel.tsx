@@ -49,10 +49,12 @@ function DepthCard({
   item,
   index,
   still,
+  numbered,
 }: {
   item: DepthCardItem;
   index: number;
   still: boolean;
+  numbered: boolean;
 }) {
   const ref = useRef<HTMLElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0, active: false });
@@ -137,10 +139,12 @@ function DepthCard({
             transition,
           }}
         >
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-brass">
-            {String(index + 1).padStart(2, "0")}
-          </p>
-          <h3 className="display mt-2 text-3xl text-white">{item.title}</h3>
+          {numbered ? (
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-brass">
+              {String(index + 1).padStart(2, "0")}
+            </p>
+          ) : null}
+          <h3 className={cn("display text-3xl text-white", numbered && "mt-2")}>{item.title}</h3>
           {item.subtitle ? (
             <p className="mt-2 text-sm leading-relaxed text-white/70">{item.subtitle}</p>
           ) : null}
@@ -150,7 +154,17 @@ function DepthCard({
   );
 }
 
-export function DepthCardCarousel({ items }: { items: DepthCardItem[] }) {
+export function DepthCardCarousel({
+  items,
+  label = "Fresh Fire gallery",
+  numbered = true,
+}: {
+  items: DepthCardItem[];
+  /** Show the 01, 02… counter on each card. */
+  numbered?: boolean;
+  /** Accessible name for the scrolling track. */
+  label?: string;
+}) {
   const trackRef = useRef<HTMLDivElement>(null);
   const still = usePrefersReducedMotion();
   const [atStart, setAtStart] = useState(true);
@@ -223,11 +237,11 @@ export function DepthCardCarousel({ items }: { items: DepthCardItem[] }) {
       <div
         ref={trackRef}
         role="group"
-        aria-label="Fresh Fire gallery"
+        aria-label={label}
         className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-2 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {items.map((item, index) => (
-          <DepthCard key={item.id} item={item} index={index} still={still} />
+          <DepthCard key={item.id} item={item} index={index} still={still} numbered={numbered} />
         ))}
       </div>
 
