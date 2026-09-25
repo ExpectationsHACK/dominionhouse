@@ -1,8 +1,8 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
-import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache";
+import kvIncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/kv-incremental-cache";
 
-// R2 holds the rendered pages for the routes that revalidate on a timer (the
-// homepage refreshes every 60 seconds).
+// KV holds the rendered pages for the routes that revalidate on a timer (the
+// homepage refreshes every 60 seconds). It needs no extra setup, unlike R2.
 export default defineCloudflareConfig({
-  incrementalCache: r2IncrementalCache,
+  incrementalCache: kvIncrementalCache,
 });

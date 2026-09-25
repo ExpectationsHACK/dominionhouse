@@ -15,10 +15,10 @@
       "service": "dominion-house"
     }
   ],
-  "r2_buckets": [
+  "kv_namespaces": [
     {
-      "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      "bucket_name": "dominion-house-opennext-cache"
+      "binding": "NEXT_INC_CACHE_KV",
+      "id": "53000a2ca4c749aab33b34a428542ce6"
     }
   ],
   "observability": { "enabled": true }
