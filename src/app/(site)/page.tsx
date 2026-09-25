@@ -1,5 +1,3 @@
-import { existsSync } from "node:fs";
-import { join } from "node:path";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DepthCardCarousel, type DepthCardItem } from "@/components/site/depth-card-carousel";
@@ -53,32 +51,36 @@ const NEXT_STEPS = [
 ] as const;
 
 /**
- * The Senior Pastors. A photo is picked up automatically when a file with the
- * matching name is dropped into public/pastors/ (see the README there), and
- * Admin, Website content can replace the whole list.
+ * The Senior Pastors. Photos are the files in public/pastors/, replace one by
+ * dropping in a new file with the same name. Admin, Website content can replace
+ * the whole list.
  */
-const SENIOR_PASTORS = [
-  { slug: "dotun-arifalo", name: "Rev Dotun Arifalo", role: "Founder / Senior Pastor" },
-  { slug: "vincent-arifalo", name: "Pastor Vincent Arifalo", role: "Senior Pastor" },
-  { slug: "isoa-okojie", name: "Pastor Isoa Okojie", role: "Senior Pastor" },
-  { slug: "ayomide-olofinjana", name: "Pastor Ayomide Olofinjana", role: "Senior Pastor" },
-] as const;
-
-const PHOTO_EXTENSIONS = ["jpg", "jpeg", "png", "webp"] as const;
-
-function seniorPastorCards(): DepthCardItem[] {
-  return SENIOR_PASTORS.map((pastor) => {
-    const found = PHOTO_EXTENSIONS.find((extension) =>
-      existsSync(join(process.cwd(), "public", "pastors", `${pastor.slug}.${extension}`)),
-    );
-    return {
-      id: pastor.slug,
-      title: pastor.name,
-      subtitle: pastor.role,
-      imageUrl: found ? `/pastors/${pastor.slug}.${found}` : null,
-    };
-  });
-}
+const SENIOR_PASTORS: DepthCardItem[] = [
+  {
+    id: "dotun-arifalo",
+    title: "Rev Dotun Arifalo",
+    subtitle: "Founder / Senior Pastor",
+    imageUrl: "/pastors/dotun-arifalo.jpg",
+  },
+  {
+    id: "vincent-arifalo",
+    title: "Pastor Vincent Arifalo",
+    subtitle: "Senior Pastor",
+    imageUrl: "/pastors/vincent-arifalo.jpg",
+  },
+  {
+    id: "isoa-okojie",
+    title: "Pastor Isoa Okojie",
+    subtitle: "Senior Pastor",
+    imageUrl: "/pastors/isoa-okojie.jpg",
+  },
+  {
+    id: "ayomide-olofinjana",
+    title: "Pastor Ayomide Olofinjana",
+    subtitle: "Senior Pastor",
+    imageUrl: "/pastors/ayomide-olofinjana.jpg",
+  },
+];
 
 export default async function HomePage() {
   const camp = await getActiveCamp();
@@ -98,7 +100,7 @@ export default async function HomePage() {
         subtitle: row.subtitle,
         imageUrl: row.imageUrl,
       }))
-    : seniorPastorCards();
+    : SENIOR_PASTORS;
 
   return (
     <>

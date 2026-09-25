@@ -7,6 +7,9 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "lint": "eslint",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
@@ -18,6 +21,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.20.6",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "@react-email/components": "^1.0.12",
@@ -50,7 +54,8 @@
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
     "typescript": "^5",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.1",
+    "wrangler": "^4.140.0"
   },
   "allowScripts": {
     "esbuild@0.28.2": true,

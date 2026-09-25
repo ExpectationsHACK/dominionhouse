@@ -1,7 +1,6 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { ImageResponse } from "next/og";
 import { requireRegistrant } from "@/lib/auth";
+import { LOGO_DATA_URL } from "@/lib/logo-data";
 import { campDateRange } from "@/lib/dates";
 import { CATEGORY_LABEL } from "@/lib/pricing";
 import { ticketQrDataUrl } from "@/lib/registration";
@@ -19,11 +18,8 @@ export async function GET() {
   if (!ticket) return new Response("No ticket yet.", { status: 404 });
   if (ticket.status === "REVOKED") return new Response("This ticket has been revoked.", { status: 403 });
 
-  const [qr, logoBytes] = await Promise.all([
-    ticketQrDataUrl(ticket.qrPayload),
-    readFile(path.join(process.cwd(), "public", "dominion-house-logo.png")),
-  ]);
-  const logo = `data:image/png;base64,${logoBytes.toString("base64")}`;
+  const qr = await ticketQrDataUrl(ticket.qrPayload);
+  const logo = LOGO_DATA_URL;
 
   const room = registrant.roomAssignment
     ? `${registrant.roomAssignment.room.block} ${registrant.roomAssignment.room.name}${

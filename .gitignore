@@ -45,3 +45,8 @@ next-env.d.ts
 # keep the template, ignore local tooling
 !.env.example
 .claude/
+
+# Cloudflare / OpenNext
+.open-next
+.wrangler
+.dev.vars
