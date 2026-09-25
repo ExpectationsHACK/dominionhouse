@@ -174,7 +174,7 @@ export default async function HomePage() {
                 open, and you can pay in instalments.
               </p>
 
-              <dl className="grid grid-cols-3 gap-6 border-t border-white/15 pt-6">
+              <dl className="grid grid-cols-2 gap-6 border-t border-white/15 pt-6">
                 <div>
                   <dt className="eyebrow text-white/40">Days away</dt>
                   <dd className="display mt-2 text-4xl text-brass">{daysAway}</dd>
@@ -184,10 +184,6 @@ export default async function HomePage() {
                   <dd className="display mt-2 text-4xl">
                     {cheapest !== null ? formatKobo(cheapest) : ", "}
                   </dd>
-                </div>
-                <div>
-                  <dt className="eyebrow text-white/40">Spaces</dt>
-                  <dd className="display mt-2 text-4xl">{camp.capacity ?? ", "}</dd>
                 </div>
               </dl>
             </div>

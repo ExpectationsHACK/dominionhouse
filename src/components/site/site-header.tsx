@@ -103,28 +103,42 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
       </div>
 
       {open ? (
-        <div id="mobile-nav" className="border-t border-ink/12 bg-bone lg:hidden">
-          <nav aria-label="Mobile" className="mx-auto max-w-[1400px] px-5 py-4 sm:px-8">
+        <>
+          {/* Dims the page beneath the menu; a tap on it closes the menu. */}
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-hidden="true"
+            onClick={() => setOpenOnPath(null)}
+            className="absolute inset-x-0 top-full -z-10 h-dvh bg-ink/40 lg:hidden"
+          />
+          {/* The header (4rem) plus this panel come to 70% of the screen height;
+              anything longer scrolls inside it. */}
+          <div
+            id="mobile-nav"
+            className="max-h-[calc(70dvh-4rem)] overflow-y-auto border-t border-ink/12 bg-bone lg:hidden"
+          >
+          <nav aria-label="Mobile" className="mx-auto max-w-[1400px] px-5 py-2 sm:px-8">
             {NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center justify-between border-b border-ink/10 py-4 text-2xl display"
+                className="display flex items-center justify-between border-b border-ink/10 py-3 text-xl"
               >
                 {item.label}
                 <Arrow className="h-4 w-4 text-ink-45" />
               </Link>
             ))}
-            <div className="mt-5 flex flex-col gap-2.5">
+            <div className="mt-4 flex flex-col gap-2 pb-2">
               <Link
                 href="/camp/register"
-                className="flex items-center justify-center gap-2 border border-ink bg-ink px-5 py-3.5 text-[12px] font-semibold uppercase tracking-[0.1em] text-white"
+                className="flex items-center justify-center gap-2 border border-ink bg-ink px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.1em] text-white"
               >
                 Register for camp <Arrow />
               </Link>
               <Link
                 href="/portal"
-                className="flex items-center justify-center gap-2 border border-ink/25 px-5 py-3.5 text-[12px] font-semibold uppercase tracking-[0.1em]"
+                className="flex items-center justify-center gap-2 border border-ink/25 px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.1em]"
               >
                 {signedInFirstName ? (
                   <>
@@ -138,7 +152,8 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
               </Link>
             </div>
           </nav>
-        </div>
+          </div>
+        </>
       ) : null}
     </header>
   );
