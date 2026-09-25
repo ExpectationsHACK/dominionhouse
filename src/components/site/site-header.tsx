@@ -112,11 +112,11 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
             onClick={() => setOpenOnPath(null)}
             className="absolute inset-x-0 top-full -z-10 h-dvh bg-ink/40 lg:hidden"
           />
-          {/* The header (4rem) plus this panel come to 70% of the screen height;
+          {/* The header (4rem) plus this panel come to at most 80% of the screen height;
               anything longer scrolls inside it. */}
           <div
             id="mobile-nav"
-            className="max-h-[calc(70dvh-4rem)] overflow-y-auto border-t border-ink/12 bg-bone lg:hidden"
+            className="max-h-[calc(80dvh-4rem)] overflow-y-auto border-t border-ink/12 bg-bone lg:hidden"
           >
           <nav aria-label="Mobile" className="mx-auto max-w-[1400px] px-5 py-2 sm:px-8">
             {NAV.map((item) => (
