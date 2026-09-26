@@ -167,6 +167,7 @@ export async function registerForCamp(
     category: tier.label,
     amountDue: tier.amountKobo,
     paymentUrl: appUrl(`/camp/payment?email=${encodeURIComponent(registrant.email)}`),
+    portalUrl: appUrl("/portal"),
   });
 
   await sendEmail({

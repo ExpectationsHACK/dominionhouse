@@ -77,26 +77,32 @@ export function registrationReceivedEmail(args: {
   category: string;
   amountDue: number;
   paymentUrl: string;
+  portalUrl: string;
 }) {
   const firstName = escapeHtml(args.firstName);
+  const registrationCode = escapeHtml(args.registrationCode);
   return {
-    subject: `You're registered, complete your ${CAMP_NAME} payment`,
+    subject: `You're registered for ${CAMP_NAME}, ${args.registrationCode}`,
     html: shell(
-      h(`Hello ${firstName}, your spot is held.`) +
+      h(`You're registered, ${firstName}.`) +
         p(
-          `We have your registration for ${CAMP_NAME}. It becomes a confirmed place, and your ticket is issued, the moment your balance reaches zero.`,
+          `Your registration for ${CAMP_NAME} is complete and your place is held. Keep your registration number, you'll be asked for it at the camp desk.`,
         ) +
         table(
-          row("Registration", args.registrationCode) +
+          row("Registration no.", registrationCode) +
             row("Ticket type", args.category) +
-            row("Amount due", formatKobo(args.amountDue)),
+            row("Camp fee", formatKobo(args.amountDue)) +
+            row("Paid so far", formatKobo(0)) +
+            row("Balance", formatKobo(args.amountDue)),
         ) +
-        p(`You can pay in full, or start with a part-payment and clear the rest before camp.`) +
+        p(
+          `<strong>Your ticket will be emailed to you once your payment is complete</strong>, that is, when your balance reaches zero. Until then you can pay in full, or start with a part-payment and clear the rest before camp.`,
+        ) +
         button(args.paymentUrl, "Make a payment") +
         p(
-          `<span style="color:#74747c;font-size:13px;">Your camp profile is already open. Sign in any time with this email address, no password needed.</span>`,
+          `Or <a href="${args.portalUrl}" style="color:${INK};font-weight:600;">open your camp profile</a> to see your balance, payments, room and schedule. <span style="color:#74747c;font-size:13px;">To sign in on another device, use the email address and phone number you registered with, no password needed.</span>`,
         ),
-      `Registration ${args.registrationCode} received. Balance ${formatKobo(args.amountDue)}.`,
+      `You're registered, ${args.registrationCode}. Balance ${formatKobo(args.amountDue)}.`,
     ),
   };
 }
@@ -189,7 +195,7 @@ export function ticketEmail(args: {
         stub +
         button(args.portalUrl, "Open my camp profile") +
         p(
-          `<span style="color:#74747c;font-size:13px;">Your profile has your schedule, room and payment history. Sign in with this email address any time.</span>`,
+          `<span style="color:#74747c;font-size:13px;">Your profile has your schedule, room and payment history. Sign in any time with the email address and phone number you registered with.</span>`,
         ),
       `Ticket ${args.ticketCode}, ${CAMP_NAME}`,
     ),

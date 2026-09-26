@@ -17,7 +17,8 @@
     "db:reset": "prisma migrate reset --force",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:int": "vitest run --config vitest.int.config.mts"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.6",

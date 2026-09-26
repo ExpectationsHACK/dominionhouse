@@ -10,7 +10,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["tests/**/*.test.ts"],
+    include: ["tests/*.test.ts"], // tests/int hits the real database, see vitest.int.config.mts
     // Tests never touch a real database or payment/email provider.
     env: {
       DATABASE_URL: "postgresql://test:test@localhost:5432/test",

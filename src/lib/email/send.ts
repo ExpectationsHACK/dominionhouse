@@ -1,9 +1,17 @@
 import "server-only";
 import { Resend } from "resend";
+import { CONTACT_EMAIL } from "@/lib/church";
 import { db } from "@/lib/db";
 
 const API_KEY = process.env.RESEND_API_KEY?.trim() ?? "";
 const FROM = process.env.EMAIL_FROM?.trim() || "Dominion House <camp@dominionhouse.org>";
+
+/**
+ * Replies go to a real inbox. The sending address (FFC27@…) is only a sender
+ * name on the verified domain, it has no mailbox, so without this a reply
+ * would bounce.
+ */
+const REPLY_TO = process.env.EMAIL_REPLY_TO?.trim() || CONTACT_EMAIL;
 
 export const emailMode: "live" | "console" = API_KEY ? "live" : "console";
 
@@ -45,6 +53,7 @@ export async function sendEmail(args: SendArgs) {
   try {
     const result = await resend.emails.send({
       from: FROM,
+      replyTo: REPLY_TO,
       to: args.to,
       subject: args.subject,
       html: args.html,
