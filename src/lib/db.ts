@@ -57,14 +57,23 @@ const onWorkers =
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const db: PrismaClient = onWorkers
-  ? new Proxy({} as PrismaClient, {
-      get(_target, property) {
-        const client = clientForThisRequest();
-        const value = Reflect.get(client, property);
-        return typeof value === "function" ? value.bind(client) : value;
-      },
-    })
-  : (globalForPrisma.prisma ?? createClient({ max: 5 }));
+function currentClient(): PrismaClient {
+  if (onWorkers) return clientForThisRequest();
 
-if (!onWorkers && process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+  // Node: one shared client (kept across dev reloads).
+  globalForPrisma.prisma ??= createClient({ max: 5 });
+  return globalForPrisma.prisma;
+}
+
+/**
+ * The client is created on first use, not when this file is imported, so a
+ * build that never touches the database (`next build` collects route config
+ * without querying) doesn't need DATABASE_URL to be set.
+ */
+export const db: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, property) {
+    const client = currentClient();
+    const value = Reflect.get(client, property);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+});
