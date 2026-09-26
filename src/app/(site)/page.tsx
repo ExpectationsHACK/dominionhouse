@@ -4,6 +4,7 @@ import { DepthCardCarousel, type DepthCardItem } from "@/components/site/depth-c
 import { HillContours } from "@/components/site/hill-contours";
 import { LighthouseCards } from "@/components/site/lighthouse-cards";
 import { MissionCards } from "@/components/site/mission-cards";
+import { SplashLoader } from "@/components/site/splash-loader";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { campLockup, getActiveCamp } from "@/lib/camp";
 import { daysUntil } from "@/lib/dates";
@@ -104,6 +105,8 @@ export default async function HomePage() {
 
   return (
     <>
+      <SplashLoader />
+
       {/* ── hero ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
         <HillContours className="absolute inset-x-0 bottom-0 h-[70%] w-full text-brass" lines={16} />

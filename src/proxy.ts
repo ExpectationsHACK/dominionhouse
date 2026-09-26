@@ -1,4 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  COOKIE_BASE,
+  PORTAL_COOKIE,
+  PORTAL_MAX_AGE,
+  PORTAL_RENEW_AFTER,
+  signToken,
+  verifyToken,
+} from "@/lib/session-token";
 
 /**
  * Content Security Policy with a per-request nonce.
@@ -12,7 +20,30 @@ import { NextResponse, type NextRequest } from "next/server";
  * inline style attributes, which a nonce cannot cover. Style injection is a
  * much smaller risk than script injection.
  */
-export function proxy(request: NextRequest) {
+/**
+ * Keeps a registrant signed in for as long as they keep using the site: a
+ * login older than a day is re-issued with a fresh year on the next page visit.
+ * Only page loads (GET) renew it. A sign-out is a POST that deletes the cookie,
+ * and renewing on top of that would quietly undo it.
+ */
+async function renewPortalLogin(request: NextRequest, response: NextResponse) {
+  if (request.method !== "GET" || !process.env.AUTH_SECRET) return;
+
+  const session = await verifyToken<{ registrantId?: string; email?: string }>(
+    request.cookies.get(PORTAL_COOKIE)?.value,
+  );
+  if (!session?.registrantId || !session.email || !session.iat) return;
+
+  if (Date.now() / 1000 - session.iat < PORTAL_RENEW_AFTER) return;
+
+  const token = await signToken(
+    { registrantId: session.registrantId, email: session.email },
+    PORTAL_MAX_AGE,
+  );
+  response.cookies.set(PORTAL_COOKIE, token, { ...COOKIE_BASE, maxAge: PORTAL_MAX_AGE });
+}
+
+export async function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const isDev = process.env.NODE_ENV === "development";
 
@@ -38,6 +69,7 @@ export function proxy(request: NextRequest) {
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", policy);
+  await renewPortalLogin(request, response);
   return response;
 }
 
