@@ -21,5 +21,12 @@
       "id": "53000a2ca4c749aab33b34a428542ce6"
     }
   ],
+  // Custom domains: Cloudflare creates the DNS records and certificates. The old
+  // site's records for these names have to be gone before the first deploy.
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "dominionhouse.org", "custom_domain": true },
+    { "pattern": "www.dominionhouse.org", "custom_domain": true }
+  ],
   "observability": { "enabled": true }
 }
