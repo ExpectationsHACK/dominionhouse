@@ -31,7 +31,7 @@ function form(email: string, extra: Record<string, string> = {}) {
     position: "DISCIPLE", lighthouse: "Guest", emergencyName: "Em Ergency", emergencyPhone: "08031234568",
     paymentPlan: "INSTALLMENT", installmentChoice: "4", agreeTerms: "on", consentPhoto: "on", ...extra,
   };
-  for (const [k, v] of Object.entries(fields)) data.set(k, v);
+  for (const [k, v] of Object.entries(fields)) if (v !== undefined) data.set(k, v);
   return data;
 }
 
@@ -70,10 +70,12 @@ describe("registerForCamp on the real database", () => {
   });
 
   it("Pay later registers the same way and goes straight to the camp profile", async () => {
-    const { redirectTo } = await submit(form(EMAILS[1], { payLater: "1" }));
+    // Exactly what the form posts for "Pay later": pay-in-full stored, plus the flag.
+    const { redirectTo } = await submit(form(EMAILS[1], { payLater: "1", paymentPlan: "FULL", installmentChoice: undefined as unknown as string }));
     expect(redirectTo).toBe("/portal");
     const registrant = await db.registrant.findFirstOrThrow({ where: { email: EMAILS[1] } });
     expect(registrant.status).toBe("PENDING");
+    expect(registrant.paymentPlan).toBe("FULL");
     expect(await db.emailLog.count({ where: { to: EMAILS[1], template: "registration-received", status: "SENT" } })).toBe(1);
   });
 

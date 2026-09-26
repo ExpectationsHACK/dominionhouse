@@ -39,7 +39,7 @@ const STEP_FIELDS: Record<number, string[]> = {
   1: ["registeringAs", "firstName", "lastName", "email", "phone", "gender"],
   2: ["position", "lighthouse", "region"],
   3: ["emergencyName", "emergencyPhone"],
-  4: ["paymentPlan", "installmentChoice", "agreeTerms"],
+  4: ["paymentChoice", "installmentChoice", "agreeTerms"],
 };
 
 const SPLITS = [2, 3, 4, 5] as const;
@@ -65,7 +65,11 @@ export function RegisterForm({
   const [state, formAction] = useActionState(registerForCamp, initialState);
   const [step, setStep] = useState(1);
   const [registeringAs, setRegisteringAs] = useState<"ADULT" | "STUDENT" | "TEEN" | "CHILD">("ADULT");
-  const [paymentPlan, setPaymentPlan] = useState<"FULL" | "INSTALLMENT">("FULL");
+  // What they picked on the last step. "LATER" is not a plan of its own: it is stored
+  // as pay-in-full (they choose properly on the payment page) and only changes
+  // where they land after registering.
+  const [paymentChoice, setPaymentChoice] = useState<"FULL" | "INSTALLMENT" | "LATER">("FULL");
+  const paymentPlan = paymentChoice === "INSTALLMENT" ? "INSTALLMENT" : "FULL";
   const [installmentChoice, setInstallmentChoice] = useState<"2" | "3" | "4" | "5" | "CUSTOM">("2");
 
   // The card answers "what does my ticket cost?" the moment they pick; the
@@ -405,28 +409,40 @@ export function RegisterForm({
             >
               <div className="grid gap-2.5">
                 <RadioCard
-                  name="paymentPlan"
+                  name="paymentChoice"
                   value="FULL"
                   label="Pay in full now"
                   description="One payment, ticket issued straight away."
                   meta={tier ? formatKobo(tier.amountKobo) : undefined}
                   required
-                  checked={paymentPlan === "FULL"}
-                  onChange={() => setPaymentPlan("FULL")}
+                  checked={paymentChoice === "FULL"}
+                  onChange={() => setPaymentChoice("FULL")}
                 />
                 {installmentsEnabled ? (
                   <RadioCard
-                    name="paymentPlan"
+                    name="paymentChoice"
                     value="INSTALLMENT"
                     label="Pay in instalments"
                     description={`Spread it out. Your ticket is issued when the balance clears, minimum ${formatKobo(effectiveMinimum)} to start.`}
                     meta={holdAmount ? `from ${formatKobo(holdAmount)}` : undefined}
-                    checked={paymentPlan === "INSTALLMENT"}
-                    onChange={() => setPaymentPlan("INSTALLMENT")}
+                    checked={paymentChoice === "INSTALLMENT"}
+                    onChange={() => setPaymentChoice("INSTALLMENT")}
                   />
                 ) : null}
+                <RadioCard
+                  name="paymentChoice"
+                  value="LATER"
+                  label="Pay later"
+                  description="Register now and pay whenever you're ready from your camp profile. Your ticket is issued once your balance is cleared."
+                  checked={paymentChoice === "LATER"}
+                  onChange={() => setPaymentChoice("LATER")}
+                />
               </div>
             </Field>
+
+            {/* The server reads the plan and the pay-later flag from these. */}
+            <input type="hidden" name="paymentPlan" value={paymentPlan} />
+            {paymentChoice === "LATER" ? <input type="hidden" name="payLater" value="1" /> : null}
 
             {paymentPlan === "INSTALLMENT" && installmentsEnabled ? (
               <Field
@@ -522,8 +538,9 @@ export function RegisterForm({
                   <span className="display text-3xl">{formatKobo(tier.amountKobo)}</span>
                 </p>
                 <p className="mt-3 text-xs leading-relaxed text-white/55">
-                  Nothing is charged yet. You&apos;ll go to the payment page next, and your camp profile
-                  opens as soon as you register.
+                  {paymentChoice === "LATER"
+                    ? "Nothing is charged. You'll go straight to your camp profile, where you can pay any time."
+                    : "Nothing is charged yet. You'll go to the payment page next, and your camp profile opens as soon as you register."}
                 </p>
               </div>
             ) : (
@@ -544,20 +561,9 @@ export function RegisterForm({
                 Continue <Arrow />
               </Button>
             ) : (
-              <div className="ml-auto flex flex-wrap items-center gap-2.5">
-                {/* Registers exactly the same way, then lands on the camp profile
-                    instead of the payment page. */}
-                <SubmitButton
-                  name="payLater"
-                  value="1"
-                  variant="outline"
-                  withArrow={false}
-                  pendingLabel="Registering…"
-                >
-                  Pay later
-                </SubmitButton>
-                <SubmitButton pendingLabel="Registering…">Register and pay</SubmitButton>
-              </div>
+              <SubmitButton className="ml-auto" pendingLabel="Registering…">
+                {paymentChoice === "LATER" ? "Register now" : "Register and pay"}
+              </SubmitButton>
             )}
           </div>
 
