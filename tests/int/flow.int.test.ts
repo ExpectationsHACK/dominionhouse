@@ -67,6 +67,8 @@ describe("registration -> payments -> ticket, on the real database", () => {
     expect(await paymentStatus("INT-P3")).toBe("ABANDONED");
     await settlePayment({ reference: "INT-P3", verifiedAmountKobo: 500_000 });
     expect(await paymentStatus("INT-P3")).toBe("SUCCESS");
+    // The earlier "not completed" note must not stay on a payment that succeeded.
+    expect((await db.payment.findUniqueOrThrow({ where: { reference: "INT-P3" } })).note).toBeNull();
     expect((await getTotals(registrantId)).paidKobo).toBe(2_000_000);
   });
 

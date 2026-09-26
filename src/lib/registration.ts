@@ -181,10 +181,14 @@ export async function settlePayment(args: {
       paidAt: args.paidAt ?? new Date(),
       channel: args.channel ?? payment.channel,
       gatewayRaw: (args.gatewayRaw as never) ?? undefined,
-      note:
-        amountKobo !== payment.amountKobo
-          ? [payment.note, "Amount adjusted to provider-verified value."].filter(Boolean).join(" ")
-          : payment.note,
+      // A payment recorded as failed/declined/abandoned and later confirmed keeps
+      // no stale failure reason on what is now a successful payment.
+      note: (() => {
+        const carried = payment.status === "PENDING" ? payment.note : null;
+        return amountKobo !== payment.amountKobo
+          ? [carried, "Amount adjusted to provider-verified value."].filter(Boolean).join(" ")
+          : carried;
+      })(),
     },
   });
 
