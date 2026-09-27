@@ -5,7 +5,6 @@ import { HillContours } from "@/components/site/hill-contours";
 import { Logo } from "@/components/site/logo";
 import { Eyebrow } from "@/components/ui";
 import { getAdminSession } from "@/lib/session";
-import { db } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Staff sign-in",
@@ -14,12 +13,6 @@ export const metadata: Metadata = {
 
 export default async function AdminLoginPage() {
   if (await getAdminSession()) redirect("/admin");
-
-  // Only shown while the seeded demo account still has its default password.
-  const seeded = await db.adminUser.findUnique({
-    where: { email: "admin@dominionhouse.org" },
-    select: { id: true },
-  });
 
   return (
     <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-ink px-5 py-16 text-white">
@@ -36,14 +29,6 @@ export default async function AdminLoginPage() {
         <div className="mt-9 bg-paper p-6 text-ink">
           <AdminLoginForm />
         </div>
-
-        {seeded ? (
-          <p className="mt-5 border border-white/15 px-4 py-3 font-mono text-[11px] leading-relaxed text-white/45">
-            Seeded account: admin@dominionhouse.org / DominionHouse2027!
-            <br />
-            Change this before going live.
-          </p>
-        ) : null}
       </div>
     </div>
   );

@@ -1,8 +1,9 @@
 import "dotenv/config";
+import { randomBytes } from "crypto";
 import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
-import type { Position, RoomGender, RoomType, ScheduleType } from "../src/generated/prisma/enums";
+import type { ScheduleType } from "../src/generated/prisma/enums";
 
 const db = new PrismaClient({
   // Prisma Postgres cold-starts a suspended database, which can take over a
@@ -71,9 +72,9 @@ async function main() {
   // ── pricing ────────────────────────────────────────────────────────────────
   const tiers = [
     { category: "ADULT" as const, label: "Adult", amount: 50_000, ageMin: 20, ageMax: null, sortOrder: 1, description: "Done with university, or 20 and above. Full board, shared accommodation, all sessions." },
-    { category: "STUDENT" as const, label: "Campus Student", amount: 35_000, ageMin: 15, ageMax: null, sortOrder: 2, description: "In a tertiary institution, or on NYSC." },
-    { category: "TEEN" as const, label: "Teenager", amount: 35_000, ageMin: 13, ageMax: 17, sortOrder: 3, description: "13–17. Supervised block, own track of sessions." },
-    { category: "CHILD" as const, label: "Children", amount: 35_000, ageMin: 0, ageMax: 12, sortOrder: 4, description: "0–12. Must be registered with a parent or guardian." },
+    { category: "STUDENT" as const, label: "Campus Student", amount: 35_000, ageMin: 15, ageMax: null, sortOrder: 2, description: "In a tertiary institution, or a recent graduate." },
+    { category: "TEEN" as const, label: "Teenager", amount: 20_000, ageMin: 12, ageMax: 17, sortOrder: 3, description: "12–17. Supervised block, own track of sessions." },
+    { category: "CHILD" as const, label: "Children", amount: 15_000, ageMin: 0, ageMax: 11, sortOrder: 4, description: "0–11, free under 5. Must be registered with a parent or guardian." },
   ];
 
   for (const tier of tiers) {
@@ -100,42 +101,9 @@ async function main() {
   }
 
   // ── rooms ──────────────────────────────────────────────────────────────────
-  const roomPlan: {
-    block: string;
-    prefix: string;
-    count: number;
-    capacity: number;
-    gender: RoomGender;
-    type: RoomType;
-    minPosition?: Position;
-  }[] = [
-    { block: "Carmel", prefix: "C", count: 6, capacity: 2, gender: "MIXED", type: "PRIVATE", minPosition: "CAMPUS_PASTOR" },
-    { block: "Eden", prefix: "E", count: 8, capacity: 4, gender: "MALE", type: "SHARED", minPosition: "TEAM_COORDINATOR" },
-    { block: "Hermon", prefix: "H", count: 8, capacity: 4, gender: "FEMALE", type: "SHARED", minPosition: "TEAM_COORDINATOR" },
-    { block: "Zion", prefix: "Z", count: 10, capacity: 12, gender: "MALE", type: "DORMITORY" },
-    { block: "Bethel", prefix: "B", count: 10, capacity: 12, gender: "FEMALE", type: "DORMITORY" },
-    { block: "Olive", prefix: "O", count: 6, capacity: 6, gender: "MIXED", type: "FAMILY" },
-  ];
-
-  for (const plan of roomPlan) {
-    for (let index = 1; index <= plan.count; index += 1) {
-      const name = `${plan.prefix}${String(index).padStart(2, "0")}`;
-      await db.room.upsert({
-        where: { campId_block_name: { campId: camp.id, block: plan.block, name } },
-        update: { minPosition: plan.minPosition ?? null },
-        create: {
-          campId: camp.id,
-          block: plan.block,
-          name,
-          capacity: plan.capacity,
-          gender: plan.gender,
-          type: plan.type,
-          minPosition: plan.minPosition ?? null,
-          floor: index <= plan.count / 2 ? "Ground" : "Upper",
-        },
-      });
-    }
-  }
+  // Rooms are not seeded. Once the venue's actual room names and numbers are
+  // known, they're added from /admin/rooms and assigned there to paid
+  // registrants, not invented ahead of time here.
 
   // ── schedule ───────────────────────────────────────────────────────────────
   const schedule: {
@@ -196,13 +164,22 @@ async function main() {
   }
 
   // ── staff ──────────────────────────────────────────────────────────────────
+  // The super admin's real password is never committed. On a fresh database
+  // (local dev, a new environment) set SEED_ADMIN_PASSWORD before seeding, or
+  // a random one-time password is generated and printed below; on an
+  // existing database, upsert's `update` branch below never touches a
+  // password, so re-seeding production is always a no-op for this account.
+  const superAdminPassword = process.env.SEED_ADMIN_PASSWORD || randomBytes(9).toString("base64url");
+
   const staff = [
-    { name: "Camp Administrator", email: "admin@dominionhouse.org", role: "SUPER_ADMIN" as const, password: "DominionHouse2027!" },
+    { name: "Camp Administrator", email: "dominionhs@gmail.com", role: "SUPER_ADMIN" as const, password: superAdminPassword },
     { name: "Finance Desk", email: "finance@dominionhouse.org", role: "FINANCE" as const, password: "DominionHouse2027!" },
     { name: "Registration Desk", email: "registration@dominionhouse.org", role: "REGISTRATION" as const, password: "DominionHouse2027!" },
   ];
 
+  let createdSuperAdmin = false;
   for (const person of staff) {
+    const existing = await db.adminUser.findUnique({ where: { email: person.email } });
     await db.adminUser.upsert({
       where: { email: person.email },
       update: { name: person.name, role: person.role, isActive: true },
@@ -213,6 +190,7 @@ async function main() {
         passwordHash: await bcrypt.hash(person.password, 10),
       },
     });
+    if (!existing && person.email === "dominionhs@gmail.com") createdSuperAdmin = true;
   }
 
   // ── announcements ──────────────────────────────────────────────────────────
@@ -285,7 +263,10 @@ async function main() {
   console.log("✓ Camp cards:", await db.siteMedia.count({ where: { placement: "CAMP_CARDS" } }));
   console.log("✓ Rooms:", await db.room.count({ where: { campId: camp.id } }));
   console.log("✓ Schedule items:", await db.scheduleItem.count({ where: { campId: camp.id } }));
-  console.log("✓ Staff logins: admin@dominionhouse.org / DominionHouse2027!");
+  console.log("✓ Staff: dominionhs@gmail.com, finance@dominionhouse.org, registration@dominionhouse.org");
+  if (createdSuperAdmin && !process.env.SEED_ADMIN_PASSWORD) {
+    console.log(`  New super-admin password (only shown once, save it now): ${superAdminPassword}`);
+  }
 }
 
 main()

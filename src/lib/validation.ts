@@ -179,6 +179,43 @@ export const siteMediaSchema = z
     path: ["videoUrl"],
   });
 
+/**
+ * A registrant entered by staff, cash at the desk, a lighthouse coordinator's
+ * paper list, someone with no internet. Looser than the public registrationSchema:
+ * no terms checkbox, no instalment plan, emergency contact still required
+ * because the camp desk genuinely needs it if something goes wrong.
+ */
+export const adminRegistrantSchema = z.object({
+  registeringAs: z.enum(["ADULT", "STUDENT", "TEEN", "CHILD"], {
+    message: "Choose a ticket type",
+  }),
+  firstName: z.string().trim().min(2, "Enter a first name").max(60),
+  lastName: z.string().trim().min(2, "Enter a last name").max(60),
+  email: emailSchema,
+  phone: phoneSchema,
+  gender: z.enum(["MALE", "FEMALE"], { message: "Select a gender" }),
+  position: z.enum(POSITION_OPTIONS, { message: "Choose a position" }),
+  branch: z.string().trim().max(80).optional().or(z.literal("")),
+  lighthouse: z.string().trim().max(80).optional().or(z.literal("")),
+  region: z.string().trim().max(80).optional().or(z.literal("")),
+  isFirstCamp: z.coerce.boolean().optional(),
+  city: z.string().trim().max(80).optional().or(z.literal("")),
+  state: z.string().trim().max(80).optional().or(z.literal("")),
+  wantsPersonalAccommodation: z.coerce.boolean().optional(),
+  transportNeeded: z.coerce.boolean().optional(),
+  emergencyName: z.string().trim().min(2, "Enter an emergency contact name").max(80),
+  emergencyPhone: phoneSchema,
+  emergencyRelation: z.string().trim().max(40).optional().or(z.literal("")),
+  medicalNotes: z.string().trim().max(600).optional().or(z.literal("")),
+  allergies: z.string().trim().max(600).optional().or(z.literal("")),
+  amountPaidNaira: z.coerce.number().min(0).optional(),
+  paymentMethod: z.enum(["BANK_TRANSFER", "CASH", "POS", "WAIVER"]).optional(),
+  paymentReference: z.string().trim().max(80).optional().or(z.literal("")),
+  sendEmail: z.coerce.boolean().optional(),
+});
+
+export type AdminRegistrantInput = z.infer<typeof adminRegistrantSchema>;
+
 export const adminUserSchema = z.object({
   name: z.string().trim().min(2, "Enter a name").max(80),
   email: emailSchema,

@@ -71,13 +71,27 @@ export default async function RegistrantsPage({
           <Eyebrow>{total} matching</Eyebrow>
           <h1 className="display mt-2 text-5xl">Registrants</h1>
         </div>
-        <Link
-          href={`/admin/registrants/export?${exportQuery.toString()}`}
-          className="border border-ink px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors hover:bg-ink hover:text-white"
-          prefetch={false}
-        >
-          Export CSV
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/admin/registrants/import"
+            className="border border-ink px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors hover:bg-ink hover:text-white"
+          >
+            Import CSV
+          </Link>
+          <Link
+            href={`/admin/registrants/export?${exportQuery.toString()}`}
+            className="border border-ink px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors hover:bg-ink hover:text-white"
+            prefetch={false}
+          >
+            Export CSV
+          </Link>
+          <Link
+            href="/admin/registrants/new"
+            className="bg-ink px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:bg-ink/85"
+          >
+            Add registrant
+          </Link>
+        </div>
       </header>
 
       <FilterBar action="/admin/registrants" activeCount={activeFilters} searchValue={filters.q}>

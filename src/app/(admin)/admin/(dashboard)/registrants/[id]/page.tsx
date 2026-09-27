@@ -23,6 +23,7 @@ import {
   DataRow,
   Eyebrow,
   Meter,
+  Notice,
   Panel,
   PanelHeader,
   StatusBadge,
@@ -43,12 +44,15 @@ export const metadata: Metadata = { title: "Registrant", robots: { index: false 
 
 export default async function RegistrantDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ created?: string }>;
 }) {
   const admin = await requireAdmin();
   const camp = await requireActiveCamp();
   const { id } = await params;
+  const { created } = await searchParams;
 
   const registrant = await db.registrant.findUnique({
     where: { id },
@@ -79,6 +83,8 @@ export default async function RegistrantDetailPage({
 
   return (
     <div className="space-y-6">
+      {created ? <Notice tone="success">Registered. The record below is live.</Notice> : null}
+
       <nav className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-45">
         <Link href="/admin/registrants" className="hover:text-ink">
           Registrants
