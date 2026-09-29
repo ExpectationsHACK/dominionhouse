@@ -241,7 +241,7 @@ async function main() {
     { title: "Teaching", imageUrl: "/camp/teaching.jpg" },
     { title: "Worship", imageUrl: "/camp/worship.jpg" },
     { title: "Prayer", imageUrl: "/camp/prayer.jpg" },
-    { title: "Breakouts", imageUrl: "/camp/breakouts.jpg" },
+    { title: "Fresh Fire", imageUrl: "/camp/breakouts.jpg" },
     { title: "Impartation", imageUrl: "/camp/impartation.jpg" },
   ];
 

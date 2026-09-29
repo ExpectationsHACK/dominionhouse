@@ -120,7 +120,7 @@ export default async function HomePage() {
         <div className="relative mx-auto max-w-[1400px] px-5 pb-10 pt-16 sm:px-8 sm:pb-12 sm:pt-24">
           <Eyebrow className="text-brass">{CHURCH.descriptor}</Eyebrow>
           <h1 className="display mt-6 text-[clamp(2.5rem,8.5vw,7rem)]">
-            The people of purpose,
+            A people of purpose,
             <br />
             passion and{" "}
             <span className="text-brass">power</span>,

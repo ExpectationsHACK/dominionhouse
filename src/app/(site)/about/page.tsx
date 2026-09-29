@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { HillContours } from "@/components/site/hill-contours";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import {
@@ -176,14 +177,28 @@ export default function AboutPage() {
           <Eyebrow>Leadership</Eyebrow>
           <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">Meet our Senior Pastors</h2>
 
-          <div className="mt-14 grid gap-px bg-ink/12 lg:grid-cols-2">
+          <div className="mt-14 grid gap-8 sm:grid-cols-2">
             {SENIOR_PASTOR_BIOS.map((pastor) => (
-              <article key={pastor.name} className="bg-bone p-7 sm:p-9">
-                <h3 className="display text-3xl">{pastor.name}</h3>
-                <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-45">
-                  {pastor.title}
-                </p>
-                <p className="mt-5 text-[15px] leading-relaxed text-ink-70">{pastor.body}</p>
+              <article key={pastor.name} className="border border-ink/15 bg-paper p-5 sm:p-7">
+                <div className="flex items-start gap-5">
+                  <Image
+                    src={pastor.imageUrl}
+                    alt={pastor.name}
+                    width={160}
+                    height={190}
+                    className="h-32 w-28 shrink-0 border border-ink/12 object-cover sm:h-40 sm:w-32"
+                  />
+                  <div className="min-w-0 pt-1">
+                    <h3 className="display text-2xl leading-[1.05] sm:text-3xl">{pastor.name}</h3>
+                    <span className="mt-3 inline-block border border-brass/40 bg-brass-soft px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-ink">
+                      {pastor.title}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-6 border-t border-dashed border-ink/25 pt-5">
+                  <p className="text-[15px] leading-relaxed text-ink-70">{pastor.body}</p>
+                </div>
               </article>
             ))}
           </div>

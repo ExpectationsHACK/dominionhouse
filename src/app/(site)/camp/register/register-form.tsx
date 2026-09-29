@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { registerForCamp, type RegisterState } from "./actions";
 import { Arrow, ArrowLeft, Button, Eyebrow } from "@/components/ui";
 import {
@@ -19,6 +19,21 @@ import { amountDueKobo } from "@/lib/pricing";
 import { POSITION_LABEL, POSITION_OPTIONS } from "@/lib/positions";
 import { CAMPUS_REGIONS, LIGHTHOUSES_OR_MINISTRIES } from "@/lib/church";
 import { cn } from "@/lib/utils";
+import { fieldErrors, identityStep, logisticsStep } from "@/lib/validation";
+
+/** Which step a schema field lives on, so a server-side error (or an error
+ * caught before ever reaching the server) always lands the wizard on the
+ * step that actually shows it, instead of leaving a banner with no visible
+ * detail on whatever step the person happens to be looking at. */
+const FIELD_STEP: Record<string, number> = {
+  registeringAs: 1, firstName: 1, lastName: 1, email: 1, phone: 1, gender: 1, childAgeYears: 1,
+  position: 2, lighthouse: 2, region: 2, branch: 2, city: 2, state: 2,
+  ageGroup: 2, maritalStatus: 2, howHeard: 2, isFirstCamp: 2,
+  wantsPersonalAccommodation: 3, transportNeeded: 3, emergencyName: 3, emergencyPhone: 3,
+  emergencyRelation: 3, medicalNotes: 3, allergies: 3,
+  bringingChildren: 3, childrenUnder5: 3, children5to11: 3,
+  paymentPlan: 4, installmentChoice: 4, customFirstAmountNaira: 4, agreeTerms: 4, consentPhoto: 4,
+};
 
 const AGE_GROUPS = [
   { value: "AGE_18_25", label: "18–25" },
@@ -90,8 +105,27 @@ export function RegisterForm({
   const [lighthouse, setLighthouse] = useState("");
   const [childAgeYears, setChildAgeYears] = useState("");
   const [bringingChildren, setBringingChildren] = useState(false);
-  const [childrenUnder5, setChildrenUnder5] = useState(0);
-  const [children5to11, setChildren5to11] = useState(0);
+  // Strings, not numbers, so the field can be emptied to type a real value
+  // instead of snapping back to a "0" that has to be selected and overtyped.
+  const [childrenUnder5, setChildrenUnder5] = useState("0");
+  const [children5to11, setChildren5to11] = useState("0");
+  const childCountUnder5 = Number(childrenUnder5) || 0;
+  const childCount5to11 = Number(children5to11) || 0;
+  const bringingAnyChildren =
+    registeringAs === "ADULT" && bringingChildren && childCountUnder5 + childCount5to11 > 0;
+  const totalTicketCount = 1 + (bringingAnyChildren ? childCountUnder5 + childCount5to11 : 0);
+  const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+
+  // A server-side rejection (or a check caught before ever submitting) always
+  // has its field on some step; jump there so the error is actually visible
+  // instead of leaving a banner with no visible detail on whatever step the
+  // person happens to be looking at.
+  useEffect(() => {
+    const keys = Object.keys(state.errors ?? {});
+    if (keys.length === 0) return;
+    const earliest = Math.min(...keys.map((key) => FIELD_STEP[key] ?? 4));
+    setStep((current) => Math.min(current, earliest));
+  }, [state.errors]);
 
   // The card answers "what does my ticket cost?" the moment they pick; the
   // server looks the real price up from the chosen category again.
@@ -112,11 +146,38 @@ export function RegisterForm({
       lighthouse,
       childAgeYears: registeringAs === "CHILD" ? (childAgeYears === "" ? null : Number(childAgeYears)) : null,
       bringingChildren: registeringAs === "ADULT" && bringingChildren,
-      children5to11,
+      children5to11: childCount5to11,
       childFeeKobo: childTier?.amountKobo ?? 1_500_000,
     });
-  }, [tier, registeringAs, lighthouse, childAgeYears, bringingChildren, children5to11, childTier]);
+  }, [tier, registeringAs, lighthouse, childAgeYears, bringingChildren, childCount5to11, childTier]);
   const isFree = tier !== null && effectiveAmountKobo === 0;
+
+  /**
+   * A required-but-empty field is caught by checkValidity() below, but a
+   * field with something typed into it that still isn't valid, a phone
+   * number in the wrong shape being the real case this exists for, isn't:
+   * the browser sees a non-empty <input type="tel">, calls that valid, and
+   * only the server's stricter regex catches it, three steps later where
+   * the field itself is off-screen. Running the real schema here closes
+   * that gap before it's ever possible to advance past it.
+   */
+  function validateStep(keys: string[], schema: { safeParse: (data: unknown) => { success: boolean; error?: import("zod").ZodError } }) {
+    const form = document.getElementById("register-form") as HTMLFormElement | null;
+    if (!form) return true;
+    const data = Object.fromEntries(new FormData(form));
+    const subset = Object.fromEntries(keys.map((key) => [key, data[key]]));
+    const result = schema.safeParse(subset);
+    if (!result.success) {
+      setLocalErrors((current) => ({ ...current, ...fieldErrors(result.error!) }));
+      return false;
+    }
+    setLocalErrors((current) => {
+      const next = { ...current };
+      for (const key of keys) delete next[key];
+      return next;
+    });
+    return true;
+  }
 
   function goNext() {
     const form = document.getElementById("register-form") as HTMLFormElement | null;
@@ -134,6 +195,33 @@ export function RegisterForm({
       }
     }
 
+    if (
+      step === 1 &&
+      !validateStep(["registeringAs", "firstName", "lastName", "email", "phone", "gender"], identityStep)
+    ) {
+      return;
+    }
+    if (
+      step === 3 &&
+      !validateStep(
+        [
+          "wantsPersonalAccommodation",
+          "transportNeeded",
+          "emergencyName",
+          "emergencyPhone",
+          "emergencyRelation",
+          "medicalNotes",
+          "allergies",
+          "bringingChildren",
+          "childrenUnder5",
+          "children5to11",
+        ],
+        logisticsStep,
+      )
+    ) {
+      return;
+    }
+
     setStep((current) => Math.min(4, current + 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -141,6 +229,12 @@ export function RegisterForm({
   function goBack() {
     setStep((current) => Math.max(1, current - 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /** A pre-submit local catch and a post-submit server error both surface the
+   * same way, whichever one exists for this field. */
+  function errorFor(name: string) {
+    return localErrors[name] ?? state.errors?.[name];
   }
 
   // The floor is per-ticket, so the cheaper tiers can still split five ways.
@@ -219,7 +313,7 @@ export function RegisterForm({
             <Field
               label="Who is this registration for?"
               required
-              error={state.errors?.registeringAs}
+              error={errorFor("registeringAs")}
               hint="This sets the ticket price and what we ask for next. Enter the camper's own details below."
             >
               <div className="grid gap-2.5 sm:grid-cols-2">
@@ -239,10 +333,10 @@ export function RegisterForm({
             </Field>
 
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="First name" htmlFor="firstName" required error={state.errors?.firstName}>
+              <Field label="First name" htmlFor="firstName" required error={errorFor("firstName")}>
                 <Input id="firstName" name="firstName" required autoComplete="given-name" minLength={2} />
               </Field>
-              <Field label="Last name" htmlFor="lastName" required error={state.errors?.lastName}>
+              <Field label="Last name" htmlFor="lastName" required error={errorFor("lastName")}>
                 <Input id="lastName" name="lastName" required autoComplete="family-name" minLength={2} />
               </Field>
             </div>
@@ -251,17 +345,17 @@ export function RegisterForm({
               label="Email address"
               htmlFor="email"
               required
-              error={state.errors?.email}
+              error={errorFor("email")}
               hint="This is your camp login and where your ticket is sent. Use one you actually check."
             >
               <Input id="email" name="email" type="email" required autoComplete="email" inputMode="email" />
             </Field>
 
-            <Field label="Phone number" htmlFor="phone" required error={state.errors?.phone}>
+            <Field label="Phone number" htmlFor="phone" required error={errorFor("phone")}>
               <Input id="phone" name="phone" type="tel" required autoComplete="tel" placeholder="0803 123 4567" />
             </Field>
 
-            <Field label="Gender" required error={state.errors?.gender} hint="Used for room allocation.">
+            <Field label="Gender" required error={errorFor("gender")} hint="Used for room allocation.">
               <div className="grid gap-2.5 sm:grid-cols-2">
                 <RadioCard name="gender" value="MALE" label="Male" required />
                 <RadioCard name="gender" value="FEMALE" label="Female" required />
@@ -482,7 +576,8 @@ export function RegisterForm({
                         inputMode="numeric"
                         min={0}
                         value={childrenUnder5}
-                        onChange={(event) => setChildrenUnder5(Math.max(0, Number(event.target.value)))}
+                        onChange={(event) => setChildrenUnder5(event.target.value)}
+                        onBlur={() => setChildrenUnder5((current) => (current === "" ? "0" : current))}
                       />
                     </Field>
                     <Field
@@ -496,7 +591,8 @@ export function RegisterForm({
                         inputMode="numeric"
                         min={0}
                         value={children5to11}
-                        onChange={(event) => setChildren5to11(Math.max(0, Number(event.target.value)))}
+                        onChange={(event) => setChildren5to11(event.target.value)}
+                        onBlur={() => setChildren5to11((current) => (current === "" ? "0" : current))}
                       />
                     </Field>
                   </div>
@@ -511,7 +607,7 @@ export function RegisterForm({
                   label="Contact name"
                   htmlFor="emergencyName"
                   required
-                  error={state.errors?.emergencyName}
+                  error={errorFor("emergencyName")}
                 >
                   <Input id="emergencyName" name="emergencyName" required minLength={2} />
                 </Field>
@@ -519,7 +615,7 @@ export function RegisterForm({
                   label="Contact phone"
                   htmlFor="emergencyPhone"
                   required
-                  error={state.errors?.emergencyPhone}
+                  error={errorFor("emergencyPhone")}
                 >
                   <Input id="emergencyPhone" name="emergencyPhone" type="tel" required />
                 </Field>
@@ -528,7 +624,7 @@ export function RegisterForm({
                 label="Relationship"
                 htmlFor="emergencyRelation"
                 className="mt-5"
-                error={state.errors?.emergencyRelation}
+                error={errorFor("emergencyRelation")}
               >
                 <Input id="emergencyRelation" name="emergencyRelation" placeholder="Spouse, parent, sibling…" />
               </Field>
@@ -540,7 +636,7 @@ export function RegisterForm({
                 <Field
                   label="Medical notes"
                   htmlFor="medicalNotes"
-                  error={state.errors?.medicalNotes}
+                  error={errorFor("medicalNotes")}
                   hint="Conditions and medication. Seen only by the camp medical team."
                 >
                   <Textarea id="medicalNotes" name="medicalNotes" rows={3} />
@@ -548,7 +644,7 @@ export function RegisterForm({
                 <Field
                   label="Do you have any allergies?"
                   htmlFor="allergies"
-                  error={state.errors?.allergies}
+                  error={errorFor("allergies")}
                   hint="Food or otherwise. Leave blank if none."
                 >
                   <Textarea id="allergies" name="allergies" rows={2} />
@@ -705,8 +801,42 @@ export function RegisterForm({
             {tier ? (
               <div className="border border-ink bg-ink px-5 py-5 text-white">
                 <p className="eyebrow text-brass">Your total</p>
-                <p className="mt-2 flex items-baseline justify-between gap-4">
-                  <span className="display text-3xl">{tier.label} ticket</span>
+
+                {bringingAnyChildren ? (
+                  <>
+                    <p className="mt-3 text-xs uppercase tracking-[0.1em] text-white/50">
+                      {totalTicketCount} tickets: you and {childCountUnder5 + childCount5to11}{" "}
+                      {childCountUnder5 + childCount5to11 === 1 ? "child" : "children"}
+                    </p>
+                    <dl className="mt-3 space-y-2 border-t border-white/15 pt-3 text-sm">
+                      <div className="flex items-baseline justify-between gap-4">
+                        <dt>{tier.label} ticket</dt>
+                        <dd className="font-mono">{formatKobo(tier.amountKobo)}</dd>
+                      </div>
+                      {childCount5to11 > 0 ? (
+                        <div className="flex items-baseline justify-between gap-4">
+                          <dt>
+                            {childCount5to11} × child ticket (5–11)
+                          </dt>
+                          <dd className="font-mono">
+                            {formatKobo(childCount5to11 * (childTier?.amountKobo ?? 1_500_000))}
+                          </dd>
+                        </div>
+                      ) : null}
+                      {childCountUnder5 > 0 ? (
+                        <div className="flex items-baseline justify-between gap-4 text-white/60">
+                          <dt>{childCountUnder5} × child ticket (under 5)</dt>
+                          <dd>Free</dd>
+                        </div>
+                      ) : null}
+                    </dl>
+                  </>
+                ) : null}
+
+                <p className="mt-3 flex items-baseline justify-between gap-4 border-t border-white/15 pt-3">
+                  <span className="display text-3xl">
+                    {bringingAnyChildren ? "Total" : `${tier.label} ticket`}
+                  </span>
                   <span className="display text-3xl">
                     {isFree ? "Free" : formatKobo(effectiveAmountKobo)}
                   </span>
