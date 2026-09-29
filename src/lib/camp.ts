@@ -61,3 +61,18 @@ export function registrationIsOpen(camp: {
   if (camp.registrationClosesAt && now > camp.registrationClosesAt) return false;
   return true;
 }
+
+/**
+ * Whether today is one of the camp's calendar days, gate to the whole day
+ * rather than `startsAt`'s exact hour, so a scan during the arrival window
+ * (which starts hours before the opening service) still counts.
+ */
+export function isWithinCampDays(camp: { startsAt: Date; endsAt: Date }, now = new Date()) {
+  const startDay = new Date(
+    Date.UTC(camp.startsAt.getUTCFullYear(), camp.startsAt.getUTCMonth(), camp.startsAt.getUTCDate()),
+  );
+  const endDay = new Date(
+    Date.UTC(camp.endsAt.getUTCFullYear(), camp.endsAt.getUTCMonth(), camp.endsAt.getUTCDate(), 23, 59, 59, 999),
+  );
+  return now >= startDay && now <= endDay;
+}

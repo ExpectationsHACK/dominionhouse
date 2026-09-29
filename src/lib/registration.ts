@@ -79,8 +79,13 @@ export async function issueTicket(registrantId: string) {
   }
 }
 
+/**
+ * The QR encodes a URL, not the bare token, so any camera app on any phone
+ * opens the ticket page directly, no dedicated scanner app required. The
+ * token still doubles as the admin scanner's lookup key (see scanTicket).
+ */
 export async function ticketQrDataUrl(payload: string) {
-  return QRCode.toDataURL(payload, {
+  return QRCode.toDataURL(appUrl(`/t/${payload}`), {
     errorCorrectionLevel: "M",
     margin: 1,
     width: 360,

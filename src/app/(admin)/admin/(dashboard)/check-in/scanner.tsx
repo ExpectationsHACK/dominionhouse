@@ -18,6 +18,7 @@ const OUTCOME_STYLE: Record<string, { bg: string; label: string; tone: "success"
   revoked: { bg: "bg-danger text-white", label: "Revoked", tone: "danger" },
   unpaid: { bg: "bg-danger text-white", label: "Owes money", tone: "danger" },
   unknown: { bg: "bg-ink text-white", label: "Not found", tone: "neutral" },
+  early: { bg: "bg-meridian text-white", label: "Not checked in", tone: "neutral" },
 };
 
 export function Scanner() {
