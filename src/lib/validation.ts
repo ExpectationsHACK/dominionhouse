@@ -175,20 +175,33 @@ const mediaUrl = (label: string) =>
     .optional()
     .or(z.literal(""));
 
-/** A card in the hero gallery, the Fresh Fire carousel or the pastors carousel. */
+const VIDEO_PLACEMENTS = ["HERO_GALLERY", "CAMP_VIDEOS", "SERVICE_VIDEOS"] as const;
+
+/**
+ * A card in the hero gallery, the Fresh Fire or service video carousels, the
+ * pastors carousel, or a testimonial (subtitle carries the testimony text,
+ * so it gets far more room than a caption).
+ */
 export const siteMediaSchema = z
   .object({
-    placement: z.enum(["HERO_GALLERY", "CAMP_CARDS", "PASTORS"]),
+    placement: z.enum([
+      "HERO_GALLERY",
+      "CAMP_CARDS",
+      "PASTORS",
+      "CAMP_VIDEOS",
+      "SERVICE_VIDEOS",
+      "TESTIMONIALS",
+    ]),
     title: z.string().trim().min(2, "Give the card a label").max(40),
-    subtitle: z.string().trim().max(160).optional().or(z.literal("")),
+    subtitle: z.string().trim().max(600).optional().or(z.literal("")),
     videoUrl: mediaUrl("The video URL"),
     imageUrl: mediaUrl("The image URL"),
     linkUrl: mediaUrl("The link"),
     posterUrl: mediaUrl("The poster URL"),
     sortOrder: z.coerce.number().int().min(0).max(999),
   })
-  .refine((data) => data.placement !== "HERO_GALLERY" || Boolean(data.videoUrl), {
-    message: "A hero card needs a video URL",
+  .refine((data) => !VIDEO_PLACEMENTS.includes(data.placement as never) || Boolean(data.videoUrl), {
+    message: "This card needs a video URL",
     path: ["videoUrl"],
   });
 

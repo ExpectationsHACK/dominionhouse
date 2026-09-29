@@ -6,6 +6,7 @@ import { audit } from "@/lib/audit";
 import { requireAdmin } from "@/lib/auth";
 import { siteMediaSchema } from "@/lib/validation";
 import { setSetting, SETTING_KEYS } from "@/lib/settings";
+import type { MediaPlacement } from "@/generated/prisma/enums";
 
 export type ContentState = { ok?: string; error?: string };
 
@@ -103,7 +104,7 @@ export async function moveHeroMedia(
 
   const placement = String(formData.get("placement") ?? "HERO_GALLERY");
   const all = await db.siteMedia.findMany({
-    where: { placement: placement as "HERO_GALLERY" | "CAMP_CARDS" | "PASTORS" },
+    where: { placement: placement as MediaPlacement },
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
   });
 

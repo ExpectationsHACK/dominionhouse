@@ -3,7 +3,9 @@ import Image from "next/image";
 import flyer from "../../../../public/fresh-fire-camp.jpeg";
 import { DepthCardCarousel } from "@/components/site/depth-card-carousel";
 import { HillContours } from "@/components/site/hill-contours";
+import { TestimonialCarousel } from "@/components/site/testimonial-carousel";
 import { TicketCards } from "@/components/site/ticket-cards";
+import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { db } from "@/lib/db";
 import { campLockup, requireActiveCamp } from "@/lib/camp";
@@ -83,13 +85,21 @@ const FAQS = [
 export default async function CampOverviewPage() {
   const camp = await requireActiveCamp();
 
-  const [schedule, cards] = await Promise.all([
+  const [schedule, cards, campVideos, testimonialRows] = await Promise.all([
     db.scheduleItem.findMany({
       where: { campId: camp.id, isPublished: true },
       orderBy: [{ startsAt: "asc" }],
     }),
     db.siteMedia.findMany({
       where: { placement: "CAMP_CARDS", isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    }),
+    db.siteMedia.findMany({
+      where: { placement: "CAMP_VIDEOS", isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    }),
+    db.siteMedia.findMany({
+      where: { placement: "TESTIMONIALS", isActive: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     }),
   ]);
@@ -243,6 +253,51 @@ export default async function CampOverviewPage() {
                   id: card.id,
                   title: card.title,
                   imageUrl: card.imageUrl,
+                }))}
+              />
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* ── the feel of it, short clips ──────────────────────────────────── */}
+      {campVideos.length > 0 ? (
+        <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
+          <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+            <Eyebrow className="text-brass">A few seconds in the room</Eyebrow>
+            <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
+              What it feels like
+            </h2>
+
+            <div className="mt-14">
+              <VideoCarousel
+                label="Fresh Fire experience clips"
+                items={campVideos.map((video) => ({
+                  id: video.id,
+                  title: video.title,
+                  videoUrl: video.videoUrl!,
+                  posterUrl: video.posterUrl,
+                }))}
+              />
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* ── testimonials ─────────────────────────────────────────────────── */}
+      {testimonialRows.length > 0 ? (
+        <section className="border-b border-ink/12">
+          <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+            <Eyebrow>In their own words</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">Fresh Fire testimonies</h2>
+
+            <div className="mt-14">
+              <TestimonialCarousel
+                items={testimonialRows.map((row) => ({
+                  id: row.id,
+                  name: row.title,
+                  testimony: row.subtitle ?? "",
+                  imageUrl: row.imageUrl,
                 }))}
               />
             </div>

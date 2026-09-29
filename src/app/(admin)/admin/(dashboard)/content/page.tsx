@@ -9,7 +9,7 @@ import {
 } from "./actions";
 import { ActionForm } from "@/components/admin/action-form";
 import { Badge, Eyebrow, Notice, Panel, PanelHeader, Stat } from "@/components/ui";
-import { Checkbox, Field, Input } from "@/components/ui/form";
+import { Checkbox, Field, Input, Textarea } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -55,6 +55,30 @@ const SECTIONS = [
     description:
       "One card per pastor: the card label is their name, the line under it their role, and the image their photo (portrait, roughly 3:4). Until you add cards here, the homepage shows the four Senior Pastors already set up; adding any card here replaces that list, so re-add all of them.",
     needs: "image" as const,
+  },
+  {
+    placement: "CAMP_VIDEOS" as const,
+    title: "Fresh Fire experience clips",
+    where: "Camp page, the video carousel",
+    description:
+      "Short 5 to 10 second clips that give a feel for what camp is like. Muted, looping, no sound needed.",
+    needs: "video" as const,
+  },
+  {
+    placement: "SERVICE_VIDEOS" as const,
+    title: "Service experience clips",
+    where: "Homepage, the video carousel",
+    description:
+      "Short 5 to 10 second clips that give a feel for a Sunday service. Muted, looping, no sound needed.",
+    needs: "video" as const,
+  },
+  {
+    placement: "TESTIMONIALS" as const,
+    title: "Camp testimonials",
+    where: "Camp page, the testimonial carousel",
+    description:
+      "One card per testimony: the label is their name, the image their photo, and the caption their testimony, in their own words.",
+    needs: "testimonial" as const,
   },
 ];
 
@@ -216,6 +240,18 @@ export default async function ContentPage() {
                                 />
                               </Field>
                             ) : null}
+                            {section.needs === "testimonial" ? (
+                              <Field label="Testimony" htmlFor={`subtitle-${item.id}`} required>
+                                <Textarea
+                                  id={`subtitle-${item.id}`}
+                                  name="subtitle"
+                                  defaultValue={item.subtitle ?? ""}
+                                  maxLength={600}
+                                  rows={4}
+                                  required
+                                />
+                              </Field>
+                            ) : null}
                             {section.needs === "video" ? (
                               <Field
                                 label="Video URL"
@@ -328,7 +364,13 @@ export default async function ContentPage() {
                       name="title"
                       required
                       maxLength={40}
-                      placeholder={section.needs === "video" ? "Worship" : "Teaching"}
+                      placeholder={
+                        section.needs === "video"
+                          ? "Worship"
+                          : section.needs === "testimonial"
+                            ? "Jane Doe"
+                            : "Teaching"
+                      }
                     />
                   </Field>
                   {section.needs === "image" ? (
@@ -338,6 +380,18 @@ export default async function ContentPage() {
                         name="subtitle"
                         maxLength={160}
                         placeholder="One line under the title"
+                      />
+                    </Field>
+                  ) : null}
+                  {section.needs === "testimonial" ? (
+                    <Field label="Testimony" htmlFor={`new-subtitle-${section.placement}`} required>
+                      <Textarea
+                        id={`new-subtitle-${section.placement}`}
+                        name="subtitle"
+                        maxLength={600}
+                        rows={4}
+                        required
+                        placeholder="In their own words"
                       />
                     </Field>
                   ) : null}

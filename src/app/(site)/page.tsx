@@ -5,6 +5,7 @@ import { HillContours } from "@/components/site/hill-contours";
 import { LighthouseCards } from "@/components/site/lighthouse-cards";
 import { MissionCards } from "@/components/site/mission-cards";
 import { SplashLoader } from "@/components/site/splash-loader";
+import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { campLockup, getActiveCamp } from "@/lib/camp";
 import { daysUntil } from "@/lib/dates";
@@ -90,10 +91,16 @@ export default async function HomePage() {
     : null;
   const daysAway = camp ? daysUntil(camp.startsAt) : null;
 
-  const pastorRows = await db.siteMedia.findMany({
-    where: { placement: "PASTORS", isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-  });
+  const [pastorRows, serviceVideos] = await Promise.all([
+    db.siteMedia.findMany({
+      where: { placement: "PASTORS", isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    }),
+    db.siteMedia.findMany({
+      where: { placement: "SERVICE_VIDEOS", isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    }),
+  ]);
   const pastors: DepthCardItem[] = pastorRows.length
     ? pastorRows.map((row) => ({
         id: row.id,
@@ -153,6 +160,30 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── the feel of a service, short clips ───────────────────────────── */}
+      {serviceVideos.length > 0 ? (
+        <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
+          <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+            <Eyebrow className="text-brass">A few seconds in the room</Eyebrow>
+            <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
+              What a service feels like
+            </h2>
+
+            <div className="mt-14">
+              <VideoCarousel
+                label="Service experience clips"
+                items={serviceVideos.map((video) => ({
+                  id: video.id,
+                  title: video.title,
+                  videoUrl: video.videoUrl!,
+                  posterUrl: video.posterUrl,
+                }))}
+              />
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* ── camp band, the loudest moment on the page ───────────────────── */}
       {camp ? (

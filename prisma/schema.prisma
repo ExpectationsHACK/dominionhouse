@@ -543,6 +543,12 @@ enum MediaPlacement {
   CAMP_CARDS
   /// Pastor cards in the "Meet our pastors" carousel on the homepage.
   PASTORS
+  /// Short clips in the camp-experience video carousel on /camp.
+  CAMP_VIDEOS
+  /// Short clips in the service-experience video carousel on the homepage.
+  SERVICE_VIDEOS
+  /// Photo, name and testimony cards in the testimonial carousel on /camp.
+  TESTIMONIALS
 }
 
 /// Editable media used across the public site. Managed at /admin/content.

@@ -258,9 +258,44 @@ async function main() {
     }
   }
 
+  // ── experience video carousels ──────────────────────────────────────────────
+  // Same placeholder-footage caveat as the hero gallery above: swap these for
+  // real camp and service clips at /admin/content whenever they're ready.
+  const campVideos = [
+    { title: "Worship", videoUrl: "https://videos.pexels.com/video-files/3129671/3129671-hd_1920_1080_30fps.mp4" },
+    { title: "The Word", videoUrl: "https://videos.pexels.com/video-files/2278095/2278095-hd_1920_1080_30fps.mp4" },
+    { title: "Prayer", videoUrl: "https://videos.pexels.com/video-files/3045163/3045163-hd_1920_1080_25fps.mp4" },
+    { title: "Community", videoUrl: "https://videos.pexels.com/video-files/4114797/4114797-hd_1920_1080_25fps.mp4" },
+  ];
+
+  if ((await db.siteMedia.count({ where: { placement: "CAMP_VIDEOS" } })) === 0) {
+    for (const [index, video] of campVideos.entries()) {
+      await db.siteMedia.create({
+        data: { placement: "CAMP_VIDEOS", title: video.title, videoUrl: video.videoUrl, sortOrder: index },
+      });
+    }
+  }
+
+  const serviceVideos = [
+    { title: "Worship", videoUrl: "https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4" },
+    { title: "The Word", videoUrl: "https://videos.pexels.com/video-files/6981411/6981411-hd_1920_1080_25fps.mp4" },
+    { title: "Community", videoUrl: "https://videos.pexels.com/video-files/3255275/3255275-hd_1920_1080_25fps.mp4" },
+    { title: "Prayer", videoUrl: "https://videos.pexels.com/video-files/2098989/2098989-hd_1920_1080_30fps.mp4" },
+  ];
+
+  if ((await db.siteMedia.count({ where: { placement: "SERVICE_VIDEOS" } })) === 0) {
+    for (const [index, video] of serviceVideos.entries()) {
+      await db.siteMedia.create({
+        data: { placement: "SERVICE_VIDEOS", title: video.title, videoUrl: video.videoUrl, sortOrder: index },
+      });
+    }
+  }
+
   console.log("✓ Camp:", camp.name);
   console.log("✓ Hero cards:", await db.siteMedia.count({ where: { placement: "HERO_GALLERY" } }));
   console.log("✓ Camp cards:", await db.siteMedia.count({ where: { placement: "CAMP_CARDS" } }));
+  console.log("✓ Camp videos:", await db.siteMedia.count({ where: { placement: "CAMP_VIDEOS" } }));
+  console.log("✓ Service videos:", await db.siteMedia.count({ where: { placement: "SERVICE_VIDEOS" } }));
   console.log("✓ Rooms:", await db.room.count({ where: { campId: camp.id } }));
   console.log("✓ Schedule items:", await db.scheduleItem.count({ where: { campId: camp.id } }));
   console.log("✓ Staff: dominionhs@gmail.com, finance@dominionhouse.org, registration@dominionhouse.org");
