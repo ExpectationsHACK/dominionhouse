@@ -5,11 +5,11 @@ import { paymentReference, registrationCode } from "@/lib/codes";
 import { sendEmail } from "@/lib/email/send";
 import { registrationReceivedEmail } from "@/lib/email/templates";
 import { formatKobo, toKobo } from "@/lib/money";
-import { CATEGORY_LABEL } from "@/lib/pricing";
-import { settlePayment } from "@/lib/registration";
+import { amountDueKobo, CATEGORY_LABEL } from "@/lib/pricing";
+import { issueTicket, sendTicketEmail, settlePayment } from "@/lib/registration";
 import type { AdminRegistrantInput } from "@/lib/validation";
 import type { AdminSession } from "@/lib/session";
-import type { Position } from "@/generated/prisma/enums";
+import type { AgeGroup, HowHeard, MaritalStatus, Position } from "@/generated/prisma/enums";
 
 export type ManualRegistrationResult =
   | { ok: true; registrantId: string; registrationCode: string }
@@ -45,9 +45,24 @@ export async function createManualRegistrant(
     };
   }
 
+  const childTier = camp.priceTiers.find((priceTier) => priceTier.category === "CHILD");
+  const bringingChildren = category === "ADULT" && Boolean(input.bringingChildren);
+  const children5to11 = bringingChildren ? (input.children5to11 ?? 0) : 0;
+  const childrenUnder5 = bringingChildren ? (input.childrenUnder5 ?? 0) : 0;
+
+  const finalAmountKobo = amountDueKobo({
+    category,
+    tierAmountKobo: tier.amountKobo,
+    lighthouse,
+    childAgeYears: category === "CHILD" ? (input.childAgeYears ?? null) : null,
+    bringingChildren,
+    children5to11,
+    childFeeKobo: childTier?.amountKobo ?? 15_000_00,
+  });
+
   const amountKobo = toKobo(input.amountPaidNaira ?? 0);
-  if (amountKobo > tier.amountKobo) {
-    return { ok: false, error: `${formatKobo(amountKobo)} is more than the ${formatKobo(tier.amountKobo)} ticket costs.` };
+  if (amountKobo > finalAmountKobo) {
+    return { ok: false, error: `${formatKobo(amountKobo)} is more than the ${formatKobo(finalAmountKobo)} due.` };
   }
 
   const existing = await db.registrant.findUnique({
@@ -80,12 +95,19 @@ export async function createManualRegistrant(
       allergies: input.allergies || null,
       category,
       priceTierId: tier.id,
-      amountDueKobo: tier.amountKobo,
+      amountDueKobo: finalAmountKobo,
+      age: category === "CHILD" ? (input.childAgeYears ?? null) : null,
+      ageGroup: category === "ADULT" ? ((input.ageGroup || null) as AgeGroup | null) : null,
+      maritalStatus: category === "ADULT" ? ((input.maritalStatus || null) as MaritalStatus | null) : null,
+      howHeard: (input.howHeard || null) as HowHeard | null,
+      bringingChildren,
+      childrenUnder5,
+      children5to11,
       wantsPersonalAccommodation: Boolean(input.wantsPersonalAccommodation),
       transportNeeded: Boolean(input.transportNeeded),
       paymentPlan: "FULL",
       consentPhoto: false,
-      status: "PENDING",
+      status: finalAmountKobo === 0 ? "PAID" : "PENDING",
       notes: "Registered by the camp desk.",
     },
   });
@@ -95,7 +117,7 @@ export async function createManualRegistrant(
       firstName: registrant.firstName,
       registrationCode: registrant.registrationCode,
       category: tier.label,
-      amountDue: tier.amountKobo,
+      amountDue: finalAmountKobo,
       paymentUrl: appUrl(`/camp/payment?email=${encodeURIComponent(registrant.email)}`),
       portalUrl: appUrl("/portal"),
     });
@@ -106,6 +128,11 @@ export async function createManualRegistrant(
       template: "registration-received",
       registrantId: registrant.id,
     });
+  }
+
+  if (finalAmountKobo === 0) {
+    await issueTicket(registrant.id);
+    await sendTicketEmail(registrant.id);
   }
 
   if (amountKobo > 0) {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Arrow, ArrowLeft, ButtonLink, DataRow, Eyebrow, Notice, Panel } from "@/components/ui";
+import { WhatsAppCta } from "@/components/site/whatsapp-cta";
 import { db } from "@/lib/db";
 import { formatKobo } from "@/lib/money";
 import { isMockPayments, verifyTransaction } from "@/lib/paystack";
@@ -154,6 +155,10 @@ export default async function PaymentCallbackPage({
                 Pay the balance
               </ButtonLink>
             ) : null}
+          </div>
+
+          <div className="mt-8">
+            <WhatsAppCta />
           </div>
         </>
       ) : (

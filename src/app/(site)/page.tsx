@@ -33,8 +33,8 @@ export const revalidate = 60;
 const NEXT_STEPS = [
   {
     href: "/locations",
-    title: "Find your lighthouse",
-    body: `Nine lighthouses across ${COUNTRY_COUNT} countries, from Ikorodu to Calgary. Tell us you're coming and someone will be looking out for you.`,
+    title: "Find a lighthouse close to you",
+    body: `Nine lighthouses across ${COUNTRY_COUNT} countries, from Jumofak to Calgary. Tell us you're coming and someone will be looking out for you.`,
     cta: "See all locations",
   },
   {
@@ -112,18 +112,19 @@ export default async function HomePage() {
         <HillContours className="absolute inset-x-0 bottom-0 h-[70%] w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 pb-10 pt-16 sm:px-8 sm:pb-12 sm:pt-24">
           <Eyebrow className="text-brass">{CHURCH.descriptor}</Eyebrow>
-          <h1 className="display mt-6 text-[clamp(3rem,11.5vw,9.5rem)]">
-            Raising
+          <h1 className="display mt-6 text-[clamp(2.5rem,8.5vw,7rem)]">
+            The people of purpose,
             <br />
-            kingdom
+            passion and{" "}
+            <span className="text-brass">power</span>,
             <br />
-            <span className="text-brass">leaders</span>
+            empowered by God&apos;s Word and Spirit
+            <br />
+            to reign in life as kings
           </h1>
           <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
             <p className="max-w-xl text-lg leading-relaxed text-white/70">
-              A people of purpose, passion and power, empowered by God&apos;s Word and Spirit to
-              reign in life as kings, taking territories and establishing the rulership of Christ in
-              every place.
+              We have a mandate to raise one million leaders.
             </p>
             <div className="flex flex-wrap gap-2.5">
               <ButtonLink href="/locations" variant="brass" size="lg">

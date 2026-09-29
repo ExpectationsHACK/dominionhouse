@@ -14,6 +14,7 @@ const valid = {
   emergencyPhone: "+2348031234567",
   paymentPlan: "FULL",
   agreeTerms: "on",
+  howHeard: "SOCIAL_MEDIA",
 };
 
 describe("registration validation", () => {

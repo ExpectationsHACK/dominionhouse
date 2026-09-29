@@ -183,6 +183,40 @@ export const SCRIPTURES = [
   },
 ] as const;
 
+// ── what we believe ──────────────────────────────────────────────────────────
+
+export const WHAT_WE_BELIEVE = [
+  "We believe that Jesus is Lord, in his incarnate birth, his death and that he resurrected for the salvation of the world.",
+  "We believe that the Bible is the written word of God written by men inspired by the Holy Spirit.",
+  "We believe in the mystery of the Holy Trinity, God the Father, Son and Holy Spirit.",
+  "We believe in praying in tongues always, as a form of personal and public devotion.",
+  "We believe in the manifestations, gifts and expressions of the Holy Spirit, in healings, miracles, signs and wonders.",
+  "We believe the great commission is the prime and most important activity of the church and everything else is secondary.",
+  "We believe that the Church is God's idea and plan for restoration of the world.",
+  "We believe in church attendance, fellowship, sharing, and love among members of the church.",
+  "We believe in the prosperity of the body through intentional giving in our church, sharing among ourselves, giving to missions and kingdom projects.",
+  "We believe that God uses both male and female in the work of the ministry, and so can be ordained based on the premise of individual calling and not gender.",
+  "We believe every believer has a purpose, calling, and assignment, and fulfilling this should be their chief aim in life.",
+  "We believe in evangelism, discipleship, goal setting and leadership in administering the work of the ministry.",
+  "We believe in the eternal salvation of men.",
+  "We believe that every member is a disciple and a discipler of men.",
+] as const;
+
+// ── senior pastors ───────────────────────────────────────────────────────────
+
+export const SENIOR_PASTOR_BIOS = [
+  {
+    name: "Rev Dotun Arifalo",
+    title: "Founder / Senior Pastor",
+    body: "A passionate preacher of the word of God, intensely consumed with the mission of Christ, go and make disciples. She has an unusual grace for prayer that has transformed lives in various nations across the globe. She is a developer of men, a broker of gifts, and an apostle to the nations. She is the visionary of this great movement together with her husband, Pastor Vincent Arifalo.",
+  },
+  {
+    name: "Pastor Vincent Arifalo",
+    title: "Senior Pastor",
+    body: "A medical doctor by training but a prolific teacher of the word by calling. He is passionate about preaching the undiluted Christocentric word of God and developing solid disciples for the mission of Christ. He is a worshipper, a student of Christ, a father and a strong anchor to many.",
+  },
+] as const;
+
 // ── weekly gatherings ────────────────────────────────────────────────────────
 
 export type Gathering = {
@@ -273,7 +307,7 @@ export const CAMPUSES: Campus[] = [
   },
   {
     slug: "ikorodu",
-    name: "Ikorodu",
+    name: "Jumofak",
     region: "Lagos",
     country: "Nigeria",
     address: "No. 134 Lagos Road, Blue House, Jumofak Bus Stop, Opposite Conoil, Ikorodu",
@@ -358,6 +392,9 @@ export const HEAD_CAMPUS = CAMPUSES[0];
 
 /** The official website inbox, used wherever the site speaks for the church. */
 export const CONTACT_EMAIL = "dominionhs@gmail.com";
+
+/** Where every registrant is invited to join once their registration is settled. */
+export const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/EvML4DUEjBx1lHwP2qSgdc";
 
 /**
  * Lighthouses a registrant can belong to, the campuses, under the name the

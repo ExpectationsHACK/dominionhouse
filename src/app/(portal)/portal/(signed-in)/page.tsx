@@ -10,6 +10,7 @@ import {
   Panel,
   PanelHeader,
 } from "@/components/ui";
+import { WhatsAppCta } from "@/components/site/whatsapp-cta";
 import { requireRegistrant } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { dayLabel, daysUntil, timeLabel } from "@/lib/dates";
@@ -23,9 +24,14 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function PortalOverviewPage() {
+export default async function PortalOverviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ joined?: string }>;
+}) {
   const registrant = await requireRegistrant();
   const totals = totalsFor(registrant);
+  const { joined } = await searchParams;
 
   const [nextUp, announcements] = await Promise.all([
     db.scheduleItem.findMany({
@@ -42,6 +48,8 @@ export default async function PortalOverviewPage() {
 
   return (
     <div className="space-y-6">
+      {joined === "1" ? <WhatsAppCta /> : null}
+
       {!totals.isSettled ? (
         <Notice tone="warn" title={`${formatKobo(totals.balanceKobo)} left on your camp fee`}>
           <p className="mt-1">

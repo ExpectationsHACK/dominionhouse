@@ -15,9 +15,25 @@ import {
 } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { effectiveMinimumKobo, formatKobo, perInstallmentKobo } from "@/lib/money";
+import { amountDueKobo } from "@/lib/pricing";
 import { POSITION_LABEL, POSITION_OPTIONS } from "@/lib/positions";
 import { CAMPUS_REGIONS, LIGHTHOUSES_OR_MINISTRIES } from "@/lib/church";
 import { cn } from "@/lib/utils";
+
+const AGE_GROUPS = [
+  { value: "AGE_18_25", label: "18–25" },
+  { value: "AGE_26_35", label: "26–35" },
+  { value: "AGE_36_50", label: "36–50" },
+  { value: "AGE_51_70", label: "51–70" },
+] as const;
+
+const HOW_HEARD = [
+  { value: "SOCIAL_MEDIA", label: "Social media" },
+  { value: "MEMBER_OR_PARTNER", label: "I am a member/partner" },
+  { value: "THROUGH_A_FRIEND", label: "Through a friend" },
+  { value: "THROUGH_EMAIL", label: "Through email" },
+  { value: "THROUGH_SMS", label: "Through SMS" },
+] as const;
 
 type Tier = {
   id: string;
@@ -36,8 +52,8 @@ const STEPS = [
 
 /** Fields the browser must find valid before a step will advance. */
 const STEP_FIELDS: Record<number, string[]> = {
-  1: ["registeringAs", "firstName", "lastName", "email", "phone", "gender"],
-  2: ["position", "lighthouse", "region"],
+  1: ["registeringAs", "firstName", "lastName", "email", "phone", "gender", "childAgeYears"],
+  2: ["position", "lighthouse", "region", "ageGroup", "maritalStatus", "howHeard"],
   3: ["emergencyName", "emergencyPhone"],
   4: ["paymentChoice", "installmentChoice", "agreeTerms"],
 };
@@ -46,9 +62,9 @@ const SPLITS = [2, 3, 4, 5] as const;
 
 const REGISTERING_AS = [
   { value: "ADULT", label: "An adult", description: "Done with university, or 20 and above." },
-  { value: "STUDENT", label: "A campus student", description: "In a tertiary institution, or on NYSC." },
-  { value: "TEEN", label: "A teenager", description: "13–17." },
-  { value: "CHILD", label: "A child", description: "12 and under. You register on their behalf." },
+  { value: "STUDENT", label: "A campus student", description: "In a tertiary institution, or a recent graduate." },
+  { value: "TEEN", label: "A teenager", description: "12–17." },
+  { value: "CHILD", label: "A child", description: "11 and under, free under 5. You register on their behalf." },
 ] as const;
 
 const initialState: RegisterState = { ok: false };
@@ -71,6 +87,11 @@ export function RegisterForm({
   const [paymentChoice, setPaymentChoice] = useState<"FULL" | "INSTALLMENT" | "LATER">("FULL");
   const paymentPlan = paymentChoice === "INSTALLMENT" ? "INSTALLMENT" : "FULL";
   const [installmentChoice, setInstallmentChoice] = useState<"2" | "3" | "4" | "5" | "CUSTOM">("2");
+  const [lighthouse, setLighthouse] = useState("");
+  const [childAgeYears, setChildAgeYears] = useState("");
+  const [bringingChildren, setBringingChildren] = useState(false);
+  const [childrenUnder5, setChildrenUnder5] = useState(0);
+  const [children5to11, setChildren5to11] = useState(0);
 
   // The card answers "what does my ticket cost?" the moment they pick; the
   // server looks the real price up from the chosen category again.
@@ -78,6 +99,24 @@ export function RegisterForm({
     () => tiers.find((candidate) => candidate.category === registeringAs) ?? null,
     [registeringAs, tiers],
   );
+  const childTier = useMemo(() => tiers.find((candidate) => candidate.category === "CHILD") ?? null, [tiers]);
+
+  // What they'll actually be charged, a Guest lighthouse, a free under-5 child
+  // ticket, and a surcharge for 5–11-year-olds tagging along all change this
+  // from the sticker price, the server works out the same number again.
+  const effectiveAmountKobo = useMemo(() => {
+    if (!tier) return 0;
+    return amountDueKobo({
+      category: registeringAs,
+      tierAmountKobo: tier.amountKobo,
+      lighthouse,
+      childAgeYears: registeringAs === "CHILD" ? (childAgeYears === "" ? null : Number(childAgeYears)) : null,
+      bringingChildren: registeringAs === "ADULT" && bringingChildren,
+      children5to11,
+      childFeeKobo: childTier?.amountKobo ?? 1_500_000,
+    });
+  }, [tier, registeringAs, lighthouse, childAgeYears, bringingChildren, children5to11, childTier]);
+  const isFree = tier !== null && effectiveAmountKobo === 0;
 
   function goNext() {
     const form = document.getElementById("register-form") as HTMLFormElement | null;
@@ -229,13 +268,35 @@ export function RegisterForm({
               </div>
             </Field>
 
+            {registeringAs === "CHILD" ? (
+              <Field
+                label="Child's age"
+                htmlFor="childAgeYears"
+                required
+                error={state.errors?.childAgeYears}
+                hint="Under 5 comes free. 5 to 11 pays the child fee."
+              >
+                <Input
+                  id="childAgeYears"
+                  name="childAgeYears"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={11}
+                  required
+                  value={childAgeYears}
+                  onChange={(event) => setChildAgeYears(event.target.value)}
+                />
+              </Field>
+            ) : null}
+
             {tier ? (
               <div className="border border-brass/40 bg-brass-soft px-4 py-3.5">
                 <p className="eyebrow text-ink-45">Your ticket</p>
                 <p className="mt-1.5 flex flex-wrap items-baseline justify-between gap-2">
                   <span className="display text-2xl">{tier.label}</span>
                   <span className="font-mono text-lg font-semibold">
-                    {formatKobo(tier.amountKobo)}
+                    {isFree ? "Free" : formatKobo(effectiveAmountKobo)}
                   </span>
                 </p>
                 {tier.description ? (
@@ -299,18 +360,52 @@ export function RegisterForm({
                     : "The Lighthouse or Ministry you belong to."
                 }
               >
-                <Select id="lighthouse" name="lighthouse" required defaultValue="">
+                <Select
+                  id="lighthouse"
+                  name="lighthouse"
+                  required
+                  defaultValue=""
+                  onChange={(event) => setLighthouse(event.target.value)}
+                >
                   <option value="" disabled>
                     Choose a Lighthouse or Ministry
                   </option>
-                  {LIGHTHOUSES_OR_MINISTRIES.map((lighthouse) => (
-                    <option key={lighthouse} value={lighthouse}>
-                      {lighthouse}
+                  {LIGHTHOUSES_OR_MINISTRIES.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
                     </option>
                   ))}
                 </Select>
+                {lighthouse === "Guest" && registeringAs !== "CHILD" ? (
+                  <p className="mt-1.5 text-xs font-medium text-meridian">
+                    Guests come free, there's nothing to pay.
+                  </p>
+                ) : null}
               </Field>
             )}
+
+            {registeringAs === "ADULT" ? (
+              <div className="grid gap-5 sm:grid-cols-2">
+                <Field label="Age group" htmlFor="ageGroup" required error={state.errors?.ageGroup}>
+                  <Select id="ageGroup" name="ageGroup" required defaultValue="">
+                    <option value="" disabled>
+                      Choose your age group
+                    </option>
+                    {AGE_GROUPS.map((group) => (
+                      <option key={group.value} value={group.value}>
+                        {group.label}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+                <Field label="Marital status" required error={state.errors?.maritalStatus}>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <RadioCard name="maritalStatus" value="SINGLE" label="Single" required />
+                    <RadioCard name="maritalStatus" value="MARRIED" label="Married" required />
+                  </div>
+                </Field>
+              </div>
+            ) : null}
 
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="City" htmlFor="city" error={state.errors?.city}>
@@ -320,6 +415,24 @@ export function RegisterForm({
                 <Input id="state" name="state" autoComplete="address-level1" placeholder="Lagos" />
               </Field>
             </div>
+
+            <Field
+              label="How did you hear about the camp meeting?"
+              htmlFor="howHeard"
+              required
+              error={state.errors?.howHeard}
+            >
+              <Select id="howHeard" name="howHeard" required defaultValue="">
+                <option value="" disabled>
+                  Choose one
+                </option>
+                {HOW_HEARD.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+            </Field>
 
             <Checkbox
               name="isFirstCamp"
@@ -343,6 +456,53 @@ export function RegisterForm({
                 description="The logistics team will confirm pick-up points nearer the time."
               />
             </div>
+
+            {registeringAs === "ADULT" ? (
+              <div className="rule pt-6">
+                <Eyebrow>Bringing children</Eyebrow>
+                <div className="mt-4">
+                  <Checkbox
+                    name="bringingChildren"
+                    label="I'm coming with children"
+                    description="Whether you're a parent or a couple bringing a child, or minding a child or teenager under 12. They're not separate registrants, just tell us how many."
+                    checked={bringingChildren}
+                    onChange={(event) => setBringingChildren(event.target.checked)}
+                  />
+                </div>
+                {bringingChildren ? (
+                  <div className="mt-4 grid gap-5 sm:grid-cols-2">
+                    <Field
+                      label="How many under 5? (free)"
+                      htmlFor="childrenUnder5"
+                    >
+                      <Input
+                        id="childrenUnder5"
+                        name="childrenUnder5"
+                        type="number"
+                        inputMode="numeric"
+                        min={0}
+                        value={childrenUnder5}
+                        onChange={(event) => setChildrenUnder5(Math.max(0, Number(event.target.value)))}
+                      />
+                    </Field>
+                    <Field
+                      label={`How many 5 to 11? (${childTier ? formatKobo(childTier.amountKobo) : "₦15,000"} each)`}
+                      htmlFor="children5to11"
+                    >
+                      <Input
+                        id="children5to11"
+                        name="children5to11"
+                        type="number"
+                        inputMode="numeric"
+                        min={0}
+                        value={children5to11}
+                        onChange={(event) => setChildren5to11(Math.max(0, Number(event.target.value)))}
+                      />
+                    </Field>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="rule pt-6">
               <Eyebrow>In case of emergency</Eyebrow>
@@ -401,50 +561,62 @@ export function RegisterForm({
           <fieldset className={cn("space-y-6 border-0 p-0", step !== 4 && "hidden")}>
             <legend className="sr-only">Ticket and terms</legend>
 
-            <Field
-              label="How would you like to pay?"
-              required
-              error={state.errors?.paymentPlan}
-              hint="You can change your mind at the payment page, this just tells us your plan."
-            >
-              <div className="grid gap-2.5">
-                <RadioCard
-                  name="paymentChoice"
-                  value="FULL"
-                  label="Pay in full now"
-                  description="One payment, ticket issued straight away."
-                  meta={tier ? formatKobo(tier.amountKobo) : undefined}
-                  required
-                  checked={paymentChoice === "FULL"}
-                  onChange={() => setPaymentChoice("FULL")}
-                />
-                {installmentsEnabled ? (
+            {isFree ? (
+              <div className="border border-meridian/40 bg-brass-soft px-4 py-3.5">
+                <p className="eyebrow text-ink-45">Nothing to pay</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-ink-70">
+                  {lighthouse === "Guest"
+                    ? "Guests come to camp free."
+                    : "This child's ticket is free under 5."}{" "}
+                  Your ticket is issued the moment you register.
+                </p>
+              </div>
+            ) : (
+              <Field
+                label="How would you like to pay?"
+                required
+                error={state.errors?.paymentPlan}
+                hint="You can change your mind at the payment page, this just tells us your plan."
+              >
+                <div className="grid gap-2.5">
                   <RadioCard
                     name="paymentChoice"
-                    value="INSTALLMENT"
-                    label="Pay in instalments"
-                    description={`Spread it out. Your ticket is issued when the balance clears, minimum ${formatKobo(effectiveMinimum)} to start.`}
-                    meta={holdAmount ? `from ${formatKobo(holdAmount)}` : undefined}
-                    checked={paymentChoice === "INSTALLMENT"}
-                    onChange={() => setPaymentChoice("INSTALLMENT")}
+                    value="FULL"
+                    label="Pay in full now"
+                    description="One payment, ticket issued straight away."
+                    meta={formatKobo(effectiveAmountKobo)}
+                    required
+                    checked={paymentChoice === "FULL"}
+                    onChange={() => setPaymentChoice("FULL")}
                   />
-                ) : null}
-                <RadioCard
-                  name="paymentChoice"
-                  value="LATER"
-                  label="Pay later"
-                  description="Register now and pay whenever you're ready from your camp profile. Your ticket is issued once your balance is cleared."
-                  checked={paymentChoice === "LATER"}
-                  onChange={() => setPaymentChoice("LATER")}
-                />
-              </div>
-            </Field>
+                  {installmentsEnabled ? (
+                    <RadioCard
+                      name="paymentChoice"
+                      value="INSTALLMENT"
+                      label="Pay in instalments"
+                      description={`Spread it out. Your ticket is issued when the balance clears, minimum ${formatKobo(effectiveMinimum)} to start.`}
+                      meta={holdAmount ? `from ${formatKobo(holdAmount)}` : undefined}
+                      checked={paymentChoice === "INSTALLMENT"}
+                      onChange={() => setPaymentChoice("INSTALLMENT")}
+                    />
+                  ) : null}
+                  <RadioCard
+                    name="paymentChoice"
+                    value="LATER"
+                    label="Pay later"
+                    description="Register now and pay whenever you're ready from your camp profile. Your ticket is issued once your balance is cleared."
+                    checked={paymentChoice === "LATER"}
+                    onChange={() => setPaymentChoice("LATER")}
+                  />
+                </div>
+              </Field>
+            )}
 
             {/* The server reads the plan and the pay-later flag from these. */}
             <input type="hidden" name="paymentPlan" value={paymentPlan} />
-            {paymentChoice === "LATER" ? <input type="hidden" name="payLater" value="1" /> : null}
+            {!isFree && paymentChoice === "LATER" ? <input type="hidden" name="payLater" value="1" /> : null}
 
-            {paymentPlan === "INSTALLMENT" && installmentsEnabled ? (
+            {!isFree && paymentPlan === "INSTALLMENT" && installmentsEnabled ? (
               <Field
                 label="How would you like to split it?"
                 required
@@ -535,12 +707,16 @@ export function RegisterForm({
                 <p className="eyebrow text-brass">Your total</p>
                 <p className="mt-2 flex items-baseline justify-between gap-4">
                   <span className="display text-3xl">{tier.label} ticket</span>
-                  <span className="display text-3xl">{formatKobo(tier.amountKobo)}</span>
+                  <span className="display text-3xl">
+                    {isFree ? "Free" : formatKobo(effectiveAmountKobo)}
+                  </span>
                 </p>
                 <p className="mt-3 text-xs leading-relaxed text-white/55">
-                  {paymentChoice === "LATER"
-                    ? "Nothing is charged. You'll go straight to your camp profile, where you can pay any time."
-                    : "Nothing is charged yet. You'll go to the payment page next, and your camp profile opens as soon as you register."}
+                  {isFree
+                    ? "Nothing to pay. Your ticket is issued the moment you register, straight to your camp profile."
+                    : paymentChoice === "LATER"
+                      ? "Nothing is charged. You'll go straight to your camp profile, where you can pay any time."
+                      : "Nothing is charged yet. You'll go to the payment page next, and your camp profile opens as soon as you register."}
                 </p>
               </div>
             ) : (
@@ -562,7 +738,7 @@ export function RegisterForm({
               </Button>
             ) : (
               <SubmitButton className="ml-auto" pendingLabel="Registering…">
-                {paymentChoice === "LATER" ? "Register now" : "Register and pay"}
+                {isFree ? "Register" : paymentChoice === "LATER" ? "Register now" : "Register and pay"}
               </SubmitButton>
             )}
           </div>

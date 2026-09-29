@@ -32,10 +32,9 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 const INCLUDED = [
-  "Accommodation for the full camp, bedding provided",
   "All meals for the duration of camp",
-  "Every teaching session, breakout and night meeting",
-  "Camp workbook and your track materials",
+  "Selected accommodation, bedding provided",
+  "Camp resources, your workbook and track materials",
 ] as const;
 
 const BRING = [
@@ -44,6 +43,14 @@ const BRING = [
   "Refillable water bottle",
   "Sandals for the shower block",
   "Your Bible, a notebook and a pen you like",
+] as const;
+
+const WHAT_TO_EXPECT = [
+  "Intense Word encounters",
+  "Deep, strategic prayer sessions",
+  "Fresh fire for destiny alignment",
+  "Spiritual equipping for global impact",
+  "A charged atmosphere of faith, clarity, and divine encounters",
 ] as const;
 
 const FAQS = [
@@ -61,7 +68,7 @@ const FAQS = [
   },
   {
     q: "Can my children come?",
-    a: "Children 12 and under register on the child ticket and must be registered alongside a parent or guardian, who stays responsible for them all week. Teenagers 13–17 have their own supervised block and their own track.",
+    a: "Children under 5 come free, and children 5 to 11 pay a ₦15,000 camp fee, register them alongside your own adult registration and tell us how many are coming. Teenagers 12–17 have their own ticket, their own supervised block and their own track.",
   },
   {
     q: "What if I can't afford it?",
@@ -141,15 +148,66 @@ export default async function CampOverviewPage() {
         </div>
       </section>
 
+      {/* ── the invasion ─────────────────────────────────────────────────── */}
+      <section className="border-b border-ink/12 bg-meridian text-white">
+        <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+          <Eyebrow className="text-brass">Dominion House annual camp is always an experience</Eyebrow>
+          <h2 className="display mt-4 max-w-3xl text-[clamp(2rem,6vw,4rem)]">
+            Get ready for an unforgettable spiritual encounter
+          </h2>
+
+          <div className="mt-8 max-w-3xl space-y-5 text-lg leading-relaxed text-white/70">
+            <p>
+              Fresh Fire Camp Meeting 2027 is a divine convergence designed to ignite your spirit,
+              sharpen your discernment, and position you for all God has prepared for the year
+              ahead.
+            </p>
+            <p>
+              This is not just a gathering, it is a spiritual invasion. An invasion of the Word. An
+              invasion of prayer. An invasion of light, authority, and kingdom influence across
+              territories and nations.
+            </p>
+            <p>
+              Prepare to be launched into deeper realms of the Word and prayer, where lives are
+              realigned, visions are reawakened, and believers are empowered to take ground locally
+              and globally.
+            </p>
+          </div>
+
+          <dl className="mt-12 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-3">
+            <Fact label="Camp opens" value="9:00 AM" />
+            <Fact label="Venue" value={camp.venue} accent />
+            <Fact label="Dates" value={campDateRange(camp.startsAt, camp.endsAt)} />
+          </dl>
+
+          <div className="mt-14">
+            <Eyebrow className="text-brass">What to expect</Eyebrow>
+            <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+              {WHAT_TO_EXPECT.map((item) => (
+                <li key={item} className="flex gap-3 text-[15px] leading-relaxed text-white/80">
+                  <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 bg-brass" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <p className="mt-14 max-w-2xl text-lg font-medium leading-relaxed text-white">
+            Come expectant. Come hungry. Come ready to invade new spiritual territories and step
+            fully into God&apos;s agenda for your life.
+          </p>
+        </div>
+      </section>
+
       {/* ── what it is ───────────────────────────────────────────────────── */}
       <section className="border-b border-ink/12">
         <div className="mx-auto grid max-w-[1400px] gap-12 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[1fr_1.1fr]">
           <div>
             <Eyebrow>The overview</Eyebrow>
-            <h2 className="display mt-4 text-[clamp(2.5rem,7vw,5rem)]">
-              The whole house,
+            <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">
+              An encounter you can&apos;t explain,
               <br />
-              in one place.
+              you can only experience.
             </h2>
           </div>
           <div className="space-y-6 text-lg leading-relaxed text-ink-70">

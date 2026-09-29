@@ -120,6 +120,29 @@ export default async function NewRegistrantPage() {
             <Checkbox name="isFirstCamp" label="First time at a Dominion House camp" />
 
             <div className="grid gap-4 border-t border-ink/10 pt-5 sm:grid-cols-2">
+              <Field
+                label="Child's age"
+                htmlFor="childAgeYears"
+                hint="Only for a Child ticket. Free under 5, ₦15,000 from 5 to 11."
+              >
+                <Input id="childAgeYears" name="childAgeYears" type="number" min={0} max={11} />
+              </Field>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Checkbox
+                name="bringingChildren"
+                label="Bringing children (adults only)"
+                description="Not separate registrants. Under 5 is free; 5 to 11 pays the child fee."
+              />
+              <Field label="Under 5" htmlFor="childrenUnder5">
+                <Input id="childrenUnder5" name="childrenUnder5" type="number" min={0} defaultValue={0} />
+              </Field>
+              <Field label="5 to 11" htmlFor="children5to11">
+                <Input id="children5to11" name="children5to11" type="number" min={0} defaultValue={0} />
+              </Field>
+            </div>
+
+            <div className="grid gap-4 border-t border-ink/10 pt-5 sm:grid-cols-2">
               <Field label="Emergency contact name" htmlFor="emergencyName" required>
                 <Input id="emergencyName" name="emergencyName" required />
               </Field>

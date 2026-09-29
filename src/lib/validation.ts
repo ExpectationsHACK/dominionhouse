@@ -38,6 +38,15 @@ export const churchStep = z.object({
   isFirstCamp: z.coerce.boolean().optional(),
   city: z.string().trim().max(80).optional().or(z.literal("")),
   state: z.string().trim().max(80).optional().or(z.literal("")),
+  /** Adults only. */
+  ageGroup: z.enum(["AGE_18_25", "AGE_26_35", "AGE_36_50", "AGE_51_70"]).optional().or(z.literal("")),
+  maritalStatus: z.enum(["SINGLE", "MARRIED"]).optional().or(z.literal("")),
+  howHeard: z.enum(
+    ["SOCIAL_MEDIA", "MEMBER_OR_PARTNER", "THROUGH_A_FRIEND", "THROUGH_EMAIL", "THROUGH_SMS"],
+    { message: "Let us know how you heard about camp" },
+  ),
+  /** The child's own age, only asked on a Child ticket; decides the free-under-5 fee. */
+  childAgeYears: z.coerce.number().int().min(0).max(11).optional(),
 });
 
 /** Step 3, logistics and care. */
@@ -49,6 +58,10 @@ export const logisticsStep = z.object({
   emergencyRelation: z.string().trim().max(40).optional().or(z.literal("")),
   medicalNotes: z.string().trim().max(600).optional().or(z.literal("")),
   allergies: z.string().trim().max(600).optional().or(z.literal("")),
+  /** Adults only: children they're bringing to camp, not separate registrants. */
+  bringingChildren: z.coerce.boolean().optional(),
+  childrenUnder5: z.coerce.number().int().min(0).max(20).optional(),
+  children5to11: z.coerce.number().int().min(0).max(20).optional(),
 });
 
 /** Step 4, ticket and terms. */
@@ -212,6 +225,16 @@ export const adminRegistrantSchema = z.object({
   paymentMethod: z.enum(["BANK_TRANSFER", "CASH", "POS", "WAIVER"]).optional(),
   paymentReference: z.string().trim().max(80).optional().or(z.literal("")),
   sendEmail: z.coerce.boolean().optional(),
+  ageGroup: z.enum(["AGE_18_25", "AGE_26_35", "AGE_36_50", "AGE_51_70"]).optional().or(z.literal("")),
+  maritalStatus: z.enum(["SINGLE", "MARRIED"]).optional().or(z.literal("")),
+  howHeard: z
+    .enum(["SOCIAL_MEDIA", "MEMBER_OR_PARTNER", "THROUGH_A_FRIEND", "THROUGH_EMAIL", "THROUGH_SMS"])
+    .optional()
+    .or(z.literal("")),
+  childAgeYears: z.coerce.number().int().min(0).max(11).optional(),
+  bringingChildren: z.coerce.boolean().optional(),
+  childrenUnder5: z.coerce.number().int().min(0).max(20).optional(),
+  children5to11: z.coerce.number().int().min(0).max(20).optional(),
 });
 
 export type AdminRegistrantInput = z.infer<typeof adminRegistrantSchema>;

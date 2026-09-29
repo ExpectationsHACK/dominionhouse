@@ -42,7 +42,7 @@ function input(email: string, extra: Partial<AdminRegistrantInput> = {}): AdminR
     phone: "08031234567",
     gender: "FEMALE",
     position: "DISCIPLE",
-    lighthouse: "Guest",
+    lighthouse: "Legacy Center",
     region: "",
     branch: "",
     isFirstCamp: false,
@@ -71,7 +71,7 @@ describe("createManualRegistrant on the real database", () => {
 
     const registrant = await db.registrant.findUniqueOrThrow({ where: { id: result.registrantId } });
     expect(registrant.status).toBe("PENDING");
-    expect(registrant.lighthouse).toBe("Guest");
+    expect(registrant.lighthouse).toBe("Legacy Center");
     expect(await db.payment.count({ where: { registrantId: result.registrantId } })).toBe(0);
     expect(await db.emailLog.count({ where: { to: EMAILS[0] } })).toBe(0);
   });

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { VisitForm } from "./visit-form";
+import { ARC_VARIANTS, ArcCard, BODY_TONE, REGION_TONE } from "@/components/site/arc-card";
 import { HillContours } from "@/components/site/hill-contours";
 import { Eyebrow, Notice } from "@/components/ui";
+import { cn } from "@/lib/utils";
 import {
   CAMPUSES,
   COUNTRY_COUNT,
@@ -54,11 +56,13 @@ export default async function LocationsPage({
             heading="Lagos, Nigeria"
             count={LAGOS_CAMPUSES.length}
             campuses={LAGOS_CAMPUSES}
+            baseIndex={0}
           />
           <CampusGroup
             heading="International"
             count={INTERNATIONAL_CAMPUSES.length}
             campuses={INTERNATIONAL_CAMPUSES}
+            baseIndex={LAGOS_CAMPUSES.length}
           />
 
           <Notice tone="neutral" title="When we gather">
@@ -89,10 +93,12 @@ function CampusGroup({
   heading,
   count,
   campuses,
+  baseIndex,
 }: {
   heading: string;
   count: number;
   campuses: Campus[];
+  baseIndex: number;
 }) {
   return (
     <div>
@@ -103,66 +109,71 @@ function CampusGroup({
         </p>
       </div>
 
-      <ul className="mt-6 grid gap-px bg-ink/12 sm:grid-cols-2">
-        {campuses.map((campus) => (
-          <li key={campus.slug} className="flex flex-col bg-bone p-6">
-            <div className="flex items-baseline justify-between gap-3">
-              <h3 className="display text-2xl">{campus.name}</h3>
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-brass">
-                {campus.country}
-              </span>
-            </div>
+      <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+        {campuses.map((campus, offset) => {
+          const index = baseIndex + offset;
+          const variant = ARC_VARIANTS[(index + Math.floor(index / 3)) % ARC_VARIANTS.length];
 
-            <address className="mt-3 text-sm not-italic leading-relaxed text-ink-70">
-              {campus.address}
-            </address>
-
-            <dl className="mt-5 space-y-2 border-t border-ink/12 pt-4 text-sm">
-              <div className="flex flex-wrap items-baseline gap-x-3">
-                <dt className="eyebrow text-ink-45">Email</dt>
-                <dd className="min-w-0">
-                  <a
-                    href={`mailto:${campus.email}`}
-                    className="break-all underline underline-offset-4 hover:text-meridian"
-                  >
-                    {campus.email}
-                  </a>
-                </dd>
+          return (
+            <ArcCard key={campus.slug} variant={variant} seed={index}>
+              <div className="flex items-baseline justify-between gap-3">
+                <h3 className="display text-2xl">{campus.name}</h3>
+                <span className={cn("font-mono text-[10px] uppercase tracking-[0.16em]", REGION_TONE[variant])}>
+                  {campus.country}
+                </span>
               </div>
-              <div className="flex flex-wrap items-baseline gap-x-3">
-                <dt className="eyebrow text-ink-45">Phone</dt>
-                <dd>
-                  {campus.phones.length === 0 ? (
-                    <span className="text-ink-45">Use email for this lighthouse</span>
-                  ) : (
-                    campus.phones.map((phone, index) => (
-                      <span key={phone}>
-                        {index > 0 ? <span className="text-ink-45"> · </span> : null}
-                        <a
-                          href={`tel:${phone.replace(/[^\d+]/g, "")}`}
-                          className="whitespace-nowrap underline underline-offset-4 hover:text-meridian"
-                        >
-                          {phone}
-                        </a>
-                      </span>
-                    ))
-                  )}
-                </dd>
-              </div>
-            </dl>
 
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                `Dominion House ${campus.name}, ${campus.address}`,
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 inline-flex text-[11px] font-semibold uppercase tracking-[0.1em] underline underline-offset-4"
-            >
-              Open in maps
-            </a>
-          </li>
-        ))}
+              <address className={cn("mt-3 text-sm not-italic leading-relaxed", BODY_TONE[variant])}>
+                {campus.address}
+              </address>
+
+              <dl className="mt-5 space-y-2 border-t border-current/15 pt-4 text-sm">
+                <div className="flex flex-wrap items-baseline gap-x-3">
+                  <dt className={cn("eyebrow", BODY_TONE[variant])}>Email</dt>
+                  <dd className="min-w-0">
+                    <a
+                      href={`mailto:${campus.email}`}
+                      className="break-all underline underline-offset-4"
+                    >
+                      {campus.email}
+                    </a>
+                  </dd>
+                </div>
+                <div className="flex flex-wrap items-baseline gap-x-3">
+                  <dt className={cn("eyebrow", BODY_TONE[variant])}>Phone</dt>
+                  <dd>
+                    {campus.phones.length === 0 ? (
+                      <span className={BODY_TONE[variant]}>Use email for this lighthouse</span>
+                    ) : (
+                      campus.phones.map((phone, phoneIndex) => (
+                        <span key={phone}>
+                          {phoneIndex > 0 ? <span className={BODY_TONE[variant]}> · </span> : null}
+                          <a
+                            href={`tel:${phone.replace(/[^\d+]/g, "")}`}
+                            className="whitespace-nowrap underline underline-offset-4"
+                          >
+                            {phone}
+                          </a>
+                        </span>
+                      ))
+                    )}
+                  </dd>
+                </div>
+              </dl>
+
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  `Dominion House ${campus.name}, ${campus.address}`,
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-auto inline-flex pt-5 text-[11px] font-semibold uppercase tracking-[0.1em] underline underline-offset-4"
+              >
+                Open in maps
+              </a>
+            </ArcCard>
+          );
+        })}
       </ul>
     </div>
   );

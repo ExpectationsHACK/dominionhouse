@@ -41,6 +41,26 @@ enum Gender {
   FEMALE
 }
 
+enum AgeGroup {
+  AGE_18_25
+  AGE_26_35
+  AGE_36_50
+  AGE_51_70
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+}
+
+enum HowHeard {
+  SOCIAL_MEDIA
+  MEMBER_OR_PARTNER
+  THROUGH_A_FRIEND
+  THROUGH_EMAIL
+  THROUGH_SMS
+}
+
 enum PaymentPlan {
   FULL
   INSTALLMENT
@@ -218,6 +238,17 @@ model Registrant {
   /// Campus-fellowship region, asked of campus students instead of a Lighthouse.
   region       String?
   isFirstCamp  Boolean  @default(false)
+  /// Adults only.
+  ageGroup      AgeGroup?
+  maritalStatus MaritalStatus?
+  howHeard      HowHeard?
+
+  // Children an adult is bringing to camp, not separate registrants or
+  // tickets. Under 5 is free; amountDueKobo carries a ₦15,000-per-head
+  // surcharge for the 5–11 band, added at registration.
+  bringingChildren Boolean @default(false)
+  childrenUnder5   Int     @default(0)
+  children5to11    Int     @default(0)
 
   // Location
   address String?
