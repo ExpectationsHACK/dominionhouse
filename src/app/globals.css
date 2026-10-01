@@ -221,3 +221,43 @@
     display: none;
   }
 }
+
+/* ── hero entrance, the first thing a page shows, so it runs on load rather
+   than waiting on scroll ───────────────────────────────────────────────── */
+
+.rise-in {
+  animation: rise-in 0.9s var(--ease-out-expo) both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── card lift, any card that wants to feel pressable on hover ───────────── */
+
+.card-lift {
+  transition:
+    transform 0.4s var(--ease-out-expo),
+    box-shadow 0.4s var(--ease-out-expo);
+}
+
+.card-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 44px -20px rgba(11, 11, 12, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in {
+    animation: none;
+  }
+  .card-lift:hover {
+    transform: none;
+  }
+}

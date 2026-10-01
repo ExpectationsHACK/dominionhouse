@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CountUp } from "@/components/site/count-up";
 import { DepthCardCarousel, type DepthCardItem } from "@/components/site/depth-card-carousel";
 import { HillContours } from "@/components/site/hill-contours";
 import { LighthouseCards } from "@/components/site/lighthouse-cards";
 import { MissionCards } from "@/components/site/mission-cards";
+import { Reveal } from "@/components/site/reveal";
 import { SplashLoader } from "@/components/site/splash-loader";
-import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { campLockup, getActiveCamp } from "@/lib/camp";
 import { daysUntil } from "@/lib/dates";
@@ -91,16 +92,10 @@ export default async function HomePage() {
     : null;
   const daysAway = camp ? daysUntil(camp.startsAt) : null;
 
-  const [pastorRows, serviceVideos] = await Promise.all([
-    db.siteMedia.findMany({
-      where: { placement: "PASTORS", isActive: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    }),
-    db.siteMedia.findMany({
-      where: { placement: "SERVICE_VIDEOS", isActive: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    }),
-  ]);
+  const pastorRows = await db.siteMedia.findMany({
+    where: { placement: "PASTORS", isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+  });
   const pastors: DepthCardItem[] = pastorRows.length
     ? pastorRows.map((row) => ({
         id: row.id,
@@ -118,18 +113,19 @@ export default async function HomePage() {
       <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
         <HillContours className="absolute inset-x-0 bottom-0 h-[70%] w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 pb-10 pt-16 sm:px-8 sm:pb-12 sm:pt-24">
-          <Eyebrow className="text-brass">{CHURCH.descriptor}</Eyebrow>
-          <h1 className="display mt-6 text-[clamp(2.5rem,8.5vw,7rem)]">
+          <Eyebrow className="rise-in text-brass">{CHURCH.descriptor}</Eyebrow>
+          <h1
+            className="display rise-in mt-6 text-[clamp(2.5rem,8.5vw,7rem)]"
+            style={{ animationDelay: "120ms" }}
+          >
             A people of purpose,
             <br />
-            passion and{" "}
-            <span className="text-brass">power</span>,
-            <br />
-            empowered by God&apos;s Word and Spirit
-            <br />
-            to reign in life as kings
+            passion and <span className="text-brass">power</span>
           </h1>
-          <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div
+            className="rise-in mt-10 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end"
+            style={{ animationDelay: "280ms" }}
+          >
             <p className="max-w-xl text-lg leading-relaxed text-white/70">
               We have a mandate to raise one million leaders.
             </p>
@@ -149,7 +145,7 @@ export default async function HomePage() {
       {/* ── the strapline, given room ────────────────────────────────────── */}
       <section className="border-b border-ink/12 bg-brass-soft text-ink">
         <div className="mx-auto max-w-[1400px] px-5 py-14 sm:px-8 sm:py-16">
-          <div className="flex flex-wrap items-baseline justify-between gap-6">
+          <Reveal className="flex flex-wrap items-baseline justify-between gap-6">
             <p className="display text-[clamp(2rem,6vw,4.5rem)]">
               The church that never sleeps
             </p>
@@ -157,33 +153,9 @@ export default async function HomePage() {
               A missional movement, {CAMPUSES.length} lighthouses across {COUNTRY_COUNT} countries,
               reaching the world one person and one community at a time.
             </p>
-          </div>
+          </Reveal>
         </div>
       </section>
-
-      {/* ── the feel of a service, short clips ───────────────────────────── */}
-      {serviceVideos.length > 0 ? (
-        <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
-          <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-            <Eyebrow className="text-brass">A few seconds in the room</Eyebrow>
-            <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
-              What a service feels like
-            </h2>
-
-            <div className="mt-14">
-              <VideoCarousel
-                label="Service experience clips"
-                items={serviceVideos.map((video) => ({
-                  id: video.id,
-                  title: video.title,
-                  videoUrl: video.videoUrl!,
-                  posterUrl: video.posterUrl,
-                }))}
-              />
-            </div>
-          </div>
-        </section>
-      ) : null}
 
       {/* ── camp band, the loudest moment on the page ───────────────────── */}
       {camp ? (
@@ -205,7 +177,7 @@ export default async function HomePage() {
               ) : null}
             </h2>
 
-            <div className="mt-12 grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-end">
+            <Reveal className="mt-12 grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-end">
               <p className="max-w-xl text-lg leading-relaxed text-white/70">
                 {camp.tagline} The whole house gathers, every lighthouse, one place. Registration is
                 open, and you can pay in instalments.
@@ -214,7 +186,9 @@ export default async function HomePage() {
               <dl className="grid grid-cols-2 gap-6 border-t border-white/15 pt-6">
                 <div>
                   <dt className="eyebrow text-white/40">Days away</dt>
-                  <dd className="display mt-2 text-4xl text-brass">{daysAway}</dd>
+                  <dd className="display mt-2 text-4xl text-brass">
+                    {daysAway !== null ? <CountUp value={daysAway} /> : null}
+                  </dd>
                 </div>
                 <div>
                   <dt className="eyebrow text-white/40">From</dt>
@@ -223,7 +197,7 @@ export default async function HomePage() {
                   </dd>
                 </div>
               </dl>
-            </div>
+            </Reveal>
 
             <div className="mt-10 flex flex-wrap gap-2.5">
               <ButtonLink href="/camp/register" variant="brass" size="lg">
@@ -240,13 +214,15 @@ export default async function HomePage() {
       {/* ── the mission, D1 to D5 ────────────────────────────────────────── */}
       <section className="border-b border-ink/12">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <Eyebrow>Our mission</Eyebrow>
-          <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">
-            Discover · Develop · Deploy
-            <br />
-            Duplicate · Dominate
-          </h2>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">{ABOUT}</p>
+          <Reveal>
+            <Eyebrow>Our mission</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">
+              Discover · Develop · Deploy
+              <br />
+              Duplicate · Dominate
+            </h2>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">{ABOUT}</p>
+          </Reveal>
 
           <MissionCards steps={STRATEGY} />
         </div>
@@ -263,13 +239,15 @@ export default async function HomePage() {
           }}
         />
         <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <Eyebrow className="text-brass">The leadership of the house</Eyebrow>
-          <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5.5rem)]">
-            Meet our Senior Pastors
-          </h2>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/70">
-            The Senior Pastors who carry the vision and shepherd the house.
-          </p>
+          <Reveal>
+            <Eyebrow className="text-brass">The leadership of the house</Eyebrow>
+            <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5.5rem)]">
+              Meet our Senior Pastors
+            </h2>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/70">
+              The Senior Pastors who carry the vision and shepherd the house.
+            </p>
+          </Reveal>
 
           <div className="mt-12">
             <DepthCardCarousel items={pastors} label="Our Senior Pastors" numbered={false} />
@@ -279,27 +257,30 @@ export default async function HomePage() {
 
       {/* ── next steps ───────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-        <Eyebrow>Three ways in</Eyebrow>
-        <h2 className="display mt-4 max-w-2xl text-[clamp(2.25rem,6vw,4.5rem)]">
-          Everyone is a leader and a minister
-        </h2>
+        <Reveal>
+          <Eyebrow>Three ways in</Eyebrow>
+          <h2 className="display mt-4 max-w-2xl text-[clamp(2.25rem,6vw,4.5rem)]">
+            Everyone is a leader and a minister
+          </h2>
+        </Reveal>
 
         <div className="mt-14 grid gap-px bg-ink/12 sm:grid-cols-3">
-          {NEXT_STEPS.map((step) => (
-            <Link
-              key={step.href}
-              href={step.href}
-              className="group flex flex-col justify-between bg-bone p-7 transition-colors hover:bg-paper sm:p-9"
-            >
-              <div>
-                <h3 className="display text-3xl">{step.title}</h3>
-                <p className="mt-4 text-sm leading-relaxed text-ink-70">{step.body}</p>
-              </div>
-              <span className="mt-10 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em]">
-                {step.cta}
-                <Arrow className="transition-transform duration-300 group-hover:translate-x-1" />
-              </span>
-            </Link>
+          {NEXT_STEPS.map((step, index) => (
+            <Reveal key={step.href} as="span" delay={index * 100} className="block">
+              <Link
+                href={step.href}
+                className="card-lift group flex h-full flex-col justify-between bg-bone p-7 transition-colors hover:bg-paper sm:p-9"
+              >
+                <div>
+                  <h3 className="display text-3xl">{step.title}</h3>
+                  <p className="mt-4 text-sm leading-relaxed text-ink-70">{step.body}</p>
+                </div>
+                <span className="mt-10 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em]">
+                  {step.cta}
+                  <Arrow className="transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+              </Link>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -307,7 +288,7 @@ export default async function HomePage() {
       <section className="relative overflow-hidden border-t border-white/10 bg-meridian text-white">
         <HillContours className="absolute inset-x-0 top-0 h-[60%] w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <div className="flex flex-wrap items-end justify-between gap-6">
+          <Reveal className="flex flex-wrap items-end justify-between gap-6">
             <div>
               <Eyebrow className="text-brass">Where we gather</Eyebrow>
               <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">
@@ -320,7 +301,7 @@ export default async function HomePage() {
             >
               All {CAMPUSES.length} lighthouses <Arrow />
             </Link>
-          </div>
+          </Reveal>
 
           <LighthouseCards campuses={CAMPUSES} />
         </div>

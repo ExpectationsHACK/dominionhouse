@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 // ── buttons ──────────────────────────────────────────────────────────────────
 
 const BUTTON_BASE =
-  "inline-flex items-center justify-center gap-2 border px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.1em] transition-colors duration-200 disabled:pointer-events-none disabled:opacity-45";
+  "inline-flex items-center justify-center gap-2 border px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.1em] transition-[color,background-color,border-color,transform] duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-45 disabled:hover:translate-y-0 [&_svg]:transition-transform [&_svg]:duration-300 hover:[&_svg]:translate-x-1";
 
 const BUTTON_VARIANTS = {
   solid: "border-ink bg-ink text-white hover:bg-brass hover:border-brass",

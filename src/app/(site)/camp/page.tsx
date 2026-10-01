@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import flyer from "../../../../public/fresh-fire-camp.jpeg";
+import { CountUp } from "@/components/site/count-up";
 import { DepthCardCarousel } from "@/components/site/depth-card-carousel";
 import { HillContours } from "@/components/site/hill-contours";
+import { Reveal } from "@/components/site/reveal";
 import { TestimonialCarousel } from "@/components/site/testimonial-carousel";
 import { TicketCards } from "@/components/site/ticket-cards";
-import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { db } from "@/lib/db";
 import { campLockup, requireActiveCamp } from "@/lib/camp";
@@ -85,17 +86,13 @@ const FAQS = [
 export default async function CampOverviewPage() {
   const camp = await requireActiveCamp();
 
-  const [schedule, cards, campVideos, testimonialRows] = await Promise.all([
+  const [schedule, cards, testimonialRows] = await Promise.all([
     db.scheduleItem.findMany({
       where: { campId: camp.id, isPublished: true },
       orderBy: [{ startsAt: "asc" }],
     }),
     db.siteMedia.findMany({
       where: { placement: "CAMP_CARDS", isActive: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    }),
-    db.siteMedia.findMany({
-      where: { placement: "CAMP_VIDEOS", isActive: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     }),
     db.siteMedia.findMany({
@@ -114,7 +111,7 @@ export default async function CampOverviewPage() {
         <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={20} />
         <div className="relative mx-auto grid max-w-[1400px] gap-12 px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20 lg:grid-cols-[1.35fr_1fr] lg:items-center">
           <div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="rise-in flex flex-wrap items-center gap-3">
             <Eyebrow className="text-brass">{camp.theme ?? "Camp Meeting"}</Eyebrow>
             <span aria-hidden="true" className="h-px w-10 bg-white/25" />
             <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/50">
@@ -122,16 +119,22 @@ export default async function CampOverviewPage() {
             </p>
           </div>
 
-          <h1 className="display mt-6 text-[clamp(3rem,11vw,9.5rem)]">
+          <h1
+            className="display rise-in mt-6 text-[clamp(3rem,11vw,9.5rem)]"
+            style={{ animationDelay: "120ms" }}
+          >
             {lockup.lead}
             {lockup.year ? <span className="text-brass"> {lockup.year}</span> : null}
           </h1>
 
-          <p className="mt-8 max-w-2xl text-xl leading-relaxed text-white/70">
+          <p
+            className="rise-in mt-8 max-w-2xl text-xl leading-relaxed text-white/70"
+            style={{ animationDelay: "240ms" }}
+          >
             {camp.tagline}
           </p>
 
-          <div className="mt-12 flex flex-wrap gap-2.5">
+          <div className="rise-in mt-12 flex flex-wrap gap-2.5" style={{ animationDelay: "360ms" }}>
             <ButtonLink href="/camp/register" variant="brass" size="lg">
               Register now <Arrow />
             </ButtonLink>
@@ -140,8 +143,11 @@ export default async function CampOverviewPage() {
             </ButtonLink>
           </div>
 
-          <dl className="mt-16 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-8">
-            <Fact label="Days away" value={String(daysUntil(camp.startsAt))} accent />
+          <dl
+            className="rise-in mt-16 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-8"
+            style={{ animationDelay: "480ms" }}
+          >
+            <Fact label="Days away" value={String(daysUntil(camp.startsAt))} count={daysUntil(camp.startsAt)} accent />
             <Fact label="Venue" value={camp.venue} />
           </dl>
           </div>
@@ -153,7 +159,8 @@ export default async function CampOverviewPage() {
             priority
             placeholder="blur"
             sizes="(max-width: 1024px) 100vw, 420px"
-            className="mx-auto w-full max-w-sm border border-white/15 lg:max-w-none"
+            className="rise-in mx-auto w-full max-w-sm border border-white/15 lg:max-w-none"
+            style={{ animationDelay: "200ms" }}
           />
         </div>
       </section>
@@ -161,36 +168,42 @@ export default async function CampOverviewPage() {
       {/* ── the invasion ─────────────────────────────────────────────────── */}
       <section className="border-b border-ink/12 bg-meridian text-white">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <Eyebrow className="text-brass">Dominion House annual camp is always an experience</Eyebrow>
-          <h2 className="display mt-4 max-w-3xl text-[clamp(2rem,6vw,4rem)]">
-            Get ready for an unforgettable spiritual encounter
-          </h2>
+          <Reveal>
+            <Eyebrow className="text-brass">Dominion House annual camp is always an experience</Eyebrow>
+            <h2 className="display mt-4 max-w-3xl text-[clamp(2rem,6vw,4rem)]">
+              Get ready for an unforgettable spiritual encounter
+            </h2>
 
-          <div className="mt-8 max-w-3xl space-y-5 text-lg leading-relaxed text-white/70">
-            <p>
-              Fresh Fire Camp Meeting 2027 is a divine convergence designed to ignite your spirit,
-              sharpen your discernment, and position you for all God has prepared for the year
-              ahead.
-            </p>
-            <p>
-              This is not just a gathering, it is a spiritual invasion. An invasion of the Word. An
-              invasion of prayer. An invasion of light, authority, and kingdom influence across
-              territories and nations.
-            </p>
-            <p>
-              Prepare to be launched into deeper realms of the Word and prayer, where lives are
-              realigned, visions are reawakened, and believers are empowered to take ground locally
-              and globally.
-            </p>
-          </div>
+            <div className="mt-8 max-w-3xl space-y-5 text-lg leading-relaxed text-white/70">
+              <p>
+                Fresh Fire Camp Meeting 2027 is a divine convergence designed to ignite your spirit,
+                sharpen your discernment, and position you for all God has prepared for the year
+                ahead.
+              </p>
+              <p>
+                This is not just a gathering, it is a spiritual invasion. An invasion of the Word. An
+                invasion of prayer. An invasion of light, authority, and kingdom influence across
+                territories and nations.
+              </p>
+              <p>
+                Prepare to be launched into deeper realms of the Word and prayer, where lives are
+                realigned, visions are reawakened, and believers are empowered to take ground locally
+                and globally.
+              </p>
+            </div>
+          </Reveal>
 
-          <dl className="mt-12 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-3">
+          <Reveal
+            as="dl"
+            delay={100}
+            className="mt-12 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-3"
+          >
             <Fact label="Camp opens" value="9:00 AM" />
             <Fact label="Venue" value={camp.venue} accent />
             <Fact label="Dates" value={campDateRange(camp.startsAt, camp.endsAt)} />
-          </dl>
+          </Reveal>
 
-          <div className="mt-14">
+          <Reveal delay={150} className="mt-14">
             <Eyebrow className="text-brass">What to expect</Eyebrow>
             <ul className="mt-6 grid gap-4 sm:grid-cols-2">
               {WHAT_TO_EXPECT.map((item) => (
@@ -200,33 +213,37 @@ export default async function CampOverviewPage() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Reveal>
 
-          <p className="mt-14 max-w-2xl text-lg font-medium leading-relaxed text-white">
+          <Reveal
+            as="p"
+            delay={200}
+            className="mt-14 max-w-2xl text-lg font-medium leading-relaxed text-white"
+          >
             Come expectant. Come hungry. Come ready to invade new spiritual territories and step
             fully into God&apos;s agenda for your life.
-          </p>
+          </Reveal>
         </div>
       </section>
 
       {/* ── what it is ───────────────────────────────────────────────────── */}
       <section className="border-b border-ink/12">
         <div className="mx-auto grid max-w-[1400px] gap-12 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[1fr_1.1fr]">
-          <div>
+          <Reveal direction="left">
             <Eyebrow>The overview</Eyebrow>
             <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">
               An encounter you can&apos;t explain,
               <br />
               you can only experience.
             </h2>
-          </div>
-          <div className="space-y-6 text-lg leading-relaxed text-ink-70">
+          </Reveal>
+          <Reveal direction="right" delay={100} className="space-y-6 text-lg leading-relaxed text-ink-70">
             <p>{camp.description}</p>
             <p className="text-ink">
               Every lighthouse, one gathering, days of unhurried attention on one thing. That is the
               whole point.
             </p>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -242,10 +259,12 @@ export default async function CampOverviewPage() {
             }}
           />
           <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-            <Eyebrow className="text-brass">What camp feels like</Eyebrow>
-            <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
-              Fresh Fire, Fresh Convictions and Fresh Impartation
-            </h2>
+            <Reveal>
+              <Eyebrow className="text-brass">What camp feels like</Eyebrow>
+              <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
+                Fresh Fire, Fresh Convictions and Fresh Impartation
+              </h2>
+            </Reveal>
 
             <div className="mt-14">
               <DepthCardCarousel
@@ -260,36 +279,14 @@ export default async function CampOverviewPage() {
         </section>
       ) : null}
 
-      {/* ── the feel of it, short clips ──────────────────────────────────── */}
-      {campVideos.length > 0 ? (
-        <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
-          <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-            <Eyebrow className="text-brass">A few seconds in the room</Eyebrow>
-            <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
-              What it feels like
-            </h2>
-
-            <div className="mt-14">
-              <VideoCarousel
-                label="Fresh Fire experience clips"
-                items={campVideos.map((video) => ({
-                  id: video.id,
-                  title: video.title,
-                  videoUrl: video.videoUrl!,
-                  posterUrl: video.posterUrl,
-                }))}
-              />
-            </div>
-          </div>
-        </section>
-      ) : null}
-
       {/* ── testimonials ─────────────────────────────────────────────────── */}
       {testimonialRows.length > 0 ? (
         <section className="border-b border-ink/12">
           <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-            <Eyebrow>In their own words</Eyebrow>
-            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">Fresh Fire testimonies</h2>
+            <Reveal>
+              <Eyebrow>In their own words</Eyebrow>
+              <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">Fresh Fire testimonies</h2>
+            </Reveal>
 
             <div className="mt-14">
               <TestimonialCarousel
@@ -308,7 +305,7 @@ export default async function CampOverviewPage() {
       {/* ── pricing ──────────────────────────────────────────────────────── */}
       <section className="border-b border-ink/12" id="pricing">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <div className="flex flex-wrap items-end justify-between gap-6">
+          <Reveal className="flex flex-wrap items-end justify-between gap-6">
             <div>
               <Eyebrow>Tickets</Eyebrow>
               <h2 className="display mt-4 text-[clamp(2.5rem,7vw,5rem)]">What it costs</h2>
@@ -321,7 +318,7 @@ export default async function CampOverviewPage() {
                 is issued automatically when the balance hits zero.
               </p>
             ) : null}
-          </div>
+          </Reveal>
 
           <TicketCards
             tiers={camp.priceTiers}
@@ -339,12 +336,14 @@ export default async function CampOverviewPage() {
       {/* ── schedule ─────────────────────────────────────────────────────── */}
       <section className="border-b border-ink/12" id="schedule">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <Eyebrow>The programme</Eyebrow>
-          <h2 className="display mt-4 text-[clamp(2.5rem,7vw,5rem)]">Programme</h2>
+          <Reveal>
+            <Eyebrow>The programme</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.5rem,7vw,5rem)]">Programme</h2>
+          </Reveal>
 
           <div className="mt-14 space-y-12">
-            {days.map(({ day, items }) => (
-              <div key={day} className="grid gap-6 lg:grid-cols-[220px_1fr]">
+            {days.map(({ day, items }, dayIndex) => (
+              <Reveal as="div" key={day} delay={dayIndex * 80} className="grid gap-6 lg:grid-cols-[220px_1fr]">
                 <h3 className="display sticky top-20 self-start text-3xl text-meridian">
                   {dayLabel.format(new Date(day))}
                 </h3>
@@ -376,7 +375,7 @@ export default async function CampOverviewPage() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -385,7 +384,7 @@ export default async function CampOverviewPage() {
       {/* ── included / bring ─────────────────────────────────────────────── */}
       <section className="border-b border-ink/12">
         <div className="mx-auto grid max-w-[1400px] gap-px bg-ink/12 md:grid-cols-2">
-          <div className="bg-bone px-5 py-16 sm:px-8 sm:py-20">
+          <Reveal direction="left" className="bg-bone px-5 py-16 sm:px-8 sm:py-20">
             <Eyebrow>In the price</Eyebrow>
             <h2 className="display mt-4 text-4xl">What&apos;s included</h2>
             <ul className="mt-8 space-y-4">
@@ -396,8 +395,8 @@ export default async function CampOverviewPage() {
                 </li>
               ))}
             </ul>
-          </div>
-          <div className="bg-bone px-5 py-16 sm:px-8 sm:py-20">
+          </Reveal>
+          <Reveal direction="right" delay={100} className="bg-bone px-5 py-16 sm:px-8 sm:py-20">
             <Eyebrow>Your bag</Eyebrow>
             <h2 className="display mt-4 text-4xl">What to bring</h2>
             <ul className="mt-8 space-y-4">
@@ -408,14 +407,16 @@ export default async function CampOverviewPage() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* ── faq ──────────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-        <Eyebrow>Before you ask</Eyebrow>
-        <h2 className="display mt-4 text-[clamp(2.5rem,7vw,5rem)]">Questions</h2>
+        <Reveal>
+          <Eyebrow>Before you ask</Eyebrow>
+          <h2 className="display mt-4 text-[clamp(2.5rem,7vw,5rem)]">Questions</h2>
+        </Reveal>
 
         <div className="mt-12 border-t border-ink/12">
           {FAQS.map((faq) => (
@@ -438,7 +439,10 @@ export default async function CampOverviewPage() {
 
       {/* ── close ────────────────────────────────────────────────────────── */}
       <section className="bg-meridian text-white">
-        <div className="mx-auto flex max-w-[1400px] flex-col gap-8 px-5 py-20 sm:px-8 sm:py-24 lg:flex-row lg:items-end lg:justify-between">
+        <Reveal
+          as="div"
+          className="mx-auto flex max-w-[1400px] flex-col gap-8 px-5 py-20 sm:px-8 sm:py-24 lg:flex-row lg:items-end lg:justify-between"
+        >
           <h2 className="display max-w-2xl text-[clamp(2.5rem,7vw,5.5rem)]">
             The house is expecting you
           </h2>
@@ -450,20 +454,30 @@ export default async function CampOverviewPage() {
               Pay a balance
             </ButtonLink>
           </div>
-        </div>
+        </Reveal>
       </section>
     </>
   );
 }
 
-function Fact({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function Fact({
+  label,
+  value,
+  count,
+  accent,
+}: {
+  label: string;
+  value: string;
+  count?: number;
+  accent?: boolean;
+}) {
   return (
     <div>
       <dt className="eyebrow text-white/40">{label}</dt>
       <dd
         className={`display mt-2 hyphens-auto break-words text-2xl sm:text-3xl ${accent ? "text-brass" : ""}`}
       >
-        {value}
+        {count !== undefined ? <CountUp value={count} /> : value}
       </dd>
     </div>
   );

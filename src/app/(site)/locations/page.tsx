@@ -3,6 +3,7 @@ import Link from "next/link";
 import { VisitForm } from "./visit-form";
 import { ARC_VARIANTS, ArcCard, BODY_TONE, REGION_TONE } from "@/components/site/arc-card";
 import { HillContours } from "@/components/site/hill-contours";
+import { Reveal } from "@/components/site/reveal";
 import { Eyebrow, Notice } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import {
@@ -35,15 +36,21 @@ export default async function LocationsPage({
       <section className="relative overflow-hidden border-b border-ink/12 bg-meridian text-white">
         <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
-          <Eyebrow className="text-brass">
+          <Eyebrow className="rise-in text-brass">
             {CAMPUSES.length} lighthouses · {COUNTRY_COUNT} countries
           </Eyebrow>
-          <h1 className="display mt-5 text-[clamp(2.5rem,9vw,7.5rem)]">
+          <h1
+            className="display rise-in mt-5 text-[clamp(2.5rem,9vw,7.5rem)]"
+            style={{ animationDelay: "120ms" }}
+          >
             Find your
             <br />
             lighthouse
           </h1>
-          <p className="mt-8 max-w-xl text-lg leading-relaxed text-white/70">
+          <p
+            className="rise-in mt-8 max-w-xl text-lg leading-relaxed text-white/70"
+            style={{ animationDelay: "260ms" }}
+          >
             Come as you are. Tell us you&apos;re coming and someone from that lighthouse will be looking
             out for you, no forms at the door, no spotlight.
           </p>
@@ -76,13 +83,13 @@ export default async function LocationsPage({
         </div>
 
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <div className="border border-ink/12 bg-paper p-6 sm:p-7">
+          <Reveal direction="right" className="border border-ink/12 bg-paper p-6 sm:p-7">
             <Eyebrow>Let us know</Eyebrow>
             <h2 className="display mt-3 text-3xl">We&apos;ll look out for you</h2>
             <div className="mt-6">
               <VisitForm defaultCampus={preselected} />
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
     </>

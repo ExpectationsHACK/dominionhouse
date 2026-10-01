@@ -70,7 +70,7 @@ export function TicketCards({
           <li
             key={tier.id}
             className={cn(
-              "relative flex min-h-[19rem] flex-col justify-between overflow-hidden rounded-[1.25rem] p-7 sm:p-8",
+              "card-lift relative flex min-h-[19rem] flex-col justify-between overflow-hidden rounded-[1.25rem] p-7 sm:p-8",
               look.card,
             )}
           >

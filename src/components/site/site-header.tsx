@@ -53,11 +53,18 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "text-[13px] font-semibold uppercase tracking-[0.1em] transition-colors",
+                  "group relative py-1 text-[13px] font-semibold uppercase tracking-[0.1em] transition-colors",
                   active ? "text-ink" : "text-ink-45 hover:text-ink",
                 )}
               >
                 {item.label}
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 bg-brass transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:scale-x-100",
+                    active && "scale-x-100 bg-ink",
+                  )}
+                />
               </Link>
             );
           })}

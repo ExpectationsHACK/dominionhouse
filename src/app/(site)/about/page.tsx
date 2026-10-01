@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { HillContours } from "@/components/site/hill-contours";
+import { Reveal } from "@/components/site/reveal";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import {
   ABOUT,
@@ -28,12 +29,23 @@ export default function AboutPage() {
       <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
         <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
-          <Eyebrow className="text-brass">About us</Eyebrow>
-          <h1 className="display mt-5 max-w-5xl text-[clamp(2.5rem,9vw,7.5rem)]">
+          <Eyebrow className="rise-in text-brass">About us</Eyebrow>
+          <h1
+            className="display rise-in mt-5 max-w-5xl text-[clamp(2.5rem,9vw,7.5rem)]"
+            style={{ animationDelay: "120ms" }}
+          >
             A new frontier church
           </h1>
-          <p className="mt-8 max-w-2xl text-lg leading-relaxed text-white/70">{ABOUT}</p>
-          <p className="mt-4 max-w-2xl text-lg font-medium leading-relaxed text-brass">
+          <p
+            className="rise-in mt-8 max-w-2xl text-lg leading-relaxed text-white/70"
+            style={{ animationDelay: "260ms" }}
+          >
+            {ABOUT}
+          </p>
+          <p
+            className="rise-in mt-4 max-w-2xl text-lg font-medium leading-relaxed text-brass"
+            style={{ animationDelay: "340ms" }}
+          >
             We are a missional church, the church that never sleeps.
           </p>
         </div>
@@ -41,18 +53,18 @@ export default function AboutPage() {
 
       {/* ── vision ───────────────────────────────────────────────────────── */}
       <section className="border-b border-ink/12 bg-brass-soft text-ink">
-        <div className="mx-auto grid max-w-[1400px] gap-10 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[280px_1fr]">
+        <Reveal as="div" className="mx-auto grid max-w-[1400px] gap-10 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[280px_1fr]">
           <Eyebrow className="lg:pt-3">Our vision</Eyebrow>
           <div>
             <p className="text-[clamp(1.375rem,3vw,2rem)] font-medium leading-[1.35]">{VISION}</p>
             <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-70">{VISION_SUPPORT}</p>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* ── mandate ──────────────────────────────────────────────────────── */}
       <section className="border-b border-ink/12 bg-meridian text-white">
-        <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+        <Reveal as="div" className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Eyebrow className="text-brass">Our mandate</Eyebrow>
           <p className="display mt-6 max-w-4xl text-[clamp(1.75rem,5vw,3.75rem)]">{MANDATE}</p>
           <p className="mt-6 max-w-2xl text-lg font-medium text-brass">
@@ -71,25 +83,32 @@ export default function AboutPage() {
           <p className="mt-12 max-w-3xl text-[15px] leading-relaxed text-white/60">
             {MANDATE_OBJECTIVE}
           </p>
-        </div>
+        </Reveal>
       </section>
 
       {/* ── foundational scriptures ──────────────────────────────────────── */}
       <section className="border-b border-ink/12">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <Eyebrow>Our foundational scriptures</Eyebrow>
-          <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">What we stand on</h2>
+          <Reveal>
+            <Eyebrow>Our foundational scriptures</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">What we stand on</h2>
+          </Reveal>
 
           <div className="mt-12 grid gap-px bg-ink/12 lg:grid-cols-3">
-            {SCRIPTURES.map((scripture) => (
-              <figure key={scripture.reference} className="bg-bone p-7 sm:p-8">
+            {SCRIPTURES.map((scripture, index) => (
+              <Reveal
+                as="figure"
+                key={scripture.reference}
+                delay={index * 100}
+                className="bg-bone p-7 sm:p-8"
+              >
                 <figcaption className="font-mono text-[11px] uppercase tracking-[0.16em] text-brass">
                   {scripture.reference} ({scripture.version})
                 </figcaption>
                 <blockquote className="mt-4 text-[15px] italic leading-relaxed text-ink-70">
                   &ldquo;{scripture.text}&rdquo;
                 </blockquote>
-              </figure>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -98,22 +117,29 @@ export default function AboutPage() {
       {/* ── culture, seven pillars ───────────────────────────────────────── */}
       <section className="border-b border-ink/12">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <Eyebrow>Our culture</Eyebrow>
-          <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">
-            The seven pillars
-            <br />
-            of Dominion House
-          </h2>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-70">
-            Culture is the invisible force that shapes the identity of a people, the unwritten code
-            that governs behaviour, decisions, priorities and expression. Programs may change,
-            environments may shift, people may come and go, but culture is what makes a house
-            remain a house. Our culture is the reason we do what we do.
-          </p>
+          <Reveal>
+            <Eyebrow>Our culture</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">
+              The seven pillars
+              <br />
+              of Dominion House
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-70">
+              Culture is the invisible force that shapes the identity of a people, the unwritten
+              code that governs behaviour, decisions, priorities and expression. Programs may
+              change, environments may shift, people may come and go, but culture is what makes a
+              house remain a house. Our culture is the reason we do what we do.
+            </p>
+          </Reveal>
 
           <div className="mt-14 grid gap-px bg-ink/12 lg:grid-cols-2">
-            {PILLARS.map((pillar) => (
-              <article key={pillar.number} className="flex flex-col bg-bone p-7 sm:p-9">
+            {PILLARS.map((pillar, index) => (
+              <Reveal
+                as="article"
+                key={pillar.number}
+                delay={(index % 2) * 100}
+                className="card-lift flex flex-col bg-bone p-7 sm:p-9"
+              >
                 <div className="flex items-baseline gap-4">
                   <span className="font-mono text-sm font-semibold text-brass">
                     {pillar.number}
@@ -140,7 +166,7 @@ export default function AboutPage() {
                 <p className="mt-auto pt-7 text-[15px] font-medium italic leading-relaxed text-ink">
                   &ldquo;{pillar.pull}&rdquo;
                 </p>
-              </article>
+              </Reveal>
             ))}
           </div>
 
@@ -155,17 +181,24 @@ export default function AboutPage() {
       {/* ── what we believe ──────────────────────────────────────────────── */}
       <section className="border-b border-ink/12 bg-bone">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <Eyebrow>Doctrine</Eyebrow>
-          <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">What we believe</h2>
+          <Reveal>
+            <Eyebrow>Doctrine</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">What we believe</h2>
+          </Reveal>
 
           <ol className="mt-12 grid gap-px bg-ink/12 sm:grid-cols-2">
             {WHAT_WE_BELIEVE.map((belief, index) => (
-              <li key={belief} className="flex gap-4 bg-paper p-6 text-[15px] leading-relaxed text-ink-70">
+              <Reveal
+                as="li"
+                key={belief}
+                delay={(index % 4) * 70}
+                className="flex gap-4 bg-paper p-6 text-[15px] leading-relaxed text-ink-70"
+              >
                 <span className="font-mono text-sm font-semibold text-brass">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <span>{belief}</span>
-              </li>
+              </Reveal>
             ))}
           </ol>
         </div>
@@ -174,12 +207,19 @@ export default function AboutPage() {
       {/* ── senior pastors ───────────────────────────────────────────────── */}
       <section className="border-b border-ink/12">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <Eyebrow>Leadership</Eyebrow>
-          <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">Meet our Senior Pastors</h2>
+          <Reveal>
+            <Eyebrow>Leadership</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">Meet our Senior Pastors</h2>
+          </Reveal>
 
           <div className="mt-14 grid gap-8 sm:grid-cols-2">
-            {SENIOR_PASTOR_BIOS.map((pastor) => (
-              <article key={pastor.name} className="border border-ink/15 bg-paper p-5 sm:p-7">
+            {SENIOR_PASTOR_BIOS.map((pastor, index) => (
+              <Reveal
+                as="article"
+                key={pastor.name}
+                delay={index * 100}
+                className="card-lift border border-ink/15 bg-paper p-5 sm:p-7"
+              >
                 <div className="flex items-start gap-5">
                   <Image
                     src={pastor.imageUrl}
@@ -199,7 +239,7 @@ export default function AboutPage() {
                 <div className="mt-6 border-t border-dashed border-ink/25 pt-5">
                   <p className="text-[15px] leading-relaxed text-ink-70">{pastor.body}</p>
                 </div>
-              </article>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -207,7 +247,10 @@ export default function AboutPage() {
 
       {/* ── close ────────────────────────────────────────────────────────── */}
       <section className="bg-ink text-white">
-        <div className="mx-auto flex max-w-[1400px] flex-col gap-8 px-5 py-20 sm:px-8 sm:py-24 lg:flex-row lg:items-end lg:justify-between">
+        <Reveal
+          as="div"
+          className="mx-auto flex max-w-[1400px] flex-col gap-8 px-5 py-20 sm:px-8 sm:py-24 lg:flex-row lg:items-end lg:justify-between"
+        >
           <div>
             <Eyebrow className="text-brass">Next step</Eyebrow>
             <h2 className="display mt-4 max-w-xl text-[clamp(2.25rem,6vw,4.5rem)]">
@@ -222,7 +265,7 @@ export default function AboutPage() {
               Fresh Fire 2027
             </ButtonLink>
           </div>
-        </div>
+        </Reveal>
       </section>
     </>
   );

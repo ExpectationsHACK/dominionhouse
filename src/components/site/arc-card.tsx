@@ -93,7 +93,11 @@ export function ArcCard({
 }) {
   return (
     <li
-      className={cn("relative flex flex-col overflow-hidden sm:min-h-[26rem]", CARD[variant], className)}
+      className={cn(
+        "card-lift relative flex flex-col overflow-hidden sm:min-h-[26rem]",
+        CARD[variant],
+        className,
+      )}
       style={
         variant === "blue"
           ? { background: "linear-gradient(180deg,#21a1ff 0%,#21a1ff 40%,#0b0b0c 135%)" }
