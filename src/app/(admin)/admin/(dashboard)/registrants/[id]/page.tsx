@@ -389,7 +389,10 @@ export default async function RegistrantDetailPage({
             <div className="mt-3">
               <DataRow label="Code" value={<span className="font-mono">{registrant.registrationCode}</span>} />
               <DataRow label="Registered" value={dateTimeLabel.format(registrant.createdAt)} />
-              <DataRow label="Gender" value={registrant.gender === "MALE" ? "Male" : "Female"} />
+              <DataRow
+                label="Gender"
+                value={registrant.gender === "MALE" ? "Male" : registrant.gender === "FEMALE" ? "Female" : "Not given yet"}
+              />
               <DataRow label="Lighthouse or Ministry" value={registrant.lighthouse ?? ", "} />
               <DataRow label="Region" value={registrant.region ?? ", "} />
               <DataRow label="Branch" value={registrant.branch ?? ", "} />
@@ -415,8 +418,8 @@ export default async function RegistrantDetailPage({
           <Panel className="p-5">
             <Eyebrow>Care and emergency</Eyebrow>
             <div className="mt-3">
-              <DataRow label="Contact" value={registrant.emergencyName} />
-              <DataRow label="Phone" value={registrant.emergencyPhone} />
+              <DataRow label="Contact" value={registrant.emergencyName ?? "Not given yet"} />
+              <DataRow label="Phone" value={registrant.emergencyPhone ?? "Not given yet"} />
               <DataRow label="Relationship" value={registrant.emergencyRelation ?? ", "} />
             </div>
             {registrant.medicalNotes ? (

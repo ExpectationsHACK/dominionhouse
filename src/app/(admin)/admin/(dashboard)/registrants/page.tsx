@@ -221,7 +221,7 @@ export default async function RegistrantsPage({
                   <Td>
                     <p className="text-sm">{CATEGORY_LABEL[registrant.category]}</p>
                     <p className="mt-0.5 text-xs text-ink-45">
-                      {registrant.gender === "MALE" ? "Male" : "Female"}
+                      {registrant.gender === "MALE" ? "Male" : registrant.gender === "FEMALE" ? "Female" : "—"}
                     </p>
                   </Td>
                   <Td>

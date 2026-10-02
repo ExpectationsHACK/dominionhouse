@@ -11,6 +11,7 @@ import {
   PanelHeader,
 } from "@/components/ui";
 import { WhatsAppCta } from "@/components/site/whatsapp-cta";
+import { CompleteProfile } from "./complete-profile";
 import { requireRegistrant } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { dayLabel, daysUntil, timeLabel } from "@/lib/dates";
@@ -32,6 +33,8 @@ export default async function PortalOverviewPage({
   const registrant = await requireRegistrant();
   const totals = totalsFor(registrant);
   const { joined } = await searchParams;
+  const needsGender = !registrant.gender;
+  const needsEmergency = !registrant.emergencyName || !registrant.emergencyPhone;
 
   const [nextUp, announcements] = await Promise.all([
     db.scheduleItem.findMany({
@@ -48,6 +51,14 @@ export default async function PortalOverviewPage({
 
   return (
     <div className="space-y-6">
+      {needsGender || needsEmergency ? (
+        <CompleteProfile
+          firstName={registrant.firstName}
+          needsGender={needsGender}
+          needsEmergency={needsEmergency}
+        />
+      ) : null}
+
       {joined === "1" ? <WhatsAppCta /> : null}
 
       {!totals.isSettled ? (

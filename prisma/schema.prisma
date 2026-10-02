@@ -224,7 +224,9 @@ model Registrant {
   lastName         String
   email            String
   phone            String
-  gender           Gender
+  /// Null only for people imported from an outside list that didn't ask;
+  /// they're asked to fill it in when they open their camp profile.
+  gender           Gender?
   dateOfBirth      DateTime?
   age              Int?
 
@@ -256,9 +258,9 @@ model Registrant {
   state   String?
   country String? @default("Nigeria")
 
-  // Emergency + care
-  emergencyName     String
-  emergencyPhone    String
+  // Emergency + care. Required at registration; null only for imports.
+  emergencyName     String?
+  emergencyPhone    String?
   emergencyRelation String?
   medicalNotes      String?
   allergies         String?
@@ -285,6 +287,9 @@ model Registrant {
 
   consentPhoto Boolean @default(true)
   notes        String?
+  /// Where a registrant came from when they didn't register on this site,
+  /// e.g. "LARK form". Null for everyone who registered here.
+  importedFrom String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

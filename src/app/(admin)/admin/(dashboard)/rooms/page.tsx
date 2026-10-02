@@ -232,7 +232,7 @@ export default async function RoomsPage() {
                     {person.firstName} {person.lastName}
                   </Link>
                   <p className="mt-0.5 text-xs text-ink-45">
-                    {person.gender === "MALE" ? "Male" : "Female"} ·{" "}
+                    {person.gender === "MALE" ? "Male" : person.gender === "FEMALE" ? "Female" : "Gender not given"} ·{" "}
                     {POSITION_LABEL[person.position]}
                     {person.department ? ` · ${person.department}` : ""}
                   </p>
@@ -254,7 +254,7 @@ export default async function RoomsPage() {
                           (room) =>
                             room.isActive &&
                             room.assignments.length < room.capacity &&
-                            (room.gender === "MIXED" || room.gender === person.gender),
+                            (room.gender === "MIXED" || (person.gender !== null && room.gender === person.gender)),
                         )
                         .map((room) => (
                           <option key={room.id} value={room.id}>

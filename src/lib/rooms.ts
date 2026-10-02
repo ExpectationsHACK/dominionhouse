@@ -91,6 +91,12 @@ export async function assignManually(args: {
     if (!movingWithinSameRoom && occupied >= room.capacity) {
       return { ok: false as const, error: `${room.block} ${room.name} is full (${room.capacity} beds).` };
     }
+    if (room.gender !== "MIXED" && !registrant.gender) {
+      return {
+        ok: false as const,
+        error: `${registrant.firstName} hasn't given a gender yet, so they can only go in a mixed room.`,
+      };
+    }
     if (room.gender !== "MIXED" && room.gender !== registrant.gender) {
       return { ok: false as const, error: `${room.block} ${room.name} is a ${room.gender.toLowerCase()} room.` };
     }
