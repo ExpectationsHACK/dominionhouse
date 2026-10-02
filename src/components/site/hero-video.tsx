@@ -3,7 +3,14 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 
-const noSubscribe = () => () => {};
+const PHONE = "(max-width: 767px)";
+
+/** Re-pick the film when the window crosses the phone width (resize, rotation). */
+function subscribe(onChange: () => void) {
+  const list = window.matchMedia(PHONE);
+  list.addEventListener("change", onChange);
+  return () => list.removeEventListener("change", onChange);
+}
 
 /** Which film to load, or none (reduced motion, data saver). Client-only. */
 function chooseSource(): string | null {
@@ -11,9 +18,7 @@ function chooseSource(): string | null {
   const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
     ?.saveData;
   if (reduceMotion || saveData) return null;
-  return window.matchMedia("(max-width: 767px)").matches
-    ? "/video/hero-mobile.mp4"
-    : "/video/hero-desktop.mp4";
+  return window.matchMedia(PHONE).matches ? "/video/hero-mobile.mp4" : "/video/hero-desktop.mp4";
 }
 
 /**
@@ -27,8 +32,10 @@ function chooseSource(): string | null {
 export function HeroVideo({ className }: { className?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   // Null on the server and in the first client render, so hydration matches.
-  const src = useSyncExternalStore(noSubscribe, chooseSource, () => null);
-  const [ready, setReady] = useState(false);
+  const src = useSyncExternalStore(subscribe, chooseSource, () => null);
+  // Which file has buffered enough to show; a swapped-in one fades in afresh.
+  const [readySrc, setReadySrc] = useState<string | null>(null);
+  const ready = readySrc !== null && readySrc === src;
 
   useEffect(() => {
     const video = videoRef.current;
@@ -53,6 +60,7 @@ export function HeroVideo({ className }: { className?: string }) {
       </picture>
       {src ? (
         <video
+          key={src}
           ref={videoRef}
           src={src}
           autoPlay
@@ -60,7 +68,7 @@ export function HeroVideo({ className }: { className?: string }) {
           loop
           playsInline
           preload="auto"
-          onCanPlay={() => setReady(true)}
+          onCanPlay={() => setReadySrc(src)}
           className={cn(
             "absolute inset-0 h-full w-full object-cover transition-opacity duration-1000",
             ready ? "opacity-100" : "opacity-0",
