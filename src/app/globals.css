@@ -292,18 +292,20 @@
   transform: none;
 }
 
-/* The block of squares a card shows before it opens, scattering away. */
-.pixel-dissolve rect {
+/* A card's header block of squares, landing square by square as it opens. */
+.pixel-assemble rect {
+  opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
+  transform: scale(0.2) rotate(45deg);
   transition:
     opacity 0.45s var(--ease-out-expo),
     transform 0.6s var(--ease-out-expo);
 }
 
-[data-open="true"] .pixel-dissolve rect {
-  opacity: 0;
-  transform: scale(0.2) rotate(45deg);
+[data-open="true"] .pixel-assemble rect {
+  opacity: 1;
+  transform: none;
 }
 
 /* ── tilt + sheen, for cards that answer the cursor ──────────────────────── */
@@ -371,11 +373,12 @@
     animation: none;
   }
   .reveal-word,
-  .pixel-dissolve rect,
+  .pixel-assemble rect,
   .tilt-sheen {
     transition: none;
   }
-  .reveal-word {
+  .reveal-word,
+  .pixel-assemble rect {
     opacity: 1;
     filter: none;
     transform: none;

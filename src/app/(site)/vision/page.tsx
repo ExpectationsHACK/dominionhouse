@@ -53,7 +53,7 @@ export default function VisionPage() {
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
             <Eyebrow>Our mission, the 5D strategy</Eyebrow>
-            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">The 5 D&apos;s.</h2>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">The 5D&apos;s.</h2>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">
               Discover, develop, deploy, duplicate, dominate: the path every disciple walks, from
               finding their purpose to leading in their sphere of influence.

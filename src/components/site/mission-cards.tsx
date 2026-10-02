@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { BLUE_SHADES, PixelBlock, shadeBackground } from "@/components/site/pixel-block";
 import { cn } from "@/lib/utils";
 
 type Step = {
@@ -12,80 +13,25 @@ type Step = {
 };
 
 /**
- * The 5D strategy as compact cards that open themselves.
+ * The 5D strategy as cards that build themselves as you arrive.
  *
  * A progress rail draws through the cards as the section scrolls into view
  * (across the row on wide screens, down the column on phones). When it reaches
- * a card, the block of squares scatters and the words rise out of a blur, one
- * after another. Once open, a card stays open.
+ * a card, its header block of squares lands square by square and the words
+ * rise out of a blur. Once open a card stays open, and what's left is the
+ * house's portrait card: squares on top, the step written out beneath, in its
+ * own shade of blue.
  *
  * Hover is decoration only: the card tilts toward the cursor and a sheen
  * passes over it. The text is always laid out, invisible until revealed, so
  * opening never changes a card's size. Reduced motion shows it all at once.
  */
 
-/** Light to deep: the strategy reads as a progression, D1 to D5. */
-const SHADES = [
-  { bg: "#a8dbff", text: "text-ink", muted: "text-ink/70", art: "text-white", dot: "bg-[#a8dbff]", glow: "rgba(168,219,255,0.55)" },
-  { bg: "#5cbcff", text: "text-ink", muted: "text-ink/70", art: "text-white", dot: "bg-[#5cbcff]", glow: "rgba(92,188,255,0.55)" },
-  { bg: "#21a1ff", text: "text-ink", muted: "text-ink/75", art: "text-ink", dot: "bg-[#21a1ff]", glow: "rgba(33,161,255,0.55)" },
-  { bg: "#1170c9", text: "text-white", muted: "text-white/90", art: "text-brass", dot: "bg-[#1170c9]", glow: "rgba(17,112,201,0.55)" },
-  { bg: "#0a3d75", text: "text-white", muted: "text-white/85", art: "text-brass", dot: "bg-[#0a3d75]", glow: "rgba(10,61,117,0.6)" },
-] as const;
-
 /** Gap between one word surfacing and the next. */
 const WORD_STEP_MS = 22;
-/** Words wait this long, so the squares are mostly gone first. */
-const WORDS_START_MS = 260;
+/** Words wait this long, so the first squares have landed. */
+const WORDS_START_MS = 220;
 const MAX_TILT = 6;
-
-const COLS = 10;
-const ROWS = 5;
-const CELL = 20;
-
-function noise(row: number, col: number, seed: number) {
-  const value = Math.sin(row * 12.9898 + col * 78.233 + seed * 37.719) * 43758.5453;
-  return value - Math.floor(value);
-}
-
-/** The block of squares that sits where the text will appear, then scatters. */
-function PixelDissolve({ seed, className }: { seed: number; className?: string }) {
-  const squares: { x: number; y: number; opacity: number; delay: number }[] = [];
-  for (let row = 0; row < ROWS; row++) {
-    for (let col = 0; col < COLS; col++) {
-      const checker = (row + col) % 2 === 0;
-      const survives = noise(row, col, seed) > row / (ROWS + 1);
-      if (row === 0 ? true : checker && survives) {
-        squares.push({
-          x: col * CELL + 2,
-          y: row * CELL + 2,
-          opacity: 1 - row / (ROWS + 1),
-          delay: Math.round(noise(col, row, seed + 7) * 320),
-        });
-      }
-    }
-  }
-  return (
-    <svg
-      viewBox={`0 0 ${COLS * CELL} ${ROWS * CELL}`}
-      aria-hidden="true"
-      className={cn("pixel-dissolve block w-full max-w-[16rem]", className)}
-      fill="currentColor"
-    >
-      {squares.map((square) => (
-        <rect
-          key={`${square.x}-${square.y}`}
-          x={square.x}
-          y={square.y}
-          width={CELL - 4}
-          height={CELL - 4}
-          opacity={square.opacity}
-          style={{ transitionDelay: `${square.delay}ms` }}
-        />
-      ))}
-    </svg>
-  );
-}
 
 /** Text split into words that surface one by one, starting at `from`. */
 function Words({ text, from }: { text: string; from: number }) {
@@ -138,7 +84,7 @@ function MissionCard({
   canTilt: boolean;
   dotRef: (node: HTMLSpanElement | null) => void;
 }) {
-  const shade = SHADES[index % SHADES.length];
+  const shade = BLUE_SHADES[index % BLUE_SHADES.length];
   const cardRef = useRef<HTMLDivElement>(null);
   const summaryWords = wordCount(step.summary);
   const bodyWords = wordCount(step.body);
@@ -182,32 +128,35 @@ function MissionCard({
         data-open={open}
         onPointerMove={tilt}
         onPointerLeave={settle}
-        className={cn("tilt-sheen relative flex h-full flex-col overflow-hidden p-5 sm:p-6", shade.text)}
-        style={{ backgroundColor: shade.bg }}
+        className={cn(
+          "tilt-sheen relative flex h-full flex-col overflow-hidden xl:min-h-[36rem]",
+          shade.text,
+        )}
+        style={{ background: shadeBackground(shade) }}
       >
-        <p className={cn("font-mono text-sm font-semibold", shade.muted)}>{step.key}</p>
-        <h3 className="display mt-2 text-3xl sm:text-4xl">{step.name}</h3>
+        {/* Whole rows only (two, three, then the full block in the row of five),
+            capped so the squares keep their size on a wide single-column card. */}
+        <div className="aspect-[5/1] w-full max-w-[20rem] overflow-hidden sm:aspect-[10/3] xl:aspect-[5/3]">
+          <PixelBlock seed={index + 1} className={cn("pixel-assemble", shade.art)} />
+        </div>
 
-        <div className="relative mt-5 flex-1">
+        <div className="flex flex-1 flex-col p-5 pt-4 sm:p-6 sm:pt-6">
+          <p className={cn("font-mono text-sm font-semibold", shade.key)}>{step.key}</p>
+          <h3 className="display mt-2 text-3xl sm:mt-3 sm:text-4xl">{step.name}</h3>
+
           {/* Transparent until revealed, but always in the page, so screen
               readers and search engines get the full text either way. */}
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.08em]">
-              <Words text={step.summary} from={0} />
+          <p className="mt-3 text-[13px] font-semibold uppercase leading-snug tracking-[0.08em] sm:text-xs">
+            <Words text={step.summary} from={0} />
+          </p>
+          <p className={cn("mt-3 text-[15px] leading-relaxed sm:mt-4 sm:text-sm", shade.muted)}>
+            <Words text={step.body} from={summaryWords} />
+          </p>
+          {step.scripture ? (
+            <p className={cn("mt-auto pt-4 font-mono text-xs uppercase tracking-[0.14em] sm:pt-5 sm:text-[11px]", shade.key)}>
+              <Words text={step.scripture} from={summaryWords + bodyWords + 4} />
             </p>
-            <p className={cn("mt-3 text-[13px] leading-relaxed sm:text-sm", shade.muted)}>
-              <Words text={step.body} from={summaryWords} />
-            </p>
-            {step.scripture ? (
-              <p className={cn("mt-4 font-mono text-[11px] uppercase tracking-[0.14em]", shade.muted)}>
-                <Words text={step.scripture} from={summaryWords + bodyWords + 4} />
-              </p>
-            ) : null}
-          </div>
-
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-            <PixelDissolve seed={index + 1} className={shade.art} />
-          </div>
+          ) : null}
         </div>
       </div>
     </li>

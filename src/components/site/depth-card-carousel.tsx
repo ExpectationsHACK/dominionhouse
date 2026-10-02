@@ -218,9 +218,6 @@ export function DepthCardCarousel({
             <path d="M2 8h11M9 4l4 4-4 4" strokeLinecap="square" />
           </svg>
         </button>
-        <p className="ml-2 font-mono text-[11px] uppercase tracking-[0.14em] text-white/40">
-          Drag, or use the arrows
-        </p>
       </div>
     </div>
   );

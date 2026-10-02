@@ -141,7 +141,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
             <Eyebrow>Leadership</Eyebrow>
-            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">Meet our Senior Pastors</h2>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">Meet our Visionaries</h2>
           </Reveal>
 
           <div className="mt-14 grid gap-8 sm:grid-cols-2">
@@ -162,9 +162,20 @@ export default function AboutPage() {
                   />
                   <div className="min-w-0 pt-1">
                     <h3 className="display text-2xl leading-[1.05] sm:text-3xl">{pastor.name}</h3>
-                    <span className="mt-3 inline-block border border-brass/40 bg-brass-soft px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-ink">
-                      {pastor.title}
-                    </span>
+                    {/* "Visionary / Founder" as a two-tone tag: the calling in the
+                        house blue, the role beside it in black. */}
+                    <p className="mt-3 inline-flex items-stretch font-mono text-[11px] font-semibold uppercase tracking-[0.14em]">
+                      {pastor.title.split(" / ").map((part, partIndex) => (
+                        <span
+                          key={part}
+                          className={
+                            partIndex === 0 ? "bg-brass px-3 py-1.5 text-ink" : "bg-ink px-3 py-1.5 text-white"
+                          }
+                        >
+                          {part}
+                        </span>
+                      ))}
+                    </p>
                   </div>
                 </div>
 

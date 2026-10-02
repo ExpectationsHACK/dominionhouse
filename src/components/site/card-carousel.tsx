@@ -1,6 +1,5 @@
 "use client";
 
-import { Children } from "react";
 import { useDragScroll } from "@/components/site/use-drag-scroll";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +22,6 @@ export function CardCarousel({
   className?: string;
 }) {
   const { trackRef, atStart, atEnd, dragging, page, handlers } = useDragScroll();
-  const count = Children.count(children);
 
   const arrow = cn(
     "flex h-11 w-11 items-center justify-center border transition-colors",
@@ -74,14 +72,6 @@ export function CardCarousel({
             <path d="M2 8h11M9 4l4 4-4 4" strokeLinecap="square" />
           </svg>
         </button>
-        <p
-          className={cn(
-            "ml-2 font-mono text-[11px] uppercase tracking-[0.14em]",
-            tone === "dark" ? "text-white/40" : "text-ink-45",
-          )}
-        >
-          {count} cards · drag or use the arrows
-        </p>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { Arcs, ARC_VARIANTS, BODY_TONE, CARD, REGION_TONE } from "@/components/site/arc-card";
 import { CardCarousel } from "@/components/site/card-carousel";
+import { BLUE_SHADES, PixelBlock, shadeBackground } from "@/components/site/pixel-block";
 import { Reveal } from "@/components/site/reveal";
 import { PILLARS, SCRIPTURES, WHAT_WE_BELIEVE } from "@/lib/church";
 import { cn } from "@/lib/utils";
@@ -63,38 +64,34 @@ export function PillarCarousel({ tone = "light" }: { tone?: "light" | "dark" }) 
   );
 }
 
-/** Light to deep, the same progression the 5D cards use. */
-const BELIEF_SHADES = [
-  { bg: "#d3eaff", text: "text-ink", number: "text-[#1170c9]" },
-  { bg: "#a8dbff", text: "text-ink", number: "text-[#0a3d75]" },
-  { bg: "#5cbcff", text: "text-ink", number: "text-white" },
-  { bg: "#21a1ff", text: "text-ink", number: "text-white" },
-  { bg: "#1170c9", text: "text-white", number: "text-[#a8dbff]" },
-  { bg: "#0a3d75", text: "text-white", number: "text-brass" },
-  { bg: "#0b0b0c", text: "text-white", number: "text-brass" },
-] as const;
-
-/** What we believe, numbered cards stepping through the blues. */
+/** What we believe, in the 5D cards' portrait design, stepping through the blues. */
 export function BeliefCarousel({ tone = "light" }: { tone?: "light" | "dark" }) {
   return (
     <CardCarousel label="What we believe" tone={tone} className="mt-12">
       {WHAT_WE_BELIEVE.map((belief, index) => {
-        const shade = BELIEF_SHADES[index % BELIEF_SHADES.length];
+        const shade = BLUE_SHADES[index % BLUE_SHADES.length];
         return (
           <Reveal
             as="article"
             key={belief}
             delay={(index % 3) * 80}
             className={cn(
-              "card-lift flex min-h-[17rem] w-[72vw] flex-col p-6 sm:w-[300px] sm:p-7",
+              "card-lift flex min-h-[22rem] w-[78vw] flex-col overflow-hidden sm:w-[300px]",
               shade.text,
             )}
-            style={{ backgroundColor: shade.bg }}
+            style={{ background: shadeBackground(shade) }}
           >
-            <p className={cn("display text-6xl leading-none", shade.number)}>
-              {String(index + 1).padStart(2, "0")}
-            </p>
-            <p className="mt-auto pt-8 text-[15px] font-medium leading-relaxed">{belief}</p>
+            {/* Exactly three rows of squares at any card width, no half-cut row. */}
+            <div className="aspect-[10/3] w-full overflow-hidden">
+              <PixelBlock seed={index + 1} className={shade.art} />
+            </div>
+            <div className="flex flex-1 flex-col p-6 pt-4">
+              <p className={cn("font-mono text-sm font-semibold", shade.key)}>We believe</p>
+              <p className="display mt-2 text-4xl">{String(index + 1).padStart(2, "0")}</p>
+              <p className={cn("mt-4 text-[15px] font-medium leading-relaxed", shade.muted)}>
+                {belief}
+              </p>
+            </div>
           </Reveal>
         );
       })}

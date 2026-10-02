@@ -207,13 +207,13 @@ export const WHAT_WE_BELIEVE = [
 export const SENIOR_PASTOR_BIOS = [
   {
     name: "Rev Dotun Arifalo",
-    title: "Founder / Senior Pastor",
+    title: "Visionary / Founder",
     body: "A passionate preacher of the word of God, intensely consumed with the mission of Christ, go and make disciples. She has an unusual grace for prayer that has transformed lives in various nations across the globe. She is a developer of men, a broker of gifts, and an apostle to the nations. She is the visionary of this great movement together with her husband, Pastor Vincent Arifalo.",
     imageUrl: "/pastors/dotun-arifalo.jpg",
   },
   {
     name: "Pastor Vincent Arifalo",
-    title: "Senior Pastor",
+    title: "Visionary / Co-Founder",
     body: "A medical doctor by training but a prolific teacher of the word by calling. He is passionate about preaching the undiluted Christocentric word of God and developing solid disciples for the mission of Christ. He is a worshipper, a student of Christ, a father and a strong anchor to many.",
     imageUrl: "/pastors/vincent-arifalo.jpg",
   },
