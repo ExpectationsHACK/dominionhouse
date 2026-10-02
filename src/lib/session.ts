@@ -13,7 +13,8 @@ import {
 
 export { ADMIN_COOKIE, PORTAL_COOKIE };
 
-export type PortalSession = { registrantId: string; email: string };
+/** firstName rides along so the site header can greet them without a database read. */
+export type PortalSession = { registrantId: string; email: string; firstName?: string };
 export type AdminSession = { adminId: string; email: string; name: string; role: AdminRole };
 
 async function read<T>(name: string): Promise<T | null> {

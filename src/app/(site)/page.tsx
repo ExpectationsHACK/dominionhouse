@@ -12,7 +12,7 @@ import { StaggerWords } from "@/components/site/stagger-words";
 import { TiltCard } from "@/components/site/tilt-card";
 import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
-import { campLockup, getActiveCamp } from "@/lib/camp";
+import { campLockup } from "@/lib/camp";
 import {
   ABOUT,
   CAMPUSES,
@@ -21,8 +21,8 @@ import {
   STRATEGY,
 } from "@/lib/church";
 import { remainingUntil } from "@/lib/countdown";
-import { db } from "@/lib/db";
 import { formatKobo } from "@/lib/money";
+import { getPublicCamp, getPublicMedia } from "@/lib/public-data";
 import { SERVICE_CLIPS } from "@/lib/site-videos";
 
 export const metadata: Metadata = {
@@ -91,19 +91,13 @@ const SENIOR_PASTORS: DepthCardItem[] = [
 ];
 
 export default async function HomePage() {
-  const camp = await getActiveCamp();
+  const camp = await getPublicCamp();
   const cheapest = camp?.priceTiers.length
     ? Math.min(...camp.priceTiers.map((tier) => tier.amountKobo))
     : null;
   const [pastorRows, clipRows] = await Promise.all([
-    db.siteMedia.findMany({
-      where: { placement: "PASTORS", isActive: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    }),
-    db.siteMedia.findMany({
-      where: { placement: "SERVICE_VIDEOS", isActive: true, videoUrl: { not: null } },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    }),
+    getPublicMedia("PASTORS"),
+    getPublicMedia("SERVICE_VIDEOS").then((rows) => rows.filter((row) => row.videoUrl)),
   ]);
   const clips = clipRows.length
     ? clipRows.map((row) => ({

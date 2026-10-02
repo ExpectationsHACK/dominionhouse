@@ -43,9 +43,9 @@ export default async function LocationsPage({
             className="display rise-in mt-5 text-[clamp(2.5rem,9vw,7.5rem)]"
             style={{ animationDelay: "120ms" }}
           >
-            Find your
+            Find a lighthouse
             <br />
-            lighthouse
+            near you
           </h1>
           <p
             className="rise-in mt-8 max-w-xl text-lg leading-relaxed text-white/70"

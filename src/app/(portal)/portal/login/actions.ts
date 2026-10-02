@@ -49,7 +49,11 @@ export async function portalSignIn(
     return { error: "This registration has been cancelled. Please contact the camp desk." };
   }
 
-  await createPortalSession({ registrantId: registrant.id, email: registrant.email });
+  await createPortalSession({
+    registrantId: registrant.id,
+    email: registrant.email,
+    firstName: registrant.firstName,
+  });
   redirect("/portal");
 }
 

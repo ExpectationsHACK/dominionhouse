@@ -42,24 +42,26 @@ export default async function PaymentPage({ searchParams }: { searchParams: Sear
   const camp = await requireActiveCamp();
   const session = await getPortalSession();
 
-  // A device that's already signed in doesn't need to log in again; an
-  // explicit ?email= (set by the login form below, or a confirmation-email
-  // link) still takes priority, so a shared device can look up someone else
-  // without signing out first.
+  // A device that's already signed in doesn't need to log in again. An
+  // explicit ?email= (a confirmation-email link, or a shared device looking up
+  // someone else) only prefills the login: an address alone never opens an
+  // account, or anyone could read anyone's name and balance off the URL.
   const email = params.email ? normalizeEmail(params.email) : (session?.email ?? null);
 
-  const registrant = email
-    ? await db.registrant.findUnique({
-        where: { campId_email: { campId: camp.id, email } },
-        include: {
-          priceTier: true,
-          payments: { orderBy: { createdAt: "desc" } },
-          ticket: true,
-        },
-      })
-    : null;
+  const found =
+    email && session
+      ? await db.registrant.findUnique({
+          where: { campId_email: { campId: camp.id, email } },
+          include: {
+            priceTier: true,
+            payments: { orderBy: { createdAt: "desc" } },
+            ticket: true,
+          },
+        })
+      : null;
 
-  const isOwnSession = Boolean(registrant && session?.registrantId === registrant.id);
+  const registrant = found && session?.registrantId === found.id ? found : null;
+  const isOwnSession = Boolean(registrant);
 
   const totals = registrant ? totalsFor(registrant) : null;
   const minimum = registrant && totals ? minimumPayableKobo(camp, totals) : 0;
@@ -135,7 +137,9 @@ export default async function PaymentPage({ searchParams }: { searchParams: Sear
             </div>
 
             {/* ── the answer ──────────────────────────────────────────────── */}
-            <div>{!email ? <Placeholder /> : <NotRegistered email={email} />}</div>
+            <div>
+              <Placeholder />
+            </div>
           </div>
         )}
       </div>
@@ -152,35 +156,13 @@ function Placeholder() {
       </p>
       <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-45">
         We check the email against the camp register. If it&apos;s there, you can pay. If it
-        isn&apos;t, we&apos;ll send you to register first, it takes about three minutes.
+        isn&apos;t, register first, it takes about three minutes.
       </p>
-    </div>
-  );
-}
-
-function NotRegistered({ email }: { email: string }) {
-  return (
-    <div className="border border-ink bg-ink px-7 py-12 text-white sm:px-10 sm:py-16">
-      <Eyebrow className="text-brass">Not on the register</Eyebrow>
-      <p className="display mt-4 text-[clamp(2.25rem,5vw,3.75rem)]">
-        We can&apos;t take a payment yet
-      </p>
-      <p className="mt-5 max-w-lg text-base leading-relaxed text-white/65">
-        <span className="font-mono text-white">{email}</span> isn&apos;t registered for Camp
-        Meeting 2027. Register first, it takes about three minutes, and you&apos;ll land right
-        back here with your balance ready to pay.
-      </p>
-      <div className="mt-9 flex flex-wrap gap-2.5">
-        <ButtonLink href="/camp/register" variant="brass" size="lg">
+      <div className="mt-6">
+        <ButtonLink href="/camp/register" variant="outline" size="sm">
           Register now <Arrow />
         </ButtonLink>
-        <ButtonLink href="/camp" variant="inverse" size="lg">
-          What is camp?
-        </ButtonLink>
       </div>
-      <p className="mt-8 border-t border-white/15 pt-5 text-sm text-white/45">
-        Registered with a different address? Try that one instead.
-      </p>
     </div>
   );
 }

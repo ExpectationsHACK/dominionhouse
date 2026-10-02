@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { HillContours } from "@/components/site/hill-contours";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
-import { getActiveCamp } from "@/lib/camp";
+import { getPublicCamp } from "@/lib/public-data";
 import { CAMPUSES, COUNTRY_COUNT, GATHERINGS } from "@/lib/church";
 import { daysUntil } from "@/lib/dates";
 
@@ -47,7 +47,7 @@ const RHYTHMS = [
 ] as const;
 
 export default async function EventsPage() {
-  const camp = await getActiveCamp();
+  const camp = await getPublicCamp();
 
   return (
     <>
@@ -173,7 +173,7 @@ export default async function EventsPage() {
 
         <div className="mt-12 flex flex-wrap gap-2.5">
           <ButtonLink href="/locations" size="lg">
-            Find your lighthouse <Arrow />
+            Find a lighthouse near you <Arrow />
           </ButtonLink>
         </div>
       </section>

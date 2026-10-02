@@ -4,9 +4,12 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { Logo } from "@/components/site/logo";
 
 const SEEN_KEY = "dh-splash-seen";
-/** How long the mark is on screen before the curtain lifts, in milliseconds. */
-const SHOW_FOR = 1900;
-const FADE_FOR = 600;
+/**
+ * How long the mark is on screen before the curtain lifts, in milliseconds.
+ * Kept brief: it stands between a first-time visitor and the page.
+ */
+const SHOW_FOR = 850;
+const FADE_FOR = 350;
 
 function subscribe() {
   return () => {};

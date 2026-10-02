@@ -29,7 +29,7 @@ import {
 async function renewPortalLogin(request: NextRequest, response: NextResponse) {
   if (request.method !== "GET" || !process.env.AUTH_SECRET) return;
 
-  const session = await verifyToken<{ registrantId?: string; email?: string }>(
+  const session = await verifyToken<{ registrantId?: string; email?: string; firstName?: string }>(
     request.cookies.get(PORTAL_COOKIE)?.value,
   );
   if (!session?.registrantId || !session.email || !session.iat) return;
@@ -37,7 +37,7 @@ async function renewPortalLogin(request: NextRequest, response: NextResponse) {
   if (Date.now() / 1000 - session.iat < PORTAL_RENEW_AFTER) return;
 
   const token = await signToken(
-    { registrantId: session.registrantId, email: session.email },
+    { registrantId: session.registrantId, email: session.email, firstName: session.firstName },
     PORTAL_MAX_AGE,
   );
   response.cookies.set(PORTAL_COOKIE, token, { ...COOKIE_BASE, maxAge: PORTAL_MAX_AGE });
@@ -58,7 +58,10 @@ export async function proxy(request: NextRequest) {
     `connect-src 'self'${isDev ? " ws: wss:" : ""}`,
     "object-src 'none'",
     "base-uri 'self'",
-    "form-action 'self'",
+    // Checkout redirects to Paystack. Browsers apply form-action to a form's
+    // redirect too, so without this a pay button pressed before the page's
+    // JavaScript loads (a plain form post) would be blocked on slow phones.
+    "form-action 'self' https://checkout.paystack.com",
     "frame-ancestors 'none'",
     ...(isDev ? [] : ["upgrade-insecure-requests"]),
   ].join("; ");

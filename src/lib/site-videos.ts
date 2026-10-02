@@ -15,8 +15,8 @@ const clip = (id: string, title: string): VideoCarouselItem => ({
 /** Homepage, "What a service feels like". */
 export const SERVICE_CLIPS: VideoCarouselItem[] = [
   clip("home-joy", "Joy"),
-  clip("home-fellowship", "Fellowship"),
-  clip("home-gathering", "Gathering"),
+  clip("home-fellowship", "Worship"),
+  clip("home-gathering", "Community"),
   clip("home-praise", "Praise"),
   clip("home-word", "The Word"),
 ];

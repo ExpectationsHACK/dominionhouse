@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { HillContours } from "@/components/site/hill-contours";
+import { BeliefCarousel, PillarCarousel, ScriptureCards } from "@/components/site/house-cards";
 import { Reveal } from "@/components/site/reveal";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import {
@@ -8,12 +9,9 @@ import {
   CHURCH,
   MANDATE,
   MANDATE_OBJECTIVE,
-  PILLARS,
-  SCRIPTURES,
   SENIOR_PASTOR_BIOS,
   VISION,
   VISION_SUPPORT,
-  WHAT_WE_BELIEVE,
 } from "@/lib/church";
 
 export const metadata: Metadata = {
@@ -94,23 +92,7 @@ export default function AboutPage() {
             <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">What we stand on</h2>
           </Reveal>
 
-          <div className="mt-12 grid gap-px bg-ink/12 lg:grid-cols-3">
-            {SCRIPTURES.map((scripture, index) => (
-              <Reveal
-                as="figure"
-                key={scripture.reference}
-                delay={index * 100}
-                className="bg-bone p-7 sm:p-8"
-              >
-                <figcaption className="font-mono text-[11px] uppercase tracking-[0.16em] text-brass">
-                  {scripture.reference} ({scripture.version})
-                </figcaption>
-                <blockquote className="mt-4 text-[15px] italic leading-relaxed text-ink-70">
-                  &ldquo;{scripture.text}&rdquo;
-                </blockquote>
-              </Reveal>
-            ))}
-          </div>
+          <ScriptureCards />
         </div>
       </section>
 
@@ -132,43 +114,7 @@ export default function AboutPage() {
             </p>
           </Reveal>
 
-          <div className="mt-14 grid gap-px bg-ink/12 lg:grid-cols-2">
-            {PILLARS.map((pillar, index) => (
-              <Reveal
-                as="article"
-                key={pillar.number}
-                delay={(index % 2) * 100}
-                className="card-lift flex flex-col bg-bone p-7 sm:p-9"
-              >
-                <div className="flex items-baseline gap-4">
-                  <span className="font-mono text-sm font-semibold text-brass">
-                    {pillar.number}
-                  </span>
-                  <div>
-                    <h3 className="display text-4xl">{pillar.name}</h3>
-                    <p className="mt-1 text-xs uppercase tracking-[0.08em] text-ink-45">
-                      {pillar.subtitle}
-                    </p>
-                  </div>
-                </div>
-
-                <p className="mt-6 text-[15px] leading-relaxed text-ink-70">{pillar.body}</p>
-
-                <ul className="mt-6 space-y-2.5">
-                  {pillar.points.map((point) => (
-                    <li key={point} className="flex gap-3 text-sm leading-relaxed text-ink-70">
-                      <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 bg-meridian" />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-
-                <p className="mt-auto pt-7 text-[15px] font-medium italic leading-relaxed text-ink">
-                  &ldquo;{pillar.pull}&rdquo;
-                </p>
-              </Reveal>
-            ))}
-          </div>
+          <PillarCarousel />
 
           <p className="mt-12 max-w-3xl text-lg leading-relaxed text-ink">
             These seven cultures are not activities, they are the essence of who we are. This is
@@ -186,21 +132,7 @@ export default function AboutPage() {
             <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">What we believe</h2>
           </Reveal>
 
-          <ol className="mt-12 grid gap-px bg-ink/12 sm:grid-cols-2">
-            {WHAT_WE_BELIEVE.map((belief, index) => (
-              <Reveal
-                as="li"
-                key={belief}
-                delay={(index % 4) * 70}
-                className="flex gap-4 bg-paper p-6 text-[15px] leading-relaxed text-ink-70"
-              >
-                <span className="font-mono text-sm font-semibold text-brass">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span>{belief}</span>
-              </Reveal>
-            ))}
-          </ol>
+          <BeliefCarousel />
         </div>
       </section>
 

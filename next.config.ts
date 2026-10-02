@@ -43,6 +43,11 @@ const NOT_NEEDED_AT_RUNTIME = [
 
 const nextConfig: NextConfig = {
   outputFileTracingExcludes: { "*": NOT_NEEDED_AT_RUNTIME },
+  // On Cloudflare there is no image optimiser behind /_next/image, so every
+  // image went through the Worker and came back full size, slowly. The images
+  // in public/ are sized for the web already, so they're served as-is
+  // straight from the CDN, with long-lived caching for the hashed imports.
+  images: { unoptimized: true },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

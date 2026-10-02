@@ -202,7 +202,11 @@ export async function registerForCamp(
 
   // The device they registered on is now their camp profile's device, no
   // separate sign-in needed until the cookie expires or they switch profiles.
-  await createPortalSession({ registrantId: registrant.id, email: registrant.email });
+  await createPortalSession({
+    registrantId: registrant.id,
+    email: registrant.email,
+    firstName: registrant.firstName,
+  });
 
   // Free ticket, Guest lighthouse or an under-5 child: nothing to pay, so the
   // ticket issues immediately instead of waiting on a payment that never comes.

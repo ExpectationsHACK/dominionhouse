@@ -9,8 +9,8 @@ import { TestimonialCarousel } from "@/components/site/testimonial-carousel";
 import { TicketCards } from "@/components/site/ticket-cards";
 import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
-import { db } from "@/lib/db";
-import { campLockup, requireActiveCamp } from "@/lib/camp";
+import { campLockup } from "@/lib/camp";
+import { getPublicCamp, getPublicMedia, getPublicSchedule } from "@/lib/public-data";
 import { remainingUntil } from "@/lib/countdown";
 import { campDateRange, dayLabel, timeLabel } from "@/lib/dates";
 import { formatKobo } from "@/lib/money";
@@ -87,25 +87,14 @@ const FAQS = [
 ] as const;
 
 export default async function CampOverviewPage() {
-  const camp = await requireActiveCamp();
+  const camp = await getPublicCamp();
+  if (!camp) throw new Error("No active camp found.");
 
   const [schedule, cards, testimonialRows, clipRows] = await Promise.all([
-    db.scheduleItem.findMany({
-      where: { campId: camp.id, isPublished: true },
-      orderBy: [{ startsAt: "asc" }],
-    }),
-    db.siteMedia.findMany({
-      where: { placement: "CAMP_CARDS", isActive: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    }),
-    db.siteMedia.findMany({
-      where: { placement: "TESTIMONIALS", isActive: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    }),
-    db.siteMedia.findMany({
-      where: { placement: "CAMP_VIDEOS", isActive: true, videoUrl: { not: null } },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    }),
+    getPublicSchedule(camp.id),
+    getPublicMedia("CAMP_CARDS"),
+    getPublicMedia("TESTIMONIALS"),
+    getPublicMedia("CAMP_VIDEOS").then((rows) => rows.filter((row) => row.videoUrl)),
   ]);
   const clips = clipRows.length
     ? clipRows.map((row) => ({

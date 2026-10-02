@@ -3,7 +3,7 @@ import { HillContours } from "@/components/site/hill-contours";
 import { Arrow, ButtonLink, Eyebrow, Notice, Panel } from "@/components/ui";
 import { CONTACT_EMAIL, PILLARS } from "@/lib/church";
 import { formatKobo } from "@/lib/money";
-import { getActiveCamp } from "@/lib/camp";
+import { getPublicCamp } from "@/lib/public-data";
 
 export const metadata: Metadata = {
   title: "Become an Angel Partner",
@@ -35,7 +35,7 @@ const WAYS = [
 ] as const;
 
 export default async function GivePage() {
-  const camp = await getActiveCamp();
+  const camp = await getPublicCamp();
   const cheapestKobo = camp?.priceTiers.length
     ? Math.min(...camp.priceTiers.map((tier) => tier.amountKobo))
     : null;

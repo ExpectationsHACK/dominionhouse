@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { HillContours } from "@/components/site/hill-contours";
+import { PillarCarousel, ScriptureCards } from "@/components/site/house-cards";
+import { MissionCards } from "@/components/site/mission-cards";
+import { Reveal } from "@/components/site/reveal";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import {
   ABOUT,
   MANDATE,
   MANDATE_OBJECTIVE,
-  PILLARS,
-  SCRIPTURES,
   STRATEGY,
   VISION,
   VISION_SUPPORT,
@@ -47,40 +48,19 @@ export default function VisionPage() {
         </div>
       </section>
 
-      {/* ── 5D strategy ──────────────────────────────────────────────────── */}
+      {/* ── 5D strategy, the same cards as the homepage ──────────────────── */}
       <section className="border-b border-ink/12">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <Eyebrow>Our mission, the 5D strategy</Eyebrow>
-          <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">
-            Discover · Develop · Deploy
-            <br />
-            Duplicate · Dominate
-          </h2>
+          <Reveal>
+            <Eyebrow>Our mission, the 5D strategy</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">The 5 D&apos;s.</h2>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">
+              Discover, develop, deploy, duplicate, dominate: the path every disciple walks, from
+              finding their purpose to leading in their sphere of influence.
+            </p>
+          </Reveal>
 
-          <div className="mt-14 border-t border-ink/12">
-            {STRATEGY.map((step) => (
-              <div
-                key={step.key}
-                className="grid gap-x-10 gap-y-3 border-b border-ink/12 py-8 lg:grid-cols-[120px_260px_1fr] lg:items-baseline"
-              >
-                <p className="display text-4xl text-brass">{step.key}</p>
-                <div>
-                  <h3 className="display text-3xl">{step.name}</h3>
-                  <p className="mt-1 text-xs uppercase tracking-[0.08em] text-ink-45">
-                    {step.summary}
-                  </p>
-                </div>
-                <div>
-                  <p className="max-w-2xl text-[15px] leading-relaxed text-ink-70">{step.body}</p>
-                  {"scripture" in step && step.scripture ? (
-                    <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-meridian">
-                      {step.scripture}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-            ))}
-          </div>
+          <MissionCards steps={STRATEGY} />
         </div>
       </section>
 
@@ -120,38 +100,7 @@ export default function VisionPage() {
             house remain a house.
           </p>
 
-          <div className="mt-14 grid gap-px bg-ink/12 lg:grid-cols-2">
-            {PILLARS.map((pillar) => (
-              <article key={pillar.number} className="flex flex-col bg-bone p-7 sm:p-9">
-                <div className="flex items-baseline gap-4">
-                  <span className="font-mono text-sm font-semibold text-brass">
-                    {pillar.number}
-                  </span>
-                  <div>
-                    <h3 className="display text-4xl">{pillar.name}</h3>
-                    <p className="mt-1 text-xs uppercase tracking-[0.08em] text-ink-45">
-                      {pillar.subtitle}
-                    </p>
-                  </div>
-                </div>
-
-                <p className="mt-6 text-[15px] leading-relaxed text-ink-70">{pillar.body}</p>
-
-                <ul className="mt-6 space-y-2.5">
-                  {pillar.points.map((point) => (
-                    <li key={point} className="flex gap-3 text-sm leading-relaxed text-ink-70">
-                      <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 bg-meridian" />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-
-                <p className="mt-auto pt-7 text-[15px] font-medium italic leading-relaxed text-ink">
-                  &ldquo;{pillar.pull}&rdquo;
-                </p>
-              </article>
-            ))}
-          </div>
+          <PillarCarousel />
 
           <p className="mt-12 max-w-3xl text-lg leading-relaxed text-ink">
             These seven cultures are not activities; they are the essence of who we are. This is our
@@ -166,18 +115,7 @@ export default function VisionPage() {
           <Eyebrow>Foundational scriptures</Eyebrow>
           <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">What we stand on</h2>
 
-          <div className="mt-12 grid gap-px bg-ink/12 lg:grid-cols-3">
-            {SCRIPTURES.map((scripture) => (
-              <figure key={scripture.reference} className="bg-bone p-7 sm:p-8">
-                <figcaption className="font-mono text-[11px] uppercase tracking-[0.16em] text-brass">
-                  {scripture.reference} ({scripture.version})
-                </figcaption>
-                <blockquote className="mt-4 text-[15px] italic leading-relaxed text-ink-70">
-                  &ldquo;{scripture.text}&rdquo;
-                </blockquote>
-              </figure>
-            ))}
-          </div>
+          <ScriptureCards />
         </div>
       </section>
 

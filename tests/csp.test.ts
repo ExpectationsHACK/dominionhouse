@@ -18,6 +18,10 @@ describe("content security policy", () => {
     expect(policy).toContain("form-action 'self'");
   });
 
+  it("lets checkout's redirect to Paystack through, even from a plain form post", async () => {
+    expect(await policyFor()).toMatch(/form-action 'self' https:\/\/checkout\.paystack\.com(;|$)/);
+  });
+
   it("uses a fresh nonce on every request", async () => {
     const nonce = (policy: string) => /'nonce-([^']+)'/.exec(policy)![1];
     expect(nonce(await policyFor())).not.toBe(nonce(await policyFor()));

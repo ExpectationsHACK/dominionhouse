@@ -2,21 +2,24 @@ import type { Metadata, Viewport } from "next";
 import { Anton, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
+// Latin only: every font file listed here is preloaded on a first visit, and
+// the extended set (Central European letters) cost three extra downloads the
+// site's English copy never used. Rare letters fall back to the system font.
 const anton = Anton({
   weight: "400",
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   variable: "--font-anton",
   display: "swap",
 });
 
 const interTight = Inter_Tight({
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   variable: "--font-inter-tight",
   display: "swap",
 });
 
 const jetbrains = JetBrains_Mono({
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   variable: "--font-jetbrains",
   display: "swap",
 });
