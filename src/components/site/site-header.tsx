@@ -44,7 +44,9 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
           <span className="display text-xl leading-none">Dominion House</span>
         </Link>
 
-        <nav aria-label="Main" className="hidden items-center gap-5 xl:gap-7 lg:flex">
+        {/* Seven links, "My camp" and Register need about 1,130px side by side;
+            below 1280px (tablets, small laptops) they live in the menu instead. */}
+        <nav aria-label="Main" className="hidden items-center gap-6 2xl:gap-8 xl:flex">
           {NAV.map((item) => {
             const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             return (
@@ -53,7 +55,7 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "group relative py-1 text-[13px] font-semibold uppercase tracking-[0.1em] transition-colors",
+                  "group relative whitespace-nowrap py-1 text-[13px] font-semibold uppercase tracking-[0.1em] transition-colors",
                   active ? "text-ink" : "text-ink-45 hover:text-ink",
                 )}
               >
@@ -73,13 +75,13 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
         <div className="flex items-center gap-2">
           <Link
             href="/portal"
-            className="hidden text-[13px] font-semibold uppercase tracking-[0.1em] text-ink-45 transition-colors hover:text-ink sm:block"
+            className="hidden max-w-[11rem] truncate whitespace-nowrap text-[13px] font-semibold uppercase tracking-[0.1em] text-ink-45 transition-colors hover:text-ink sm:block"
           >
             {signedInFirstName ? `Hi, ${signedInFirstName}` : "My camp"}
           </Link>
           <Link
             href="/camp/register"
-            className="hidden items-center gap-2 border border-ink bg-ink px-5 py-2.5 text-[12px] font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:bg-brass hover:border-brass sm:inline-flex"
+            className="hidden items-center gap-2 whitespace-nowrap border border-ink bg-ink px-5 py-2.5 text-[12px] font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:bg-brass hover:border-brass sm:inline-flex"
           >
             Register <Arrow />
           </Link>
@@ -89,7 +91,7 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
             onClick={() => setOpenOnPath(open ? null : pathname)}
             aria-expanded={open}
             aria-controls="mobile-nav"
-            className="flex h-10 w-10 items-center justify-center border border-ink/20 lg:hidden"
+            className="flex h-10 w-10 items-center justify-center border border-ink/20 xl:hidden"
           >
             <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
             <span aria-hidden="true" className="relative block h-3 w-4">
@@ -118,13 +120,13 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
             tabIndex={-1}
             aria-hidden="true"
             onClick={() => setOpenOnPath(null)}
-            className="absolute inset-x-0 top-full -z-10 h-dvh bg-ink/40 lg:hidden"
+            className="absolute inset-x-0 top-full -z-10 h-dvh bg-ink/40 xl:hidden"
           />
           {/* The header (4rem) plus this panel come to at most 90% of the screen height;
               anything longer scrolls inside it. */}
           <div
             id="mobile-nav"
-            className="max-h-[calc(90dvh-4rem)] overflow-y-auto border-t border-ink/12 bg-bone lg:hidden"
+            className="max-h-[calc(90dvh-4rem)] overflow-y-auto border-t border-ink/12 bg-bone xl:hidden"
           >
           <nav aria-label="Mobile" className="mx-auto max-w-[1400px] px-5 py-2 sm:px-8">
             {NAV.map((item) => (
