@@ -1,17 +1,20 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import flyer from "../../../../public/fresh-fire-camp.jpeg";
-import { CountUp } from "@/components/site/count-up";
+import { Countdown } from "@/components/site/countdown";
 import { DepthCardCarousel } from "@/components/site/depth-card-carousel";
 import { HillContours } from "@/components/site/hill-contours";
 import { Reveal } from "@/components/site/reveal";
 import { TestimonialCarousel } from "@/components/site/testimonial-carousel";
 import { TicketCards } from "@/components/site/ticket-cards";
+import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { db } from "@/lib/db";
 import { campLockup, requireActiveCamp } from "@/lib/camp";
-import { campDateRange, dayLabel, daysUntil, timeLabel } from "@/lib/dates";
+import { remainingUntil } from "@/lib/countdown";
+import { campDateRange, dayLabel, timeLabel } from "@/lib/dates";
 import { formatKobo } from "@/lib/money";
+import { CAMP_CLIPS } from "@/lib/site-videos";
 
 export const metadata: Metadata = {
   title: "Fresh Fire Camp Meeting 2027",
@@ -86,7 +89,7 @@ const FAQS = [
 export default async function CampOverviewPage() {
   const camp = await requireActiveCamp();
 
-  const [schedule, cards, testimonialRows] = await Promise.all([
+  const [schedule, cards, testimonialRows, clipRows] = await Promise.all([
     db.scheduleItem.findMany({
       where: { campId: camp.id, isPublished: true },
       orderBy: [{ startsAt: "asc" }],
@@ -99,7 +102,19 @@ export default async function CampOverviewPage() {
       where: { placement: "TESTIMONIALS", isActive: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     }),
+    db.siteMedia.findMany({
+      where: { placement: "CAMP_VIDEOS", isActive: true, videoUrl: { not: null } },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    }),
   ]);
+  const clips = clipRows.length
+    ? clipRows.map((row) => ({
+        id: row.id,
+        title: row.title,
+        videoUrl: row.videoUrl!,
+        posterUrl: row.posterUrl,
+      }))
+    : CAMP_CLIPS;
 
   const lockup = campLockup(camp.name);
   const days = groupByDay(schedule);
@@ -143,13 +158,27 @@ export default async function CampOverviewPage() {
             </ButtonLink>
           </div>
 
-          <dl
-            className="rise-in mt-16 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-8"
+          <div
+            className="rise-in mt-16 flex flex-wrap items-end gap-x-10 gap-y-8 border-t border-white/15 pt-8"
             style={{ animationDelay: "480ms" }}
           >
-            <Fact label="Days away" value={String(daysUntil(camp.startsAt))} count={daysUntil(camp.startsAt)} accent />
-            <Fact label="Venue" value={camp.venue} />
-          </dl>
+            <div>
+              <p className="eyebrow flex items-center gap-2 text-white/40">
+                <span className="pulse-ring relative h-1.5 w-1.5 rounded-full bg-brass text-brass" />
+                Camp starts in
+              </p>
+              <Countdown
+                target={camp.startsAt.toISOString()}
+                initial={remainingUntil(camp.startsAt)}
+                className="mt-3"
+                numberClassName="text-3xl sm:text-4xl"
+                labelClassName="text-white/40"
+              />
+            </div>
+            <dl>
+              <Fact label="Venue" value={camp.venue} />
+            </dl>
+          </div>
           </div>
 
           {/* The official flyer, carrying the house's own blue-and-amber treatment. */}
@@ -278,6 +307,21 @@ export default async function CampOverviewPage() {
           </div>
         </section>
       ) : null}
+
+      {/* ── the feel of it, five-second clips ─────────────────────────────── */}
+      <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
+        <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+          <Reveal>
+            <Eyebrow className="text-brass">A few seconds in the room</Eyebrow>
+            <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
+              What it feels like
+            </h2>
+          </Reveal>
+          <div className="mt-14">
+            <VideoCarousel label="Fresh Fire experience clips" items={clips} />
+          </div>
+        </div>
+      </section>
 
       {/* ── testimonials ─────────────────────────────────────────────────── */}
       {testimonialRows.length > 0 ? (
@@ -460,24 +504,14 @@ export default async function CampOverviewPage() {
   );
 }
 
-function Fact({
-  label,
-  value,
-  count,
-  accent,
-}: {
-  label: string;
-  value: string;
-  count?: number;
-  accent?: boolean;
-}) {
+function Fact({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div>
       <dt className="eyebrow text-white/40">{label}</dt>
       <dd
         className={`display mt-2 hyphens-auto break-words text-2xl sm:text-3xl ${accent ? "text-brass" : ""}`}
       >
-        {count !== undefined ? <CountUp value={count} /> : value}
+        {value}
       </dd>
     </div>
   );

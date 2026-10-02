@@ -51,3 +51,7 @@ next-env.d.ts
 .wrangler
 .dev.vars
 cf-build.log
+
+# Raw camera footage. Far too large for git (100 MB/file) or Cloudflare static
+# assets (25 MB/file); the web clips cut from it live in public/video/.
+/media-originals

@@ -1,3 +1,4 @@
+import { ScrollProgress } from "@/components/site/scroll-progress";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { db } from "@/lib/db";
@@ -16,6 +17,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="flex min-h-dvh flex-col">
+      <ScrollProgress />
       <SiteHeader signedInFirstName={signedInFirstName} />
       <main id="main" className="flex-1">
         {children}

@@ -50,11 +50,13 @@ function DepthCard({
   index,
   still,
   numbered,
+  centred,
 }: {
   item: DepthCardItem;
   index: number;
   still: boolean;
   numbered: boolean;
+  centred: boolean;
 }) {
   const ref = useRef<HTMLElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0, active: false });
@@ -80,7 +82,12 @@ function DepthCard({
       ref={ref}
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
-      className="group relative aspect-[3/4] w-[76vw] shrink-0 snap-center sm:w-[340px] lg:w-[380px]"
+      className={cn(
+        "group relative aspect-[3/4] w-[76vw] shrink-0 snap-center transition-[transform,filter] duration-500 ease-[var(--ease-out-expo)] sm:w-[340px] lg:w-[380px]",
+        centred
+          ? "z-10 scale-[1.05] drop-shadow-[0_28px_40px_rgba(0,0,0,0.45)]"
+          : "scale-100 drop-shadow-[0_10px_18px_rgba(0,0,0,0.25)]",
+      )}
       style={{ perspective: "1000px" }}
     >
       <div
@@ -106,6 +113,7 @@ function DepthCard({
             <img
               src={item.imageUrl}
               alt=""
+              draggable={false}
               className="h-full w-full object-cover"
               loading="lazy"
               decoding="async"
@@ -169,6 +177,10 @@ export function DepthCardCarousel({
   const still = usePrefersReducedMotion();
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
+  const [centred, setCentred] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const drag = useRef({ x: 0, scroll: 0, lastX: 0, lastT: 0, velocity: 0 });
+  const glide = useRef(0);
 
   const syncEdges = useCallback(() => {
     const track = trackRef.current;
@@ -184,7 +196,78 @@ export function DepthCardCarousel({
 
     setAtStart(track.scrollLeft <= 4);
     setAtEnd(track.scrollLeft + track.clientWidth >= track.scrollWidth - 4);
+
+    // The card nearest the middle of the track is the one in focus.
+    const middle = track.scrollLeft + track.clientWidth / 2;
+    let best = 0;
+    let bestDistance = Infinity;
+    Array.from(track.children).forEach((child, index) => {
+      const card = child as HTMLElement;
+      const distance = Math.abs(card.offsetLeft + card.offsetWidth / 2 - middle);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = index;
+      }
+    });
+    setCentred(best);
   }, []);
+
+  // Mouse drag with a flick: touch already scrolls natively with momentum,
+  // this gives a mouse the same feel instead of only arrows and the wheel.
+  function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    if (event.pointerType !== "mouse" || event.button !== 0) return;
+    const track = trackRef.current;
+    if (!track) return;
+    cancelAnimationFrame(glide.current);
+    track.setPointerCapture(event.pointerId);
+    track.style.scrollSnapType = "none";
+    drag.current = {
+      x: event.clientX,
+      scroll: track.scrollLeft,
+      lastX: event.clientX,
+      lastT: performance.now(),
+      velocity: 0,
+    };
+    setDragging(true);
+  }
+
+  function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (!dragging) return;
+    const track = trackRef.current;
+    if (!track) return;
+    const now = performance.now();
+    const state = drag.current;
+    track.scrollLeft = state.scroll - (event.clientX - state.x);
+    const dt = Math.max(1, now - state.lastT);
+    // Smoothed, so the last jittery millisecond doesn't decide the flick.
+    state.velocity = state.velocity * 0.6 + ((event.clientX - state.lastX) / dt) * 0.4;
+    state.lastX = event.clientX;
+    state.lastT = now;
+  }
+
+  function endDrag() {
+    if (!dragging) return;
+    setDragging(false);
+    const track = trackRef.current;
+    if (!track) return;
+    let velocity = still ? 0 : drag.current.velocity; // px per ms
+    let last = performance.now();
+    const release = () => {
+      track.style.scrollSnapType = "";
+    };
+    const step = (now: number) => {
+      const dt = now - last;
+      last = now;
+      track.scrollLeft -= velocity * dt;
+      velocity *= Math.pow(0.94, dt / 16);
+      if (Math.abs(velocity) > 0.02) glide.current = requestAnimationFrame(step);
+      else release();
+    };
+    if (Math.abs(velocity) > 0.02) glide.current = requestAnimationFrame(step);
+    else release();
+  }
+
+  useEffect(() => () => cancelAnimationFrame(glide.current), []);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -238,10 +321,25 @@ export function DepthCardCarousel({
         ref={trackRef}
         role="group"
         aria-label={label}
-        className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-2 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        className={cn(
+          // Vertical padding gives the centred card room to scale without clipping.
+          "-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 py-6 select-none sm:mx-0 sm:px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          dragging ? "cursor-grabbing" : "cursor-grab",
+        )}
       >
         {items.map((item, index) => (
-          <DepthCard key={item.id} item={item} index={index} still={still} numbered={numbered} />
+          <DepthCard
+            key={item.id}
+            item={item}
+            index={index}
+            still={still}
+            numbered={numbered}
+            centred={index === centred}
+          />
         ))}
       </div>
 

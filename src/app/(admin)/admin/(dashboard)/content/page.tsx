@@ -61,7 +61,7 @@ const SECTIONS = [
     title: "Fresh Fire experience clips",
     where: "Camp page, the video carousel",
     description:
-      "Short 5 to 10 second clips that give a feel for what camp is like. Muted, looping, no sound needed.",
+      "Five-second clips that give a feel for what camp is like, muted and looping. Until you add clips here, the page shows the five already cut from the house's own footage (in public/video/); adding any clip here replaces that list, so re-add any you want to keep, e.g. /video/camp-prayer.mp4 with poster /video/camp-prayer.jpg.",
     needs: "video" as const,
   },
   {
@@ -69,7 +69,7 @@ const SECTIONS = [
     title: "Service experience clips",
     where: "Homepage, the video carousel",
     description:
-      "Short 5 to 10 second clips that give a feel for a Sunday service. Muted, looping, no sound needed.",
+      "Five-second clips that give a feel for a service, muted and looping. Until you add clips here, the homepage shows the five already cut from the house's own footage (in public/video/); adding any clip here replaces that list, so re-add any you want to keep, e.g. /video/home-joy.mp4 with poster /video/home-joy.jpg.",
     needs: "video" as const,
   },
   {

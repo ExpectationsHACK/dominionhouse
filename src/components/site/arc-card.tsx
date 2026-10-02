@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Reveal } from "@/components/site/reveal";
 import { cn } from "@/lib/utils";
 
 /**
@@ -79,7 +80,11 @@ export function Arcs({ variant, seed }: { variant: ArcVariant; seed: number }) {
 }
 
 
-/** The card shell: background, arcs, and a padded body for the caller's content. */
+/**
+ * The card shell: background, arcs, and a padded body for the caller's
+ * content. Cards rise in as they scroll into view, a beat apart, so a long
+ * list arrives as a wave rather than a dump.
+ */
 export function ArcCard({
   variant,
   seed,
@@ -92,7 +97,9 @@ export function ArcCard({
   children: ReactNode;
 }) {
   return (
-    <li
+    <Reveal
+      as="li"
+      delay={(seed % 3) * 90}
       className={cn(
         "card-lift relative flex flex-col overflow-hidden sm:min-h-[26rem]",
         CARD[variant],
@@ -106,6 +113,6 @@ export function ArcCard({
     >
       <Arcs variant={variant} seed={seed} />
       <div className="flex flex-1 flex-col p-5 pt-4 sm:p-6 sm:pt-5">{children}</div>
-    </li>
+    </Reveal>
   );
 }

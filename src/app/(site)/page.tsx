@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CountUp } from "@/components/site/count-up";
+import { Countdown } from "@/components/site/countdown";
 import { DepthCardCarousel, type DepthCardItem } from "@/components/site/depth-card-carousel";
+import { HeroVideo } from "@/components/site/hero-video";
 import { HillContours } from "@/components/site/hill-contours";
 import { LighthouseCards } from "@/components/site/lighthouse-cards";
 import { MissionCards } from "@/components/site/mission-cards";
 import { Reveal } from "@/components/site/reveal";
 import { SplashLoader } from "@/components/site/splash-loader";
+import { StaggerWords } from "@/components/site/stagger-words";
+import { TiltCard } from "@/components/site/tilt-card";
+import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { campLockup, getActiveCamp } from "@/lib/camp";
-import { daysUntil } from "@/lib/dates";
 import {
   ABOUT,
   CAMPUSES,
@@ -17,8 +20,10 @@ import {
   COUNTRY_COUNT,
   STRATEGY,
 } from "@/lib/church";
+import { remainingUntil } from "@/lib/countdown";
 import { db } from "@/lib/db";
 import { formatKobo } from "@/lib/money";
+import { SERVICE_CLIPS } from "@/lib/site-videos";
 
 export const metadata: Metadata = {
   title: { absolute: "Dominion House, the church that never sleeps" },
@@ -90,12 +95,24 @@ export default async function HomePage() {
   const cheapest = camp?.priceTiers.length
     ? Math.min(...camp.priceTiers.map((tier) => tier.amountKobo))
     : null;
-  const daysAway = camp ? daysUntil(camp.startsAt) : null;
-
-  const pastorRows = await db.siteMedia.findMany({
-    where: { placement: "PASTORS", isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-  });
+  const [pastorRows, clipRows] = await Promise.all([
+    db.siteMedia.findMany({
+      where: { placement: "PASTORS", isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    }),
+    db.siteMedia.findMany({
+      where: { placement: "SERVICE_VIDEOS", isActive: true, videoUrl: { not: null } },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    }),
+  ]);
+  const clips = clipRows.length
+    ? clipRows.map((row) => ({
+        id: row.id,
+        title: row.title,
+        videoUrl: row.videoUrl!,
+        posterUrl: row.posterUrl,
+      }))
+    : SERVICE_CLIPS;
   const pastors: DepthCardItem[] = pastorRows.length
     ? pastorRows.map((row) => ({
         id: row.id,
@@ -109,24 +126,30 @@ export default async function HomePage() {
     <>
       <SplashLoader />
 
-      {/* ── hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
-        <HillContours className="absolute inset-x-0 bottom-0 h-[70%] w-full text-brass" lines={16} />
-        <div className="relative mx-auto max-w-[1400px] px-5 pb-10 pt-16 sm:px-8 sm:pb-12 sm:pt-24">
+      {/* ── hero, over the house's own aerial footage ─────────────────────── */}
+      <section className="relative flex min-h-[88svh] flex-col justify-end overflow-hidden border-b border-ink/12 bg-ink text-white">
+        <HeroVideo />
+        {/* Legibility: darkest where the type sits, lighter up top so the film reads. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-t from-ink via-ink/65 to-ink/25"
+        />
+        <div className="relative mx-auto w-full max-w-[1400px] px-5 pb-12 pt-32 sm:px-8 sm:pb-16">
           <Eyebrow className="rise-in text-brass">{CHURCH.descriptor}</Eyebrow>
-          <h1
-            className="display rise-in mt-6 text-[clamp(2.5rem,8.5vw,7rem)]"
-            style={{ animationDelay: "120ms" }}
-          >
-            A people of purpose,
-            <br />
-            passion and <span className="text-brass">power</span>
+          <h1 className="display mt-6 text-[clamp(2.5rem,8.5vw,7rem)]">
+            <StaggerWords
+              start={120}
+              lines={[
+                ["A", "people", "of", "purpose,"],
+                ["passion", "and", { text: "power", className: "text-brass" }],
+              ]}
+            />
           </h1>
           <div
             className="rise-in mt-10 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end"
-            style={{ animationDelay: "280ms" }}
+            style={{ animationDelay: "760ms" }}
           >
-            <p className="max-w-xl text-lg leading-relaxed text-white/70">
+            <p className="max-w-xl text-lg leading-relaxed text-white/80">
               We have a mandate to raise one million leaders.
             </p>
             <div className="flex flex-wrap gap-2.5">
@@ -139,21 +162,51 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
-
       </section>
 
-      {/* ── the strapline, given room ────────────────────────────────────── */}
-      <section className="border-b border-ink/12 bg-brass-soft text-ink">
-        <div className="mx-auto max-w-[1400px] px-5 py-14 sm:px-8 sm:py-16">
-          <Reveal className="flex flex-wrap items-baseline justify-between gap-6">
-            <p className="display text-[clamp(2rem,6vw,4.5rem)]">
-              The church that never sleeps
+      {/* ── the strapline, as a band that never stops moving ─────────────── */}
+      <section
+        aria-label="The church that never sleeps"
+        className="marquee overflow-hidden border-b border-ink/12 bg-brass-soft py-8 text-ink sm:py-10"
+      >
+        <div aria-hidden="true" className="marquee-track flex w-max">
+          {[0, 1].map((copy) => (
+            <p key={copy} className="display flex shrink-0 items-center text-[clamp(2rem,6vw,4.5rem)]">
+              {[
+                "The church that never sleeps",
+                `${CAMPUSES.length} lighthouses`,
+                `${COUNTRY_COUNT} countries`,
+                "Raising kingdom leaders",
+              ].map((phrase) => (
+                <span key={phrase} className="flex items-center">
+                  <span className="px-6 sm:px-10">{phrase}</span>
+                  <span className="h-3 w-3 shrink-0 bg-brass sm:h-4 sm:w-4" />
+                </span>
+              ))}
             </p>
-            <p className="max-w-sm text-sm leading-relaxed text-ink-70">
-              A missional movement, {CAMPUSES.length} lighthouses across {COUNTRY_COUNT} countries,
-              reaching the world one person and one community at a time.
-            </p>
+          ))}
+        </div>
+        <h2 className="sr-only">The church that never sleeps</h2>
+        <div className="mx-auto mt-6 max-w-[1400px] px-5 sm:px-8">
+          <p className="max-w-xl text-sm leading-relaxed text-ink-70">
+            A missional movement, {CAMPUSES.length} lighthouses across {COUNTRY_COUNT} countries,
+            reaching the world one person and one community at a time.
+          </p>
+        </div>
+      </section>
+
+      {/* ── the feel of a service, five-second clips ─────────────────────── */}
+      <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
+        <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+          <Reveal>
+            <Eyebrow className="text-brass">A few seconds in the room</Eyebrow>
+            <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
+              What a service feels like
+            </h2>
           </Reveal>
+          <div className="mt-14">
+            <VideoCarousel label="Service experience clips" items={clips} />
+          </div>
         </div>
       </section>
 
@@ -177,26 +230,33 @@ export default async function HomePage() {
               ) : null}
             </h2>
 
-            <Reveal className="mt-12 grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-end">
+            <Reveal className="mt-12 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
               <p className="max-w-xl text-lg leading-relaxed text-white/70">
                 {camp.tagline} The whole house gathers, every lighthouse, one place. Registration is
                 open, and you can pay in instalments.
               </p>
 
-              <dl className="grid grid-cols-2 gap-6 border-t border-white/15 pt-6">
+              <div className="flex flex-wrap items-end gap-x-10 gap-y-6 border-t border-white/15 pt-6">
                 <div>
-                  <dt className="eyebrow text-white/40">Days away</dt>
-                  <dd className="display mt-2 text-4xl text-brass">
-                    {daysAway !== null ? <CountUp value={daysAway} /> : null}
-                  </dd>
+                  <p className="eyebrow flex items-center gap-2 text-white/40">
+                    <span className="pulse-ring relative h-1.5 w-1.5 rounded-full bg-brass text-brass" />
+                    Camp starts in
+                  </p>
+                  <Countdown
+                    target={camp.startsAt.toISOString()}
+                    initial={remainingUntil(camp.startsAt)}
+                    className="mt-3"
+                    numberClassName="text-4xl sm:text-5xl"
+                    labelClassName="text-white/40"
+                  />
                 </div>
                 <div>
-                  <dt className="eyebrow text-white/40">From</dt>
-                  <dd className="display mt-2 text-4xl">
+                  <p className="eyebrow text-white/40">From</p>
+                  <p className="display mt-3 text-4xl sm:text-5xl">
                     {cheapest !== null ? formatKobo(cheapest) : ", "}
-                  </dd>
+                  </p>
                 </div>
-              </dl>
+              </div>
             </Reveal>
 
             <div className="mt-10 flex flex-wrap gap-2.5">
@@ -216,11 +276,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
             <Eyebrow>Our mission</Eyebrow>
-            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">
-              Discover · Develop · Deploy
-              <br />
-              Duplicate · Dominate
-            </h2>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">The 5 D&apos;s.</h2>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">{ABOUT}</p>
           </Reveal>
 
@@ -264,22 +320,25 @@ export default async function HomePage() {
           </h2>
         </Reveal>
 
-        <div className="mt-14 grid gap-px bg-ink/12 sm:grid-cols-3">
+        <div className="mt-14 grid gap-4 sm:grid-cols-3">
           {NEXT_STEPS.map((step, index) => (
-            <Reveal key={step.href} as="span" delay={index * 100} className="block">
-              <Link
+            <Reveal key={step.href} delay={index * 150} className="h-full">
+              <TiltCard
                 href={step.href}
-                className="card-lift group flex h-full flex-col justify-between bg-bone p-7 transition-colors hover:bg-paper sm:p-9"
+                className="h-full border border-ink/12 bg-paper p-7 transition-[background-color,box-shadow] hover:bg-brass-soft hover:shadow-[0_24px_48px_-24px_rgba(11,11,12,0.35)] sm:p-9"
               >
-                <div>
-                  <h3 className="display text-3xl">{step.title}</h3>
-                  <p className="mt-4 text-sm leading-relaxed text-ink-70">{step.body}</p>
+                <div className="flex h-full flex-col justify-between">
+                  <div>
+                    <p className="font-mono text-sm font-semibold text-brass">0{index + 1}</p>
+                    <h3 className="display mt-3 text-3xl">{step.title}</h3>
+                    <p className="mt-4 text-sm leading-relaxed text-ink-70">{step.body}</p>
+                  </div>
+                  <span className="mt-10 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em]">
+                    {step.cta}
+                    <Arrow className="transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
                 </div>
-                <span className="mt-10 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em]">
-                  {step.cta}
-                  <Arrow className="transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </Link>
+              </TiltCard>
             </Reveal>
           ))}
         </div>
