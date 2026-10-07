@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { isStaleDeploymentError, reloadForNewDeployment } from "@/lib/stale-deploy";
 import { cn } from "@/lib/utils";
@@ -82,20 +81,23 @@ function Shell({ children, className }: { children: React.ReactNode; className?:
 
 function Actions({ onRetry, retryLabel }: { onRetry: () => void; retryLabel: string }) {
   return (
-    <div className="mt-9 flex flex-wrap items-center gap-4">
+    <div className="mt-9 flex flex-wrap items-center gap-3">
+      {/* Home is always the way out, so it leads. A full page load, not a
+          client-side hop, since the app may be the thing that's broken. */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+      <a
+        href="/"
+        className="inline-flex items-center gap-2 border border-ink bg-ink px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:border-brass hover:bg-brass hover:text-ink"
+      >
+        Go to the homepage &rarr;
+      </a>
       <button
         type="button"
         onClick={onRetry}
-        className="border border-ink bg-ink px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:border-brass hover:bg-brass"
+        className="border border-ink/25 px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.1em] text-ink transition-colors hover:border-ink"
       >
         {retryLabel}
       </button>
-      <Link
-        href="/"
-        className="text-[13px] font-semibold uppercase tracking-[0.1em] underline underline-offset-4"
-      >
-        Back home
-      </Link>
     </div>
   );
 }
