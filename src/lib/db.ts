@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 
@@ -46,10 +47,32 @@ function clientForThisRequest(): PrismaClient {
 
   let client = perRequest.get(key);
   if (!client) {
-    client = createClient({ max: 1 });
-    perRequest.set(key, client);
+    const fresh = createClient({ max: 1 });
+    perRequest.set(key, fresh);
+    releaseAfterResponse(fresh);
+    client = fresh;
   }
   return client;
+}
+
+/**
+ * Each client starts its own copy of Prisma's WebAssembly query engine and
+ * opens a socket. Left to the garbage collector, a busy isolate piled them up
+ * until it ran past Cloudflare's memory limit (error 1102), so each one is shut
+ * down as soon as its response has gone out.
+ */
+function releaseAfterResponse(client: PrismaClient) {
+  const release = () => client.$disconnect().catch(() => {});
+  try {
+    after(release);
+  } catch {
+    // Outside a request scope after() isn't available; give the request's own
+    // work a generous head start, then release.
+    const context = (globalThis as Record<symbol, { ctx?: { waitUntil?: (p: Promise<unknown>) => void } } | undefined>)[
+      CLOUDFLARE_CONTEXT
+    ];
+    context?.ctx?.waitUntil?.(new Promise((resolve) => setTimeout(resolve, 20_000)).then(release));
+  }
 }
 
 const onWorkers =
