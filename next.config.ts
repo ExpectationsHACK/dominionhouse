@@ -38,7 +38,13 @@ const NOT_NEEDED_AT_RUNTIME = [
   "node_modules/@prisma/client/runtime/*sqlite*",
   "node_modules/@prisma/client/runtime/*sqlserver*",
   "node_modules/@prisma/client/runtime/*cockroachdb*",
-  "node_modules/@prisma/client/runtime/*wasm-base64*",
+  // The Cloudflare build imports the query compiler as a WebAssembly module
+  // (see scripts/generate-prisma.mjs), so the base64 copy is dead weight there.
+  // Everywhere else (Netlify, `next start`) Prisma loads exactly that copy, and
+  // leaving it out breaks every database query.
+  ...(process.env.PRISMA_TARGET === "workers"
+    ? ["node_modules/@prisma/client/runtime/*wasm-base64*"]
+    : []),
 ];
 
 const nextConfig: NextConfig = {
