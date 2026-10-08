@@ -11,8 +11,7 @@ export const metadata: Metadata = {
     "Partner with Dominion House: sponsor a missionary, give to the Legacy Project, or send someone to Fresh Fire Camp Meeting 2027.",
 };
 
-/** Every 30 minutes: see PUBLIC_TTL_SECONDS in src/lib/public-data.ts for why. */
-export const revalidate = 1800;
+export const revalidate = 60;
 
 const GIVING = PILLARS.find((pillar) => pillar.name === "Giving")!;
 

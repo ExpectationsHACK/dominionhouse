@@ -1,17 +1,27 @@
 import { ScrollProgress } from "@/components/site/scroll-progress";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { db } from "@/lib/db";
+import { getPortalSession } from "@/lib/session";
 
-/**
- * Reads nothing per request (no cookies, no database) so the public pages
- * under it can be cached copies, served without running the app. The header
- * picks up a signed-in visitor's name in the browser instead.
- */
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const session = await getPortalSession();
+  // Sign-ins carry the first name; only a sign-in from before that needs the
+  // database, and it picks the name up at its next sign-in.
+  const signedInFirstName = session
+    ? (session.firstName ??
+      (
+        await db.registrant.findUnique({
+          where: { id: session.registrantId },
+          select: { firstName: true },
+        })
+      )?.firstName)
+    : undefined;
+
   return (
     <div className="flex min-h-dvh flex-col">
       <ScrollProgress />
-      <SiteHeader />
+      <SiteHeader signedInFirstName={signedInFirstName} />
       <main id="main" className="flex-1">
         {children}
       </main>

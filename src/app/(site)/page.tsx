@@ -33,9 +33,9 @@ export const metadata: Metadata = {
 
 /**
  * Revalidated on a short cycle so live counts, prices and dates stay honest.
+ * Admin edits also call revalidatePath, so a change shows up immediately.
  */
-/** Every 30 minutes: see PUBLIC_TTL_SECONDS in src/lib/public-data.ts for why. */
-export const revalidate = 1800;
+export const revalidate = 60;
 
 const NEXT_STEPS = [
   {

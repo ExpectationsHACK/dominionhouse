@@ -5,7 +5,6 @@ import {
   ADMIN_COOKIE,
   ADMIN_MAX_AGE,
   COOKIE_BASE,
-  GREETING_COOKIE,
   PORTAL_COOKIE,
   PORTAL_MAX_AGE,
   signToken,
@@ -26,15 +25,7 @@ async function read<T>(name: string): Promise<T | null> {
 
 export async function createPortalSession(session: PortalSession) {
   const token = await signToken({ ...session }, PORTAL_MAX_AGE);
-  const jar = await cookies();
-  jar.set(PORTAL_COOKIE, token, { ...COOKIE_BASE, maxAge: PORTAL_MAX_AGE });
-  if (session.firstName) {
-    jar.set(GREETING_COOKIE, session.firstName, {
-      ...COOKIE_BASE,
-      httpOnly: false,
-      maxAge: PORTAL_MAX_AGE,
-    });
-  }
+  (await cookies()).set(PORTAL_COOKIE, token, { ...COOKIE_BASE, maxAge: PORTAL_MAX_AGE });
 }
 
 export async function getPortalSession() {
@@ -42,9 +33,7 @@ export async function getPortalSession() {
 }
 
 export async function destroyPortalSession() {
-  const jar = await cookies();
-  jar.delete(PORTAL_COOKIE);
-  jar.delete(GREETING_COOKIE);
+  (await cookies()).delete(PORTAL_COOKIE);
 }
 
 // ── admin, 12 hours, a working day at the registration desk ──────────────────

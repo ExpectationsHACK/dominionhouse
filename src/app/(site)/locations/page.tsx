@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
-import { CampusVisitForm, VisitForm } from "./visit-form";
+import { VisitForm } from "./visit-form";
 import { ARC_VARIANTS, ArcCard, BODY_TONE, REGION_TONE } from "@/components/site/arc-card";
 import { HillContours } from "@/components/site/hill-contours";
 import { Reveal } from "@/components/site/reveal";
@@ -21,7 +20,15 @@ export const metadata: Metadata = {
     "Dominion House gathers at nine lighthouses across Nigeria, the United Kingdom, Canada and Trinidad. Find the one nearest you and tell us you're coming.",
 };
 
-export default function LocationsPage() {
+type SearchParams = Promise<{ campus?: string }>;
+
+export default async function LocationsPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const { campus } = await searchParams;
+  const preselected = CAMPUSES.find((item) => item.slug === campus)?.name ?? "";
 
   return (
     <>
@@ -80,10 +87,7 @@ export default function LocationsPage() {
             <Eyebrow>Let us know</Eyebrow>
             <h2 className="display mt-3 text-3xl">We&apos;ll look out for you</h2>
             <div className="mt-6">
-              {/* The form reads ?campus= itself, so this page stays a cached copy. */}
-              <Suspense fallback={<VisitForm />}>
-                <CampusVisitForm />
-              </Suspense>
+              <VisitForm defaultCampus={preselected} />
             </div>
           </Reveal>
         </div>

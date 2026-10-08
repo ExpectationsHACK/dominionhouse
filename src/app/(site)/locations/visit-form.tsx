@@ -1,20 +1,11 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { useActionState } from "react";
 import { planAVisit, type VisitState } from "./actions";
 import { Eyebrow } from "@/components/ui";
 import { Checkbox, Field, FormError, Input, Select, Textarea } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { CAMPUSES } from "@/lib/church";
-
-/** The form, with the campus a "Plan a visit" link named (?campus=slug) already chosen. */
-export function CampusVisitForm() {
-  const slug = useSearchParams().get("campus");
-  const campus = CAMPUSES.find((item) => item.slug === slug)?.name ?? "";
-  // Keyed so arriving from a different campus link resets the choice.
-  return <VisitForm key={campus} defaultCampus={campus} />;
-}
 
 export function VisitForm({ defaultCampus = "" }: { defaultCampus?: string }) {
   const [state, formAction] = useActionState<VisitState, FormData>(planAVisit, {});

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/site/logo";
 import { Arrow } from "@/components/ui";
 import { cn } from "@/lib/utils";
@@ -17,25 +17,8 @@ const NAV = [
   { href: "/give", label: "Give" },
 ] as const;
 
-const noSubscribe = () => () => {};
-
-/** The greeting cookie set at sign-in (see GREETING_COOKIE), read in the browser. */
-function readGreetingName(): string | undefined {
-  const match = document.cookie.match(/(?:^|;\s*)dh_name=([^;]*)/);
-  if (!match) return undefined;
-  try {
-    return decodeURIComponent(match[1]) || undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-export function SiteHeader({ signedInFirstName: fromServer }: { signedInFirstName?: string }) {
+export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }) {
   const pathname = usePathname();
-  // Public pages are cached copies, the same for everyone, so the name can't
-  // come from the server there; pages that do know it pass it in.
-  const fromCookie = useSyncExternalStore(noSubscribe, readGreetingName, () => undefined);
-  const signedInFirstName = fromServer ?? fromCookie;
 
   // The menu belongs to the route it was opened on, so navigating away closes
   // it as a consequence of the render rather than needing an effect.
