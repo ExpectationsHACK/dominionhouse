@@ -1,0 +1,23 @@
+# Netlify builds and serves the site with its Next.js runtime
+# (@netlify/plugin-nextjs, picked up automatically for a Next.js project).
+# Cloudflare files (wrangler.jsonc, open-next.config.ts, scripts/cf-build.mjs)
+# are left in place but unused here.
+
+[build]
+  # Generates the (Node) Prisma client, then `next build`.
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# The videos and posters are large and rarely change: let browsers keep them
+# for a week. A replaced clip under the same name can take that long to show
+# for a returning visitor, so give a replacement a new file name.
+[[headers]]
+  for = "/video/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
