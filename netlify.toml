@@ -4,29 +4,30 @@
 # are left in place but unused here.
 
 [build]
- the site, so a key found there isn't exposed.# Generates the (Node) Prisma client, then `next build`.
- the site, so a key found there isn't exposed.command = "npm run build"
- the site, so a key found there isn't exposed.publish = ".next"
+  # Generates the (Node) Prisma client, then `next build`.
+  command = "npm run build"
+  publish = ".next"
 
 [build.environment]
- the site, so a key found there isn't exposed.NODE_VERSION = "22"
- the site, so a key found there isn't exposed.# Netlify fails a build when a secret's value appears in the output. These
- the site, so a key found there isn't exposed.# three are expected there and aren't secrets to browsers: Next writes the
- the site, so a key found there isn't exposed.# Server Action key into its own server-only manifest, APP_URL is the site's
- the site, so a key found there isn't exposed.# public address, and the Paystack public key is publishable by design.
- the site, so a key found there isn't exposed.SECRETS_SCAN_OMIT_KEYS = "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,APP_URL,PAYSTACK_PUBLIC_KEY"
- the site, so a key found there isn't exposed.# Next's compiler cache keeps a snapshot of the build environment between
- the site, so a key found there isn't exposed.# builds. It sits inside the build output folder but is never published to
- the site, so a key found there isn't exposed.# the site, so a key found there isn't exposed.
- the site, so a key found there isn't exposed.SECRETS_SCAN_OMIT_PATHS = ".next/cache/**,.netlify/.next/cache/**"
+  NODE_VERSION = "22"
+  # Netlify fails a build when a secret's value appears in the output. These
+  # three are expected there and aren't secrets to browsers: Next writes the
+  # Server Action key into its own server-only manifest, APP_URL is the site's
+  # public address, and the Paystack public key is publishable by design.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,APP_URL,PAYSTACK_PUBLIC_KEY"
+  # Next's compiler cache keeps a snapshot of the build environment between
+  # builds. It sits inside the build output folder but is never published to
+  # the site, so a key found there isn't exposed. Netlify's Next.js runtime
+  # copies the build to .netlify/.next, so the cache appears there too.
+  SECRETS_SCAN_OMIT_PATHS = ".next/cache/**,.netlify/.next/cache/**"
 
 [[plugins]]
- the site, so a key found there isn't exposed.package = "@netlify/plugin-nextjs"
+  package = "@netlify/plugin-nextjs"
 
 # The videos and posters are large and rarely change: let browsers keep them
 # for a week. A replaced clip under the same name can take that long to show
 # for a returning visitor, so give a replacement a new file name.
 [[headers]]
- the site, so a key found there isn't exposed.for = "/video/*"
- the site, so a key found there isn't exposed.[headers.values]
- the site, so a key found there isn't exposed.  Cache-Control = "public, max-age=604800"
+  for = "/video/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
