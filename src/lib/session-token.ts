@@ -8,6 +8,12 @@ import { SignJWT, jwtVerify } from "jose";
 
 export const PORTAL_COOKIE = "dh_portal";
 export const ADMIN_COOKIE = "dh_admin";
+/**
+ * The signed-in first name, readable by the page itself (not httpOnly) so the
+ * header can greet someone on a cached page that is the same for everyone.
+ * It grants nothing: who is signed in is only ever read from PORTAL_COOKIE.
+ */
+export const GREETING_COOKIE = "dh_name";
 
 /**
  * Registrants stay signed in for a year, renewed by use: registration opens

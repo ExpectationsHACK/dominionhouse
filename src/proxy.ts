@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import {
   COOKIE_BASE,
+  GREETING_COOKIE,
   PORTAL_COOKIE,
   PORTAL_MAX_AGE,
   PORTAL_RENEW_AFTER,
@@ -32,6 +33,14 @@ async function renewPortalLogin(request: NextRequest, response: NextResponse) {
   const session = await verifyToken<{ registrantId?: string; email?: string; firstName?: string }>(
     request.cookies.get(PORTAL_COOKIE)?.value,
   );
+  // Sign-ins from before the greeting cookie existed pick it up here.
+  if (session?.firstName && !request.cookies.get(GREETING_COOKIE)) {
+    response.cookies.set(GREETING_COOKIE, session.firstName, {
+      ...COOKIE_BASE,
+      httpOnly: false,
+      maxAge: PORTAL_MAX_AGE,
+    });
+  }
   if (!session?.registrantId || !session.email || !session.iat) return;
 
   if (Date.now() / 1000 - session.iat < PORTAL_RENEW_AFTER) return;
@@ -43,13 +52,32 @@ async function renewPortalLogin(request: NextRequest, response: NextResponse) {
   response.cookies.set(PORTAL_COOKIE, token, { ...COOKIE_BASE, maxAge: PORTAL_MAX_AGE });
 }
 
+/**
+ * The public pages that are the same for every visitor. They're served as
+ * cached copies (built every minute, not per request) so they cost the Worker
+ * almost nothing, which keeps the site inside Cloudflare's free-plan CPU
+ * limit. A cached copy can't carry a per-request nonce, so these pages allow
+ * inline scripts instead. They render no visitor-supplied content, so the
+ * nonce had little to guard there; everything that takes input or shows
+ * personal data (registration, payment, the camp profile, admin) keeps it.
+ */
+const CACHED_PAGES = new Set(["/", "/about", "/vision", "/locations", "/events", "/give", "/camp"]);
+
+export function isCachedPage(pathname: string) {
+  return CACHED_PAGES.has(pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname);
+}
+
 export async function proxy(request: NextRequest) {
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const isDev = process.env.NODE_ENV === "development";
+  const cached = isCachedPage(request.nextUrl.pathname);
+  const nonce = cached ? null : Buffer.from(crypto.randomUUID()).toString("base64");
+  const scriptSrc = nonce
+    ? `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`
+    : "script-src 'self' 'unsafe-inline'";
 
   const policy = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    `${scriptSrc}${isDev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
     // Admin-managed hero media may be hosted on any https origin.
     "img-src 'self' data: blob: https:",
@@ -67,8 +95,12 @@ export async function proxy(request: NextRequest) {
   ].join("; ");
 
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-nonce", nonce);
-  requestHeaders.set("Content-Security-Policy", policy);
+  // Next stamps the nonce into the page only when the request carries one;
+  // a cached page must not, or its copy would hold a stale nonce.
+  if (nonce) {
+    requestHeaders.set("x-nonce", nonce);
+    requestHeaders.set("Content-Security-Policy", policy);
+  }
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", policy);

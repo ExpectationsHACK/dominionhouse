@@ -9,13 +9,16 @@ import type { MediaPlacement } from "@/generated/prisma/enums";
  * On Cloudflare every request opens its own database connection, a round
  * trip across the internet, so a homepage that queried on each visit spent
  * most of its time waiting on Postgres. These results are kept in the
- * incremental cache (KV) for a minute instead: admin edits reach the public
- * pages within about a minute, and visitors in between pay nothing.
+ * incremental cache (KV) instead, refreshed every 30 minutes: admin edits
+ * reach the public pages within half an hour, and visitors in between pay
+ * nothing. Not more often: Cloudflare's free KV plan allows about 1,000 writes
+ * a day, and these entries plus the cached pages they feed are rewritten on
+ * each refresh.
  *
  * Only display reads belong here. Anything that prices, charges or registers
  * someone (registration, payment) reads the database directly, uncached.
  */
-const PUBLIC_TTL_SECONDS = 60;
+export const PUBLIC_TTL_SECONDS = 1800;
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/;
 
