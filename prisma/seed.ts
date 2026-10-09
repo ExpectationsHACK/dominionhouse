@@ -30,7 +30,7 @@ async function main() {
   // payments, rooms, is never touched here.
   const campFacts = {
     name: "Fresh Fire Camp Meeting 2027",
-    tagline: "Four days at Redemption City. The whole house, one gathering.",
+    tagline: "Four days of Impartation, Immersion, Realignment and Reawakening.",
     description:
       "Fresh Fire is where every Dominion House lighthouse comes together, four days of teaching, prayer and worship at Redemption City that set the direction for the year.",
     venue: "Redemption City",
@@ -49,7 +49,7 @@ async function main() {
       slug: CAMP_SLUG,
       name: "Fresh Fire Camp Meeting 2027",
       theme: null,
-      tagline: "Four days at Redemption City. The whole house, one gathering.",
+      tagline: "Four days of Impartation, Immersion, Realignment and Reawakening.",
       description:
         "Fresh Fire is where every Dominion House lighthouse comes together, four days of teaching, prayer and worship at Redemption City that set the direction for the year.",
       venue: "Redemption City",
