@@ -44,13 +44,11 @@ npm run db:seed
 npm run dev
 ```
 
-Seeded staff logins (**change these before going live**):
-
-| Email | Password | Role |
-|---|---|---|
-| admin@dominionhouse.org | DominionHouse2027! | Super admin |
-| finance@dominionhouse.org | DominionHouse2027! | Finance |
-| registration@dominionhouse.org | DominionHouse2027! | Registration |
+Seeding a fresh database creates three staff accounts (dominionhs@gmail.com as super
+admin, finance@dominionhouse.org, registration@dominionhouse.org), each with a random
+password printed once in the seed output. Set `SEED_ADMIN_PASSWORD` to choose the super
+admin's. Accounts that already exist are never changed by seeding. Manage staff and
+reset passwords at `/admin/users`.
 
 ### Scripts
 

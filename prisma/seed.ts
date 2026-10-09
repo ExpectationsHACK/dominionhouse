@@ -164,33 +164,30 @@ async function main() {
   }
 
   // ── staff ──────────────────────────────────────────────────────────────────
-  // The super admin's real password is never committed. On a fresh database
-  // (local dev, a new environment) set SEED_ADMIN_PASSWORD before seeding, or
-  // a random one-time password is generated and printed below; on an
-  // existing database, upsert's `update` branch below never touches a
-  // password, so re-seeding production is always a no-op for this account.
-  const superAdminPassword = process.env.SEED_ADMIN_PASSWORD || randomBytes(9).toString("base64url");
-
+  // No password is ever committed: the repository is public. On a fresh
+  // database each account gets a random one-time password, printed below
+  // (or SEED_ADMIN_PASSWORD for the super admin). An account that already
+  // exists is left exactly as it is, password, role and on/off switch, so
+  // re-seeding never resets a password or revives a disabled account.
   const staff = [
-    { name: "Camp Administrator", email: "dominionhs@gmail.com", role: "SUPER_ADMIN" as const, password: superAdminPassword },
-    { name: "Finance Desk", email: "finance@dominionhouse.org", role: "FINANCE" as const, password: "DominionHouse2027!" },
-    { name: "Registration Desk", email: "registration@dominionhouse.org", role: "REGISTRATION" as const, password: "DominionHouse2027!" },
+    { name: "Camp Administrator", email: "dominionhs@gmail.com", role: "SUPER_ADMIN" as const, password: process.env.SEED_ADMIN_PASSWORD || randomBytes(9).toString("base64url") },
+    { name: "Finance Desk", email: "finance@dominionhouse.org", role: "FINANCE" as const, password: randomBytes(9).toString("base64url") },
+    { name: "Registration Desk", email: "registration@dominionhouse.org", role: "REGISTRATION" as const, password: randomBytes(9).toString("base64url") },
   ];
 
-  let createdSuperAdmin = false;
+  const createdStaff: typeof staff = [];
   for (const person of staff) {
     const existing = await db.adminUser.findUnique({ where: { email: person.email } });
-    await db.adminUser.upsert({
-      where: { email: person.email },
-      update: { name: person.name, role: person.role, isActive: true },
-      create: {
+    if (existing) continue;
+    await db.adminUser.create({
+      data: {
         name: person.name,
         email: person.email,
         role: person.role,
         passwordHash: await bcrypt.hash(person.password, 10),
       },
     });
-    if (!existing && person.email === "dominionhs@gmail.com") createdSuperAdmin = true;
+    createdStaff.push(person);
   }
 
   // ── announcements ──────────────────────────────────────────────────────────
@@ -264,8 +261,9 @@ async function main() {
   console.log("✓ Rooms:", await db.room.count({ where: { campId: camp.id } }));
   console.log("✓ Schedule items:", await db.scheduleItem.count({ where: { campId: camp.id } }));
   console.log("✓ Staff: dominionhs@gmail.com, finance@dominionhouse.org, registration@dominionhouse.org");
-  if (createdSuperAdmin && !process.env.SEED_ADMIN_PASSWORD) {
-    console.log(`  New super-admin password (only shown once, save it now): ${superAdminPassword}`);
+  for (const person of createdStaff) {
+    if (person.role === "SUPER_ADMIN" && process.env.SEED_ADMIN_PASSWORD) continue;
+    console.log(`  New password for ${person.email} (only shown once, save it now): ${person.password}`);
   }
 }
 
