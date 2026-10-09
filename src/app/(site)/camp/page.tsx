@@ -292,18 +292,10 @@ export default async function CampOverviewPage() {
 
       {/* ── the fire ─────────────────────────────────────────────────────── */}
       {cards.length > 0 ? (
-        <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 opacity-70"
-            style={{
-              background:
-                "radial-gradient(1100px 520px at 15% 0%, rgba(33,161,255,.32), transparent 65%), radial-gradient(820px 420px at 90% 100%, rgba(238,247,255,.20), transparent 60%)",
-            }}
-          />
+        <section className="relative overflow-hidden border-b border-ink/12 bg-white">
           <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
             <Reveal>
-              <Eyebrow className="text-brass">What camp feels like</Eyebrow>
+              <Eyebrow className="text-meridian">What camp feels like</Eyebrow>
               <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
                 Fresh Fire, Fresh Convictions and Fresh Impartation
               </h2>
@@ -311,6 +303,7 @@ export default async function CampOverviewPage() {
 
             <div className="mt-14">
               <DepthCardCarousel
+                tone="light"
                 items={cards.map((card) => ({
                   id: card.id,
                   title: card.title,

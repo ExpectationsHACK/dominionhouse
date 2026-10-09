@@ -153,14 +153,20 @@ export function DepthCardCarousel({
   items,
   label = "Fresh Fire gallery",
   numbered = true,
+  tone = "dark",
 }: {
   items: DepthCardItem[];
+  /** The section behind it: arrows are drawn to show on either. */
+  tone?: "light" | "dark";
   /** Show the 01, 02… counter on each card. */
   numbered?: boolean;
   /** Accessible name for the scrolling track. */
   label?: string;
 }) {
   const { trackRef, still, atStart, atEnd, centred, dragging, page, handlers } = useDragScroll();
+  const arrow = tone === "dark" ? "border-white/25 text-white" : "border-ink/20 text-ink";
+  const live =
+    tone === "dark" ? "hover:border-brass hover:bg-brass hover:text-ink" : "hover:border-ink hover:bg-ink hover:text-white";
 
   if (items.length === 0) return null;
 
@@ -196,8 +202,9 @@ export function DepthCardCarousel({
           disabled={atStart}
           aria-label="Previous cards"
           className={cn(
-            "flex h-11 w-11 items-center justify-center border border-white/25 text-white transition-colors",
-            atStart ? "opacity-30" : "hover:border-brass hover:bg-brass hover:text-ink",
+            "flex h-11 w-11 items-center justify-center border transition-colors",
+            arrow,
+            atStart ? "opacity-30" : live,
           )}
         >
           <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
@@ -210,8 +217,9 @@ export function DepthCardCarousel({
           disabled={atEnd}
           aria-label="Next cards"
           className={cn(
-            "flex h-11 w-11 items-center justify-center border border-white/25 text-white transition-colors",
-            atEnd ? "opacity-30" : "hover:border-brass hover:bg-brass hover:text-ink",
+            "flex h-11 w-11 items-center justify-center border transition-colors",
+            arrow,
+            atEnd ? "opacity-30" : live,
           )}
         >
           <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">

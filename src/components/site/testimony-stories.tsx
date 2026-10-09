@@ -33,7 +33,7 @@ export function TestimonyStories({ items }: { items: Testimony[] }) {
             >
               &ldquo;
             </span>
-            <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-meridian">
+            <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#0b78c9]">
               {item.title}
             </p>
             {/* The testimony itself, trimmed to a few lines; the rest is a tap away. */}
@@ -58,7 +58,7 @@ export function TestimonyStories({ items }: { items: Testimony[] }) {
                   draggable={false}
                   loading="lazy"
                   decoding="async"
-                  className="h-14 w-14 shrink-0 rounded-full border-2 border-meridian object-cover object-top"
+                  className="h-14 w-14 shrink-0 rounded-full border-2 border-brass object-cover object-top"
                 />
                 <div className="min-w-0">
                   <p className="text-base font-semibold leading-tight">
