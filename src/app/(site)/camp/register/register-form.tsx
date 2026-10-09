@@ -20,6 +20,7 @@ import { POSITION_LABEL, POSITION_OPTIONS } from "@/lib/positions";
 import { CAMPUS_REGIONS, LIGHTHOUSES_OR_MINISTRIES } from "@/lib/church";
 import { cn } from "@/lib/utils";
 import { fieldErrors, identityStep, logisticsStep } from "@/lib/validation";
+import { KeepValuesForm } from "@/components/ui/keep-values-form";
 
 /** Which step a schema field lives on, so a server-side error (or an error
  * caught before ever reaching the server) always lands the wizard on the
@@ -305,7 +306,7 @@ export function RegisterForm({
           </div>
         ) : null}
 
-        <form id="register-form" action={formAction} className="space-y-8">
+        <KeepValuesForm id="register-form" action={formAction} className="space-y-8">
           {/* ── step 1 ─────────────────────────────────────────────────── */}
           <fieldset className={cn("space-y-6 border-0 p-0", step !== 1 && "hidden")}>
             <legend className="sr-only">About you</legend>
@@ -880,7 +881,7 @@ export function RegisterForm({
               on 0803 000 0000 and we&apos;ll register you over the phone.
             </p>
           </noscript>
-        </form>
+        </KeepValuesForm>
       </div>
 
       {/* ── aside ────────────────────────────────────────────────────── */}

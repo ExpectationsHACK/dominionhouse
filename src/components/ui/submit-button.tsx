@@ -2,6 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import { Arrow, buttonClass, type ButtonSize, type ButtonVariant } from "@/components/ui";
+import { useKeepValuesPending } from "@/components/ui/keep-values-form";
 import { cn } from "@/lib/utils";
 
 export function SubmitButton({
@@ -23,7 +24,10 @@ export function SubmitButton({
   name?: string;
   value?: string;
 }) {
-  const { pending } = useFormStatus();
+  // A plain form reports through useFormStatus; a KeepValuesForm through context.
+  const formStatus = useFormStatus();
+  const keepValuesPending = useKeepValuesPending();
+  const pending = formStatus.pending || keepValuesPending;
 
   return (
     <button

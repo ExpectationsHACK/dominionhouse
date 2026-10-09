@@ -6,12 +6,13 @@ import { portalSignIn, type LoginState } from "./actions";
 import { Eyebrow } from "@/components/ui";
 import { Field, FormError, Input } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { KeepValuesForm } from "@/components/ui/keep-values-form";
 
 export function PortalLoginForm({ prefillEmail = "" }: { prefillEmail?: string }) {
   const [state, formAction] = useActionState<LoginState, FormData>(portalSignIn, {});
 
   return (
-    <form action={formAction} className="space-y-5">
+    <KeepValuesForm action={formAction} className="space-y-5">
       <FormError message={state.error} />
 
       <Field
@@ -64,6 +65,6 @@ export function PortalLoginForm({ prefillEmail = "" }: { prefillEmail?: string }
           Register for camp
         </Link>
       </div>
-    </form>
+    </KeepValuesForm>
   );
 }

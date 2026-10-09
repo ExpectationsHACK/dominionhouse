@@ -5,6 +5,7 @@ import { completeProfile, type CompleteProfileState } from "./profile-actions";
 import { Eyebrow, Panel } from "@/components/ui";
 import { Field, FormError, Input, RadioCard } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { KeepValuesForm } from "@/components/ui/keep-values-form";
 
 /**
  * Shown at the top of the camp profile to someone whose registration came
@@ -35,7 +36,7 @@ export function CompleteProfile({
         {needsEmergency ? "someone to call in an emergency" : null}.
       </p>
 
-      <form action={formAction} className="mt-6 space-y-5">
+      <KeepValuesForm action={formAction} className="mt-6 space-y-5">
         <FormError message={state.error} />
 
         {needsGender ? (
@@ -62,7 +63,7 @@ export function CompleteProfile({
         ) : null}
 
         <SubmitButton pendingLabel="Saving…">Save my details</SubmitButton>
-      </form>
+      </KeepValuesForm>
     </Panel>
   );
 }

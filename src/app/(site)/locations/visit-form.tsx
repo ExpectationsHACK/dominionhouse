@@ -6,6 +6,7 @@ import { Eyebrow } from "@/components/ui";
 import { Checkbox, Field, FormError, Input, Select, Textarea } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { CAMPUSES } from "@/lib/church";
+import { KeepValuesForm } from "@/components/ui/keep-values-form";
 
 export function VisitForm({ defaultCampus = "" }: { defaultCampus?: string }) {
   const [state, formAction] = useActionState<VisitState, FormData>(planAVisit, {});
@@ -24,7 +25,7 @@ export function VisitForm({ defaultCampus = "" }: { defaultCampus?: string }) {
   }
 
   return (
-    <form action={formAction} className="space-y-5">
+    <KeepValuesForm action={formAction} className="space-y-5">
       <FormError message={state.error} />
 
       <div className="grid gap-5 sm:grid-cols-2">
@@ -103,6 +104,6 @@ export function VisitForm({ defaultCampus = "" }: { defaultCampus?: string }) {
       <SubmitButton className="w-full" pendingLabel="Sending…">
         Tell us you&apos;re coming
       </SubmitButton>
-    </form>
+    </KeepValuesForm>
   );
 }

@@ -6,6 +6,7 @@ import { ButtonLink } from "@/components/ui";
 import { FormError, Input, RadioCard } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { formatKobo, toNaira } from "@/lib/money";
+import { KeepValuesForm } from "@/components/ui/keep-values-form";
 
 export function PayForm({
   registrantId,
@@ -32,7 +33,7 @@ export function PayForm({
   const balanceNaira = Math.floor(toNaira(balanceKobo));
 
   return (
-    <form action={formAction} className="space-y-5">
+    <KeepValuesForm action={formAction} className="space-y-5">
       <input type="hidden" name="registrantId" value={registrantId} />
       <FormError message={state.error} />
 
@@ -101,6 +102,6 @@ export function PayForm({
       <p className="text-center text-xs text-ink-45">
         Card, bank transfer or USSD. You&apos;ll come straight back here when it&apos;s done.
       </p>
-    </form>
+    </KeepValuesForm>
   );
 }

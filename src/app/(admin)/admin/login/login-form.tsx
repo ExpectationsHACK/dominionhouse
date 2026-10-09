@@ -4,12 +4,13 @@ import { useActionState } from "react";
 import { adminSignIn, type AdminLoginState } from "./actions";
 import { Field, FormError, Input } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { KeepValuesForm } from "@/components/ui/keep-values-form";
 
 export function AdminLoginForm() {
   const [state, formAction] = useActionState<AdminLoginState, FormData>(adminSignIn, {});
 
   return (
-    <form action={formAction} className="space-y-5">
+    <KeepValuesForm action={formAction} className="space-y-5">
       <FormError message={state.error} />
 
       <Field label="Email" htmlFor="email" required>
@@ -29,6 +30,6 @@ export function AdminLoginForm() {
       <SubmitButton className="w-full" pendingLabel="Signing in…">
         Sign in
       </SubmitButton>
-    </form>
+    </KeepValuesForm>
   );
 }

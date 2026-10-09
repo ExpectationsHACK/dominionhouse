@@ -13,6 +13,7 @@ import {
   type GivingCurrency,
 } from "@/lib/giving-rules";
 import { cn } from "@/lib/utils";
+import { KeepValuesForm } from "@/components/ui/keep-values-form";
 
 /** A pair of buttons that behave as one choice, sent as a hidden field. */
 function Toggle<T extends string>({
@@ -64,7 +65,7 @@ export function GiveForm() {
   }
 
   return (
-    <form action={formAction} className="space-y-5">
+    <KeepValuesForm action={formAction} className="space-y-5">
       <FormError message={state.error} />
 
       <Toggle
@@ -158,6 +159,6 @@ export function GiveForm() {
           ? "Your card is charged today and on the same date each month. A covenant invitation: pause anytime."
           : "A single payment, nothing recurring."}
       </p>
-    </form>
+    </KeepValuesForm>
   );
 }
