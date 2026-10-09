@@ -149,7 +149,8 @@ export function ticketEmail(args: {
   ticketCode: string;
   category: string;
   registrationCode: string;
-  qrDataUrl: string;
+  /** An ordinary https image link: mail apps drop data: URLs. */
+  qrImageUrl: string;
   portalUrl: string;
   room?: { block: string; name: string; bedLabel?: string | null } | null;
 }) {
@@ -173,7 +174,7 @@ export function ticketEmail(args: {
   </td></tr>
   <tr><td style="padding:0;height:1px;background:repeating-linear-gradient(to right, ${INK} 0 6px, transparent 6px 12px);"></td></tr>
   <tr><td style="padding:22px;text-align:center;background:#fff;">
-    <img src="${args.qrDataUrl}" width="180" height="180" alt="Ticket QR code" style="display:block;margin:0 auto;border:0;">
+    <img src="${args.qrImageUrl}" width="180" height="180" alt="Ticket QR code" style="display:block;margin:0 auto;border:0;">
     <div style="font-family:ui-monospace,Menlo,monospace;font-size:18px;letter-spacing:.14em;margin-top:14px;font-weight:700;">${args.ticketCode}</div>
     <div style="font-size:12px;color:#74747c;margin-top:6px;">Show this at the gate. One scan, one entry.</div>
   </td></tr>

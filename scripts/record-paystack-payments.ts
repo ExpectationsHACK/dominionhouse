@@ -7,8 +7,8 @@
  *
  * Credits what the payer chose to pay (Paystack's `requested_amount`), not the
  * fee they covered on top. Safe to run again: a reference already recorded is
- * skipped. Anyone this settles gets their ticket, emailed with the portal link;
- * nobody else is emailed. The `--conditions` flag and the alias below let the
+ * skipped. Each payer gets the site's usual receipt, and anyone it settles also
+ * gets their ticket by email, exactly as if they had paid on the site. The `--conditions` flag and the alias below let the
  * site's server-only modules load outside Next.
  */
 import "dotenv/config";
@@ -31,7 +31,7 @@ const REFERENCES = [
 async function main() {
   const commit = process.argv.includes("--commit");
   const { db } = await import("../src/lib/db");
-  const { getTotals, issueTicket, sendTicketEmail, statusFor } = await import("../src/lib/registration");
+  const { getTotals, settlePayment } = await import("../src/lib/registration");
 
   const key = process.env.PAYSTACK_SECRET_KEY;
   if (!key?.startsWith("sk_")) throw new Error("PAYSTACK_SECRET_KEY is not set.");
@@ -68,26 +68,25 @@ async function main() {
     );
     if (!commit) continue;
 
+    // Recorded as pending, then settled by the same function the site's own
+    // Paystack payments go through: status, receipt, and ticket when paid up.
     await db.payment.create({
       data: {
         registrantId: registrant.id,
         reference: tx.reference,
         amountKobo: creditKobo,
         method: "PAYSTACK",
-        status: "SUCCESS",
-        channel: tx.channel ?? null,
-        paidAt: new Date(tx.paid_at),
+        status: "PENDING",
         gatewayRef: String(tx.id),
-        gatewayRaw: tx,
         note: `Paid on the Paystack page "2027 FRESH FIRE CAMP - DH"; NGN ${(tx.fees / 100).toLocaleString()} Paystack fee paid on top, not credited.`,
       },
     });
-
-    const totals = await getTotals(registrant.id);
-    const status = statusFor(totals, registrant.status);
-    if (status !== registrant.status) {
-      await db.registrant.update({ where: { id: registrant.id }, data: { status } });
-    }
+    const result = await settlePayment({
+      reference: tx.reference,
+      paidAt: new Date(tx.paid_at),
+      channel: tx.channel ?? null,
+      gatewayRaw: tx,
+    });
     await db.auditLog.create({
       data: {
         actorLabel: "record-paystack-payments script",
@@ -98,14 +97,12 @@ async function main() {
       },
     });
 
-    if (totals.isSettled) {
-      const ticket = await issueTicket(registrant.id);
-      await sendTicketEmail(registrant.id);
-      const sent = await db.ticket.findUnique({ where: { id: ticket.id }, select: { emailSentAt: true } });
-      console.log(`  → ticket ${ticket.code} issued; email ${sent?.emailSentAt ? "sent" : "NOT sent, check the admin outbox"}.`);
-    } else {
-      console.log(`  → recorded, status ${status}. No email sent.`);
-    }
+    const ticket = await db.ticket.findUnique({ where: { registrantId: registrant.id } });
+    console.log(
+      result.ok && result.totals.isSettled
+        ? `  → paid in full: receipt sent, ticket ${ticket?.code} ${ticket?.emailSentAt ? "emailed" : "NOT emailed, check the admin outbox"}.`
+        : `  → recorded, receipt sent showing the balance.`,
+    );
   }
 
   if (!commit) console.log("\nDry run, nothing written. Run again with --commit to record.");

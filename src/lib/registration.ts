@@ -93,6 +93,11 @@ export async function ticketQrDataUrl(payload: string) {
   });
 }
 
+/** The same QR as a PNG link, for email (see app/api/ticket-qr). */
+export function ticketQrImageUrl(payload: string) {
+  return appUrl(`/api/ticket-qr/${payload}.png`);
+}
+
 export async function sendTicketEmail(registrantId: string) {
   const registrant = await db.registrant.findUniqueOrThrow({
     where: { id: registrantId },
@@ -100,15 +105,13 @@ export async function sendTicketEmail(registrantId: string) {
   });
   if (!registrant.ticket) return;
 
-  const qrDataUrl = await ticketQrDataUrl(registrant.ticket.qrPayload);
-
   const { subject, html } = ticketEmail({
     firstName: registrant.firstName,
     lastName: registrant.lastName,
     ticketCode: registrant.ticket.code,
     category: CATEGORY_LABEL[registrant.category],
     registrationCode: registrant.registrationCode,
-    qrDataUrl,
+    qrImageUrl: ticketQrImageUrl(registrant.ticket.qrPayload),
     portalUrl: appUrl("/portal"),
     room: registrant.roomAssignment
       ? {
