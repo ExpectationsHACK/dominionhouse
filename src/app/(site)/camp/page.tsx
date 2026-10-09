@@ -150,7 +150,7 @@ export default async function CampOverviewPage() {
           </div>
 
           <div
-            className="rise-in mt-16 flex flex-wrap items-end gap-x-10 gap-y-8 border-t border-white/15 pt-8"
+            className="rise-in mt-16 flex flex-wrap items-start gap-x-10 gap-y-8 border-t border-white/15 pt-8"
             style={{ animationDelay: "480ms" }}
           >
             <div>
@@ -246,61 +246,8 @@ export default async function CampOverviewPage() {
         </div>
       </section>
 
-      {/* ── what it is ───────────────────────────────────────────────────── */}
-      <section className="border-b border-ink/12">
-        <div className="mx-auto grid max-w-[1400px] gap-12 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[1fr_1.1fr]">
-          <Reveal direction="left">
-            <Eyebrow>The overview</Eyebrow>
-            <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">
-              An encounter you can&apos;t explain,
-              <br />
-              you can only experience.
-            </h2>
-          </Reveal>
-          <Reveal direction="right" delay={100} className="space-y-6 text-lg leading-relaxed text-ink-70">
-            <p>{camp.description}</p>
-            <p className="text-ink">
-              Every lighthouse, one gathering, days of unhurried attention on one thing. That is the
-              whole point.
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ── the fire ─────────────────────────────────────────────────────── */}
-      {cards.length > 0 ? (
-        <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 opacity-70"
-            style={{
-              background:
-                "radial-gradient(1100px 520px at 15% 0%, rgba(33,161,255,.32), transparent 65%), radial-gradient(820px 420px at 90% 100%, rgba(238,247,255,.20), transparent 60%)",
-            }}
-          />
-          <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-            <Reveal>
-              <Eyebrow className="text-brass">What camp feels like</Eyebrow>
-              <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
-                Fresh Fire, Fresh Convictions and Fresh Impartation
-              </h2>
-            </Reveal>
-
-            <div className="mt-14">
-              <DepthCardCarousel
-                items={cards.map((card) => ({
-                  id: card.id,
-                  title: card.title,
-                  imageUrl: card.imageUrl,
-                }))}
-              />
-            </div>
-          </div>
-        </section>
-      ) : null}
-
       {/* ── the feel of it, five-second clips ─────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
+      <section className="relative overflow-hidden border-b border-white/10 bg-ink text-white">
         <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
             <Eyebrow className="text-brass">A few seconds in the room</Eyebrow>
@@ -342,6 +289,38 @@ export default async function CampOverviewPage() {
           </div>
         </div>
       </section>
+
+      {/* ── the fire ─────────────────────────────────────────────────────── */}
+      {cards.length > 0 ? (
+        <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 opacity-70"
+            style={{
+              background:
+                "radial-gradient(1100px 520px at 15% 0%, rgba(33,161,255,.32), transparent 65%), radial-gradient(820px 420px at 90% 100%, rgba(238,247,255,.20), transparent 60%)",
+            }}
+          />
+          <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+            <Reveal>
+              <Eyebrow className="text-brass">What camp feels like</Eyebrow>
+              <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
+                Fresh Fire, Fresh Convictions and Fresh Impartation
+              </h2>
+            </Reveal>
+
+            <div className="mt-14">
+              <DepthCardCarousel
+                items={cards.map((card) => ({
+                  id: card.id,
+                  title: card.title,
+                  imageUrl: card.imageUrl,
+                }))}
+              />
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* ── pricing ──────────────────────────────────────────────────────── */}
       <section className="border-b border-ink/12" id="pricing">

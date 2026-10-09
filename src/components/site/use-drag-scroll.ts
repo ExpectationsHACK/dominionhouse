@@ -86,13 +86,19 @@ export function useDragScroll() {
 
   // Mouse drag with a flick: touch already scrolls natively with momentum,
   // this gives a mouse the same feel instead of only arrows and the wheel.
+  //
+  // A press only becomes a drag once the mouse has moved a few pixels. Taking
+  // the pointer on press (as this used to) sent every click to the track, so a
+  // button inside a card, "Read the full story", barely ever got its click.
+  const pressed = useRef<{ pointerId: number } | null>(null);
+  const DRAG_THRESHOLD = 6;
+
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
     if (event.pointerType !== "mouse" || event.button !== 0) return;
     const track = trackRef.current;
     if (!track) return;
     cancelAnimationFrame(glide.current);
-    track.setPointerCapture(event.pointerId);
-    track.style.scrollSnapType = "none";
+    pressed.current = { pointerId: event.pointerId };
     drag.current = {
       x: event.clientX,
       scroll: track.scrollLeft,
@@ -101,17 +107,29 @@ export function useDragScroll() {
       velocity: 0,
       moved: 0,
     };
-    setDragging(true);
   }
 
   function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
-    if (!dragging) return;
     const track = trackRef.current;
-    if (!track) return;
-    const now = performance.now();
+    if (!track || !pressed.current) return;
+    // Released outside the track before a drag began: forget the press.
+    if (!dragging && event.buttons === 0) {
+      pressed.current = null;
+      return;
+    }
     const state = drag.current;
+    const distance = Math.abs(event.clientX - state.x);
+
+    if (!dragging) {
+      if (distance < DRAG_THRESHOLD) return;
+      track.setPointerCapture(pressed.current.pointerId);
+      track.style.scrollSnapType = "none";
+      setDragging(true);
+    }
+
+    const now = performance.now();
     track.scrollLeft = state.scroll - (event.clientX - state.x);
-    state.moved = Math.max(state.moved, Math.abs(event.clientX - state.x));
+    state.moved = Math.max(state.moved, distance);
     const dt = Math.max(1, now - state.lastT);
     // Smoothed, so the last jittery millisecond doesn't decide the flick.
     state.velocity = state.velocity * 0.6 + ((event.clientX - state.lastX) / dt) * 0.4;
@@ -120,6 +138,7 @@ export function useDragScroll() {
   }
 
   function endDrag() {
+    pressed.current = null;
     if (!dragging) return;
     setDragging(false);
     const track = trackRef.current;
@@ -143,7 +162,7 @@ export function useDragScroll() {
 
   /** A drag that ends on a link shouldn't also follow it. */
   function onClickCapture(event: React.MouseEvent<HTMLDivElement>) {
-    if (drag.current.moved > 6) {
+    if (drag.current.moved >= DRAG_THRESHOLD) {
       event.preventDefault();
       event.stopPropagation();
       drag.current.moved = 0;

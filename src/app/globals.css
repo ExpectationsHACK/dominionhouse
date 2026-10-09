@@ -65,6 +65,9 @@
     font-family: var(--font-sans);
     font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
+    /* Panels that slide in from the side start 32px past the edge; clip, not
+       hidden, so the page never scrolls sideways and sticky still works. */
+    overflow-x: clip;
   }
 
   ::selection {

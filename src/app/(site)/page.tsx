@@ -230,7 +230,9 @@ export default async function HomePage() {
                 open, and you can pay in instalments.
               </p>
 
-              <div className="flex flex-wrap items-end gap-x-10 gap-y-6 border-t border-white/15 pt-6">
+              {/* Aligned from the top: the countdown has its unit labels under the
+                  numbers, so bottom-aligning dropped "From" and the price a line lower. */}
+              <div className="flex flex-wrap items-start gap-x-10 gap-y-6 border-t border-white/15 pt-6">
                 <div>
                   <p className="eyebrow flex items-center gap-2 text-white/40">
                     <span className="pulse-ring relative h-1.5 w-1.5 rounded-full bg-brass text-brass" />
@@ -246,7 +248,7 @@ export default async function HomePage() {
                 </div>
                 <div>
                   <p className="eyebrow text-white/40">From</p>
-                  <p className="display mt-3 text-4xl sm:text-5xl">
+                  <p className="display mt-3 text-4xl leading-none sm:text-5xl">
                     {cheapest !== null ? formatKobo(cheapest) : ", "}
                   </p>
                 </div>

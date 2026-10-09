@@ -14,7 +14,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 export function WhatsAppCta() {
   return (
     <div className="border border-[#25D366]/50 bg-[#25D366]/10 px-5 py-5">
-      <p className="eyebrow text-ink-45">Stay in the loop</p>
+      <p className="eyebrow text-ink-45">Stay in touch</p>
       <p className="mt-1.5 text-sm leading-relaxed text-ink-70">
         Join the Fresh Fire Camp Meeting WhatsApp group for updates, reminders and everything you
         need to know before you travel.

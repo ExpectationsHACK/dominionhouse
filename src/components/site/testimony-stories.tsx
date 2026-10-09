@@ -5,9 +5,9 @@ import { CardCarousel } from "@/components/site/card-carousel";
 import type { Testimony } from "@/lib/testimonies";
 
 /**
- * Testimonies as portrait cards: the person, the camp it happened at, and one
- * line from their story. The full testimony opens in a dialog, so a long story
- * is there for anyone who wants it without stretching every card to fit.
+ * Testimonies as quote cards: a line from the story up top, the person below
+ * with their photo as a round profile picture. The full testimony opens in a
+ * dialog, so a long story is there without stretching every card to fit.
  */
 export function TestimonyStories({ items }: { items: Testimony[] }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -25,43 +25,50 @@ export function TestimonyStories({ items }: { items: Testimony[] }) {
         {items.map((item) => (
           <article
             key={item.id}
-            className="card-lift flex w-[82vw] flex-col overflow-hidden border border-white/12 bg-white/[0.04] sm:w-[360px]"
+            className="card-lift flex w-[82vw] flex-col border border-white/12 bg-white/[0.04] p-6 sm:w-[380px] sm:p-7"
           >
-            <div className="relative aspect-[4/5] overflow-hidden">
-              {/* Local files, already sized for these cards. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.imageUrl}
-                alt={item.name}
-                draggable={false}
-                loading="lazy"
-                decoding="async"
-                className="h-full w-full object-cover"
-              />
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent"
-              />
-              <p className="absolute left-5 top-5 bg-brass px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-ink">
-                {item.camp}
-              </p>
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <p className="display text-3xl leading-none">{item.name}</p>
-                <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-brass">
-                  {item.title}
-                </p>
-              </div>
-            </div>
+            <span
+              aria-hidden="true"
+              className="display text-6xl leading-[0.6] text-brass"
+            >
+              &ldquo;
+            </span>
+            <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-brass">
+              {item.title}
+            </p>
+            {/* The testimony itself, trimmed to a few lines; the rest is a tap away. */}
+            <p className="mt-3 line-clamp-7 text-[16px] leading-relaxed text-white/85">
+              {item.story.join(" ")}
+            </p>
+            <button
+              type="button"
+              onClick={() => show(item.id)}
+              className="mt-5 self-start text-[12px] font-semibold uppercase tracking-[0.12em] text-brass underline-offset-4 hover:underline"
+            >
+              Read the full story &rarr;
+            </button>
 
-            <div className="flex flex-1 flex-col p-5 sm:p-6">
-              <p className="text-[17px] leading-relaxed text-white/85">&ldquo;{item.quote}&rdquo;</p>
-              <button
-                type="button"
-                onClick={() => show(item.id)}
-                className="mt-auto self-start pt-5 text-[12px] font-semibold uppercase tracking-[0.12em] text-brass underline-offset-4 hover:underline"
-              >
-                Read the full story &rarr;
-              </button>
+            <div className="mt-auto pt-6">
+              <div className="flex items-center gap-4 border-t border-white/12 pt-5">
+                {/* Local files, already sized; shown as a profile photo. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={item.imageUrl}
+                  alt={item.name}
+                  draggable={false}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-14 w-14 shrink-0 rounded-full border-2 border-brass object-cover object-top"
+                />
+                <div className="min-w-0">
+                  <p className="text-base font-semibold leading-tight">
+                    {item.name}
+                  </p>
+                  <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.14em] text-white/50">
+                    {item.camp}
+                  </p>
+                </div>
+              </div>
             </div>
           </article>
         ))}
@@ -90,10 +97,15 @@ export function TestimonyStories({ items }: { items: Testimony[] }) {
                 <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-brass">
                   {open.camp}
                 </p>
-                <h3 id="testimony-title" className="display mt-1 text-3xl leading-tight sm:text-4xl">
+                <h3
+                  id="testimony-title"
+                  className="display mt-1 text-3xl leading-tight sm:text-4xl"
+                >
                   {open.title}
                 </h3>
-                <p className="mt-1 text-sm font-semibold text-ink-70">{open.name}</p>
+                <p className="mt-1 text-sm font-semibold text-ink-70">
+                  {open.name}
+                </p>
               </div>
               <button
                 type="button"
