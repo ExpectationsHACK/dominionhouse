@@ -150,32 +150,32 @@ enum VisitorStatus {
 // ─────────────────────────────────────────────────────────────── camp ─────────
 
 model Camp {
-  id                    String   @id @default(cuid())
-  slug                  String   @unique
-  name                  String
-  theme                 String?
-  tagline               String?
-  description           String?
-  venue                 String
-  venueAddress          String?
-  startsAt              DateTime
-  endsAt                DateTime
-  currency              String   @default("NGN")
-  isActive              Boolean  @default(true)
-  registrationOpensAt   DateTime?
-  registrationClosesAt  DateTime?
-  capacity              Int?
+  id                   String    @id @default(cuid())
+  slug                 String    @unique
+  name                 String
+  theme                String?
+  tagline              String?
+  description          String?
+  venue                String
+  venueAddress         String?
+  startsAt             DateTime
+  endsAt               DateTime
+  currency             String    @default("NGN")
+  isActive             Boolean   @default(true)
+  registrationOpensAt  DateTime?
+  registrationClosesAt DateTime?
+  capacity             Int?
 
   // Payment policy
-  installmentsEnabled   Boolean  @default(true)
+  installmentsEnabled     Boolean   @default(true)
   /// Flat floor on the first payment, in kobo. A percentage cannot express a
   /// single amount that applies across tiers priced differently.
-  minFirstInstallmentKobo Int    @default(1000000)
-  paymentDeadline       DateTime?
+  minFirstInstallmentKobo Int       @default(1000000)
+  paymentDeadline         DateTime?
 
   // Accommodation policy
-  accommodationEnabled  Boolean  @default(true)
-  requireFullPayForRoom Boolean  @default(true)
+  accommodationEnabled  Boolean @default(true)
+  requireFullPayForRoom Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -219,7 +219,7 @@ model Registrant {
   camp   Camp   @relation(fields: [campId], references: [id], onDelete: Cascade)
 
   // Identity
-  registrationCode String   @unique
+  registrationCode String    @unique
   firstName        String
   lastName         String
   email            String
@@ -231,15 +231,15 @@ model Registrant {
   age              Int?
 
   // Church context
-  position     Position @default(DISCIPLE)
-  positionNote String?
-  department   String?
-  branch       String?
+  position      Position       @default(DISCIPLE)
+  positionNote  String?
+  department    String?
+  branch        String?
   /// Which Lighthouse (campus) they belong to, adults, teenagers and children.
-  lighthouse   String?
+  lighthouse    String?
   /// Campus-fellowship region, asked of campus students instead of a Lighthouse.
-  region       String?
-  isFirstCamp  Boolean  @default(false)
+  region        String?
+  isFirstCamp   Boolean        @default(false)
   /// Adults only.
   ageGroup      AgeGroup?
   maritalStatus MaritalStatus?
@@ -266,24 +266,24 @@ model Registrant {
   allergies         String?
 
   // Logistics
-  category            AgeCategory
-  priceTierId         String?
-  priceTier           PriceTier?  @relation(fields: [priceTierId], references: [id])
+  category                   AgeCategory
+  priceTierId                String?
+  priceTier                  PriceTier?  @relation(fields: [priceTierId], references: [id])
   /// Everyone who pays gets a bed; this is a request for a personal room.
-  wantsPersonalAccommodation Boolean @default(false)
-  arrivalDate         DateTime?
-  departureDate       DateTime?
-  transportNeeded     Boolean     @default(false)
+  wantsPersonalAccommodation Boolean     @default(false)
+  arrivalDate                DateTime?
+  departureDate              DateTime?
+  transportNeeded            Boolean     @default(false)
 
   // Money (kobo)
-  paymentPlan   PaymentPlan        @default(FULL)
+  paymentPlan          PaymentPlan        @default(FULL)
   /// How many instalments they opted for (2–5). Null when paying in full, or
   /// when they named their own first amount instead of an even split.
   installmentCount     Int?
   /// A specific first instalment they asked for, in kobo.
   firstInstallmentKobo Int?
-  status        RegistrationStatus @default(PENDING)
-  amountDueKobo Int                @default(0)
+  status               RegistrationStatus @default(PENDING)
+  amountDueKobo        Int                @default(0)
 
   consentPhoto Boolean @default(true)
   notes        String?
@@ -314,15 +314,15 @@ model Payment {
   registrantId String
   registrant   Registrant @relation(fields: [registrantId], references: [id], onDelete: Cascade)
 
-  reference    String        @unique
-  amountKobo   Int
-  method       PaymentMethod @default(PAYSTACK)
-  status       PaymentStatus @default(PENDING)
-  channel      String?
-  paidAt       DateTime?
-  gatewayRef   String?
-  gatewayRaw   Json?
-  note         String?
+  reference  String        @unique
+  amountKobo Int
+  method     PaymentMethod @default(PAYSTACK)
+  status     PaymentStatus @default(PENDING)
+  channel    String?
+  paidAt     DateTime?
+  gatewayRef String?
+  gatewayRaw Json?
+  note       String?
 
   // Offline payments recorded by staff
   recordedById String?
@@ -429,13 +429,13 @@ model AdminUser {
 
 /// One-time 6-digit codes for passwordless registrant portal login.
 model LoginCode {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   email      String
   codeHash   String
   expiresAt  DateTime
   consumedAt DateTime?
-  attempts   Int      @default(0)
-  createdAt  DateTime @default(now())
+  attempts   Int       @default(0)
+  createdAt  DateTime  @default(now())
 
   @@index([email, expiresAt])
 }
@@ -485,18 +485,18 @@ model Announcement {
 
 /// First-timer / plan-a-visit submissions from the public church site.
 model Visitor {
-  id             String        @id @default(cuid())
-  firstName      String
-  lastName       String
-  email          String
-  phone          String?
-  campus         String?
-  visitDate      DateTime?
-  howHeard       String?
-  prayerRequest  String?
-  wantsFollowUp  Boolean       @default(true)
-  status         VisitorStatus @default(NEW)
-  staffNote      String?
+  id            String        @id @default(cuid())
+  firstName     String
+  lastName      String
+  email         String
+  phone         String?
+  campus        String?
+  visitDate     DateTime?
+  howHeard      String?
+  prayerRequest String?
+  wantsFollowUp Boolean       @default(true)
+  status        VisitorStatus @default(NEW)
+  staffNote     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -526,14 +526,14 @@ model EmailLog {
 }
 
 model AuditLog {
-  id       String  @id @default(cuid())
-  actorId  String?
-  actor    AdminUser? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  id         String     @id @default(cuid())
+  actorId    String?
+  actor      AdminUser? @relation(fields: [actorId], references: [id], onDelete: SetNull)
   actorLabel String
-  action   String
-  entity   String
-  entityId String?
-  meta     Json?
+  action     String
+  entity     String
+  entityId   String?
+  meta       Json?
 
   createdAt DateTime @default(now())
 
@@ -582,4 +582,98 @@ model Setting {
   key       String   @id
   value     Json
   updatedAt DateTime @updatedAt
+}
+
+// ──────────────────────────────────────────────────────── angel partners ──────
+
+enum PartnerStatus {
+  /// Checkout started, first payment not confirmed yet.
+  PENDING
+  /// Subscription live and charging monthly.
+  ACTIVE
+  /// Paystack stopped renewing (cancelled, or the card kept failing).
+  CANCELLED
+}
+
+enum GiftKind {
+  /// A charge on an Angel Partner's monthly subscription.
+  MONTHLY
+  /// A one-time seed.
+  ONE_TIME
+}
+
+enum GiftStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+/// Someone who has committed to a monthly Angel Partnership (Legacy Place).
+/// Billing runs on a Paystack subscription; this mirrors its state.
+model Partner {
+  id          String        @id @default(cuid())
+  name        String
+  email       String
+  phone       String
+  country     String?
+  /// "NGN" or "USD". Amounts are in that currency's minor unit (kobo, cents).
+  currency    String
+  amountMinor Int
+  status      PartnerStatus @default(PENDING)
+  /// Name on the Founding 500 Wall.
+  wallOptIn   Boolean       @default(false)
+
+  paystackPlanCode         String?
+  paystackCustomerCode     String?
+  paystackSubscriptionCode String?   @unique
+  /// Paystack's token for managing (disabling) the subscription.
+  paystackEmailToken       String?
+  cancelledAt              DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  gifts Gift[]
+
+  @@index([status])
+  @@index([email])
+}
+
+/// Every giving payment: one-time seeds and each monthly partnership charge.
+model Gift {
+  id        String   @id @default(cuid())
+  partnerId String?
+  partner   Partner? @relation(fields: [partnerId], references: [id], onDelete: SetNull)
+
+  reference   String     @unique
+  kind        GiftKind
+  status      GiftStatus @default(PENDING)
+  currency    String
+  amountMinor Int
+  name        String
+  email       String
+  phone       String?
+  channel     String?
+  paidAt      DateTime?
+  gatewayRaw  Json?
+  note        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([paidAt])
+  @@index([partnerId])
+}
+
+/// Paystack plans, one per currency and monthly amount, created on first use.
+model GivingPlan {
+  id          String @id @default(cuid())
+  currency    String
+  amountMinor Int
+  planCode    String @unique
+
+  createdAt DateTime @default(now())
+
+  @@unique([currency, amountMinor])
 }

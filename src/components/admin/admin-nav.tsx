@@ -15,6 +15,7 @@ const SECTIONS: { heading: string; items: NavItem[] }[] = [
       { href: "/admin", label: "Dashboard" },
       { href: "/admin/registrants", label: "Registrants" },
       { href: "/admin/payments", label: "Payments", roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"] },
+      { href: "/admin/partners", label: "Angel Partners", roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"] },
       { href: "/admin/rooms", label: "Rooms" },
       { href: "/admin/tickets", label: "Tickets" },
       { href: "/admin/check-in", label: "Check-in" },

@@ -38,6 +38,12 @@ export type InitialiseArgs = {
   reference: string;
   callbackUrl: string;
   metadata?: Record<string, unknown>;
+  /** "NGN" unless given. USD needs USD enabled on the Paystack account. */
+  currency?: string;
+  /** Subscribe to this plan: Paystack charges the plan's amount, then monthly. */
+  planCode?: string;
+  /** Where the simulated checkout sends a test payment (mock mode only). */
+  simulatePath?: string;
 };
 
 export type VerifiedTransaction = {
@@ -58,7 +64,8 @@ export async function initialiseTransaction(args: InitialiseArgs): Promise<{ aut
     const url = new URL(args.callbackUrl);
     url.searchParams.set("reference", args.reference);
     url.searchParams.set("mock", "1");
-    return { authorizationUrl: `/camp/payment/simulate?reference=${encodeURIComponent(args.reference)}` };
+    const path = args.simulatePath ?? "/camp/payment/simulate";
+    return { authorizationUrl: `${path}?reference=${encodeURIComponent(args.reference)}` };
   }
 
   const response = await fetch(`${BASE}/transaction/initialize`, {
@@ -72,7 +79,8 @@ export async function initialiseTransaction(args: InitialiseArgs): Promise<{ aut
       amount: args.amountKobo,
       reference: args.reference,
       callback_url: args.callbackUrl,
-      currency: "NGN",
+      currency: args.currency ?? "NGN",
+      ...(args.planCode ? { plan: args.planCode } : {}),
       metadata: args.metadata ?? {},
     }),
     cache: "no-store",
@@ -137,6 +145,48 @@ export async function verifyTransaction(reference: string): Promise<VerifiedTran
     paidAt: data.paid_at ? new Date(data.paid_at) : null,
     raw: data,
   };
+}
+
+type PaystackEnvelope<T> = { status: boolean; message: string; data?: T };
+
+async function paystack<T>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
+  const response = await fetch(`${BASE}${path}`, {
+    method: init?.method ?? "GET",
+    headers: { Authorization: `Bearer ${SECRET}`, "Content-Type": "application/json" },
+    body: init?.body ? JSON.stringify(init.body) : undefined,
+    cache: "no-store",
+  });
+  const payload = (await response.json()) as PaystackEnvelope<T>;
+  if (!response.ok || !payload.status || payload.data === undefined) {
+    throw new Error(payload.message || `Paystack request failed (${path}).`);
+  }
+  return payload.data;
+}
+
+/** A monthly plan for one amount in one currency. Returns its plan code. */
+export async function createMonthlyPlan(args: {
+  name: string;
+  amountMinor: number;
+  currency: string;
+}): Promise<string> {
+  if (isMockPayments) {
+    assertNotMockInProduction();
+    return `PLN_mock_${args.currency}_${args.amountMinor}`;
+  }
+  const plan = await paystack<{ plan_code: string }>("/plan", {
+    method: "POST",
+    body: { name: args.name, interval: "monthly", amount: args.amountMinor, currency: args.currency },
+  });
+  return plan.plan_code;
+}
+
+/** Stop a subscription renewing. Needs the email token Paystack issued with it. */
+export async function disableSubscription(code: string, emailToken: string): Promise<void> {
+  if (isMockPayments) {
+    assertNotMockInProduction();
+    return;
+  }
+  await paystack("/subscription/disable", { method: "POST", body: { code, token: emailToken } });
 }
 
 /** Paystack signs webhook bodies with HMAC-SHA512 of the raw request body. */

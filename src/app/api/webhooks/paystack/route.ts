@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { failGift, onSubscriptionCreated, onSubscriptionEnded, recordRenewal, settleGift } from "@/lib/giving";
+import { isGiftReference } from "@/lib/giving-rules";
 import { classifyGatewayOutcome } from "@/lib/payment-outcome";
 import { getTotals, recordUnsuccessfulPayment, settlePayment, statusFor } from "@/lib/registration";
 import { verifyWebhookSignature } from "@/lib/paystack";
@@ -33,6 +35,22 @@ export async function POST(request: Request) {
   const data = event.data ?? {};
   const reference = typeof data.reference === "string" ? data.reference : null;
 
+  // Angel Partner subscriptions carry no reference of ours.
+  try {
+    switch (event.event) {
+      case "subscription.create":
+        await onSubscriptionCreated(data);
+        return NextResponse.json({ received: true });
+      case "subscription.disable":
+      case "subscription.not_renew":
+        await onSubscriptionEnded(data);
+        return NextResponse.json({ received: true });
+    }
+  } catch (error) {
+    console.error("[paystack:webhook]", event.event, error);
+    return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+  }
+
   if (!reference) {
     // Nothing to reconcile, acknowledge so Paystack stops retrying.
     return NextResponse.json({ received: true });
@@ -41,17 +59,38 @@ export async function POST(request: Request) {
   try {
     switch (event.event) {
       case "charge.success": {
-        await settlePayment({
+        if (isGiftReference(reference)) {
+          await settleGift({
+            reference,
+            paidAt: typeof data.paid_at === "string" ? new Date(data.paid_at) : new Date(),
+            channel: typeof data.channel === "string" ? data.channel : null,
+            amountMinor: typeof data.amount === "number" ? data.amount : undefined,
+            raw: data,
+          });
+          break;
+        }
+        const camp = await settlePayment({
           reference,
           paidAt: typeof data.paid_at === "string" ? new Date(data.paid_at) : new Date(),
           channel: typeof data.channel === "string" ? data.channel : null,
           gatewayRaw: data,
           verifiedAmountKobo: typeof data.amount === "number" ? data.amount : undefined,
         });
+        // Not a camp payment either: a partnership renewal, which Paystack
+        // charges under its own reference.
+        if (!camp.ok && camp.reason === "unknown-reference") await recordRenewal(data);
         break;
       }
 
       case "charge.failed": {
+        if (isGiftReference(reference)) {
+          await failGift(
+            reference,
+            typeof data.gateway_response === "string" ? data.gateway_response : "Payment failed.",
+            data,
+          );
+          break;
+        }
         const outcome = classifyGatewayOutcome({
           status: "failed",
           gatewayResponse: typeof data.gateway_response === "string" ? data.gateway_response : null,

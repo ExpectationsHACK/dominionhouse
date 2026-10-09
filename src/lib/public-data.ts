@@ -67,3 +67,13 @@ export const getPublicSchedule = shared("public-schedule", (campId: string) =>
     orderBy: [{ startsAt: "asc" }],
   }),
 );
+
+/** Setting key for the amount raised toward Legacy Place, in naira (set in the admin). */
+export const LEGACY_RAISED_SETTING = "legacy.raisedNaira";
+
+/** The Legacy Place amount raised so far, in naira, or null if never set. */
+export const getPublicLegacyRaised = shared("public-legacy-raised", async () => {
+  const setting = await db.setting.findUnique({ where: { key: LEGACY_RAISED_SETTING } });
+  const value = Number(setting?.value);
+  return Number.isFinite(value) && value >= 0 ? value : null;
+});

@@ -248,3 +248,41 @@ export function announcementEmail(args: { title: string; body: string; portalUrl
     ),
   };
 }
+
+/** Receipt for an Angel Partner charge or a one-time seed. */
+export function giftReceiptEmail(args: {
+  firstName: string;
+  amount: string;
+  reference: string;
+  monthly: boolean;
+  firstMonth: boolean;
+  giveUrl: string;
+}) {
+  const firstName = escapeHtml(args.firstName);
+  const reference = escapeHtml(args.reference);
+  const heading = args.monthly
+    ? args.firstMonth
+      ? `Welcome to the Angel Partners, ${firstName}.`
+      : `Thank you for this month, ${firstName}.`
+    : `Thank you for your seed, ${firstName}.`;
+  return {
+    subject: args.monthly
+      ? args.firstMonth
+        ? "Welcome, Angel Partner: your covenant has begun"
+        : `Your ${args.amount} Angel Partner gift is in`
+      : `Your ${args.amount} seed is received`,
+    html: shell(
+      h(heading) +
+        p(
+          args.monthly
+            ? args.firstMonth
+              ? "Your monthly partnership for Legacy Place is active. It renews on the same day each month; you'll get a receipt like this every time, and monthly reports on how Legacy Place is coming together. If life happens, write to us and we'll pause it, no questions."
+              : "Your monthly partnership renewed. Every brick, every chair, every Bible: it all adds up to transformed lives."
+            : "Your gift to Legacy Place has been received. Thank you for building what outlives you.",
+        ) +
+        table(row("Amount", escapeHtml(args.amount)) + row("Reference", reference)) +
+        button(args.giveUrl, "See Legacy Place"),
+      `${args.amount} received for Legacy Place.`,
+    ),
+  };
+}
