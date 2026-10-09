@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email/send";
 import { giftReceiptEmail } from "@/lib/email/templates";
 import { GIFT_REFERENCE_PREFIX, formatMoney } from "@/lib/giving-rules";
-import { createMonthlyPlan } from "@/lib/paystack";
+import { createMonthlyPlan, isMockPayments } from "@/lib/paystack";
 
 /**
  * Angel Partners: monthly partnerships run as Paystack subscriptions, plus
@@ -31,6 +31,9 @@ export async function planFor(currency: string, amountMinor: number): Promise<st
     amountMinor,
     currency,
   });
+  // A simulated plan must never be saved: development shares this database,
+  // and a stored fake plan code would be handed to real partners later.
+  if (isMockPayments) return planCode;
   try {
     await db.givingPlan.create({ data: { currency, amountMinor, planCode } });
   } catch (error) {
