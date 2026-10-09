@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { mediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
 const PHONE = "(max-width: 767px)";
@@ -18,7 +19,7 @@ function chooseSource(): string | null {
   const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
     ?.saveData;
   if (reduceMotion || saveData) return null;
-  return window.matchMedia(PHONE).matches ? "/video/hero-mobile.mp4" : "/video/hero-desktop.mp4";
+  return mediaUrl(window.matchMedia(PHONE).matches ? "/video/hero-mobile.mp4" : "/video/hero-desktop.mp4");
 }
 
 /**
@@ -49,10 +50,10 @@ export function HeroVideo({ className }: { className?: string }) {
   return (
     <div aria-hidden="true" className={cn("absolute inset-0 overflow-hidden", className)}>
       <picture>
-        <source media="(max-width: 767px)" srcSet="/video/hero-mobile.jpg" />
+        <source media="(max-width: 767px)" srcSet={mediaUrl("/video/hero-mobile.jpg")} />
         {/* A plain poster, sized by CSS: next/image's wrapper fights object-cover here. */}
         <img
-          src="/video/hero-desktop.jpg"
+          src={mediaUrl("/video/hero-desktop.jpg")}
           alt=""
           fetchPriority="high"
           className="h-full w-full object-cover"

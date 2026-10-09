@@ -1,4 +1,5 @@
 import type { VideoCarouselItem } from "@/components/site/video-carousel";
+import { mediaUrl } from "@/lib/media";
 
 /**
  * Five-second clips cut from the house's own footage (public/video/, sources
@@ -8,8 +9,8 @@ import type { VideoCarouselItem } from "@/components/site/video-carousel";
 const clip = (id: string, title: string): VideoCarouselItem => ({
   id,
   title,
-  videoUrl: `/video/${id}.mp4`,
-  posterUrl: `/video/${id}.jpg`,
+  videoUrl: mediaUrl(`/video/${id}.mp4`),
+  posterUrl: mediaUrl(`/video/${id}.jpg`),
 });
 
 /** Homepage, "What a service feels like". */
