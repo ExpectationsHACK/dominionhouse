@@ -80,7 +80,9 @@ export function Countdown({
         {left.days} days, {left.hours} hours and {left.minutes} minutes to go
       </span>
       {units.map((unit, index) => (
-        <div key={unit.label} aria-hidden="true" className="flex flex-col">
+        // Each label centred under its own figures; the left pad offsets the
+        // letter-spacing trailing the last letter, so it centres by eye too.
+        <div key={unit.label} aria-hidden="true" className="flex flex-col items-center">
           <span
             className={cn(
               "display flex leading-none",
@@ -90,7 +92,7 @@ export function Countdown({
           >
             <Wheels value={unit.value} pad={unit.pad} />
           </span>
-          <span className={cn("eyebrow mt-2", labelClassName)}>{unit.label}</span>
+          <span className={cn("eyebrow mt-2 pl-[0.18em]", labelClassName)}>{unit.label}</span>
         </div>
       ))}
     </div>
