@@ -34,17 +34,22 @@ export default async function CheckInPage() {
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <Eyebrow>The gate</Eyebrow>
-          <h1 className="display mt-2 text-5xl">Check-in</h1>
+          <h1 className="display mt-2 text-4xl sm:text-5xl">Check-in</h1>
         </div>
       </header>
 
-      <div className="grid gap-px bg-ink/12 sm:grid-cols-3">
-        <Stat label="Checked in" value={checkedIn} tone="brand" />
-        <Stat label="Tickets issued" value={issued} />
-        <Stat label="Still to arrive" value={Math.max(0, issued - checkedIn)} />
-      </div>
+      {/* Phones at the gate: camera first, the counts underneath. */}
+      <div className="flex flex-col gap-6">
+        <div className="order-2 grid grid-cols-3 gap-px bg-ink/12 lg:order-1">
+          <Stat label="Checked in" value={checkedIn} tone="brand" />
+          <Stat label="Tickets issued" value={issued} />
+          <Stat label="Still to arrive" value={Math.max(0, issued - checkedIn)} />
+        </div>
 
-      <Scanner />
+        <div className="order-1 lg:order-2">
+          <Scanner />
+        </div>
+      </div>
 
       <Panel>
         <PanelHeader title="Just arrived" description="The last twelve people through the gate." />
