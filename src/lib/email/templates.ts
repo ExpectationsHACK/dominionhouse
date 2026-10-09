@@ -195,7 +195,10 @@ export function ticketEmail(args: {
         stub +
         button(args.portalUrl, "Open my camp profile") +
         p(
-          `<span style="color:#74747c;font-size:13px;">Your profile has your schedule, room and payment history. Sign in any time with the email address and phone number you registered with.</span>`,
+          `<strong>To sign in:</strong> go to <a href="${args.portalUrl}" style="color:${INK};font-weight:600;">${args.portalUrl.replace(/^https?:\/\//, "")}</a> and enter the email address and phone number you registered with. No password needed.`,
+        ) +
+        p(
+          `<span style="color:#74747c;font-size:13px;">Your ticket is always there too, along with your schedule, room and payment history.</span>`,
         ),
       `Ticket ${args.ticketCode}, ${CAMP_NAME}`,
     ),
