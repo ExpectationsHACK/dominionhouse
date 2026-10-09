@@ -201,14 +201,13 @@ export default async function CampOverviewPage() {
                 ahead.
               </p>
               <p>
-                This is not just a gathering, it is a spiritual invasion. An invasion of the Word. An
-                invasion of prayer. An invasion of light, authority, and kingdom influence across
-                territories and nations.
+                This is not just a gathering, it is a spiritual awakening. An awakening through the
+                Word, Prayer and Impartation. For kingdom influence across territories and nations.
               </p>
               <p>
-                Prepare to be launched into deeper realms of the Word and prayer, where lives are
-                realigned, visions are reawakened, and believers are empowered to take ground locally
-                and globally.
+                Prepare to be launched into deeper depths of the Word and prayer, where lives are
+                realigned, visions are reawakened, and believers are empowered to take territories
+                locally and globally.
               </p>
             </div>
           </Reveal>
