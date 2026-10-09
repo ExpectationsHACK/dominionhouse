@@ -6,6 +6,7 @@ import { DepthCardCarousel } from "@/components/site/depth-card-carousel";
 import { HillContours } from "@/components/site/hill-contours";
 import { Reveal } from "@/components/site/reveal";
 import { TestimonialCarousel } from "@/components/site/testimonial-carousel";
+import { TestimonyStories } from "@/components/site/testimony-stories";
 import { TicketCards } from "@/components/site/ticket-cards";
 import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
@@ -15,6 +16,7 @@ import { remainingUntil } from "@/lib/countdown";
 import { campDateRange, dayLabel, timeLabel } from "@/lib/dates";
 import { formatKobo } from "@/lib/money";
 import { CAMP_CLIPS } from "@/lib/site-videos";
+import { TESTIMONIES } from "@/lib/testimonies";
 
 export const metadata: Metadata = {
   title: "Fresh Fire Camp Meeting 2027",
@@ -312,16 +314,20 @@ export default async function CampOverviewPage() {
         </div>
       </section>
 
-      {/* ── testimonials ─────────────────────────────────────────────────── */}
-      {testimonialRows.length > 0 ? (
-        <section className="border-b border-ink/12">
-          <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-            <Reveal>
-              <Eyebrow>In their own words</Eyebrow>
-              <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">Fresh Fire testimonies</h2>
-            </Reveal>
+      {/* ── testimonials: the admin's, or the house's own stories ─────────── */}
+      <section className="border-b border-white/10 bg-ink text-white">
+        <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+          <Reveal>
+            <Eyebrow className="text-brass">In their own words</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">Fresh Fire testimonies</h2>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/65">
+              Healing, calling, direction, assurance. A few of the stories people carried home from
+              camp.
+            </p>
+          </Reveal>
 
-            <div className="mt-14">
+          <div className="mt-12">
+            {testimonialRows.length > 0 ? (
               <TestimonialCarousel
                 items={testimonialRows.map((row) => ({
                   id: row.id,
@@ -330,10 +336,12 @@ export default async function CampOverviewPage() {
                   imageUrl: row.imageUrl,
                 }))}
               />
-            </div>
+            ) : (
+              <TestimonyStories items={TESTIMONIES} />
+            )}
           </div>
-        </section>
-      ) : null}
+        </div>
+      </section>
 
       {/* ── pricing ──────────────────────────────────────────────────────── */}
       <section className="border-b border-ink/12" id="pricing">
