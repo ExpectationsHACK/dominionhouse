@@ -20,7 +20,7 @@ export default async function AdminDashboardLayout({
         <div className="flex items-center justify-between gap-3 border-b border-white/12 px-5 py-4">
           <Link href="/admin" className="flex items-center gap-2.5">
             <Logo className="h-7 w-auto" />
-            <span className="display text-lg leading-none">Camp Desk</span>
+            <span className="display text-lg leading-none">Admin Desk</span>
           </Link>
         </div>
 

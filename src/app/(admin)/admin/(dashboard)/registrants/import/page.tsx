@@ -14,7 +14,7 @@ export default async function ImportRegistrantsPage() {
     <div className="max-w-3xl space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Eyebrow>Camp desk</Eyebrow>
+          <Eyebrow>Admin desk</Eyebrow>
           <h1 className="display mt-2 text-5xl">Import registrants</h1>
           <p className="mt-2 max-w-xl text-sm text-ink-45">
             A whole lighthouse's paper sign-up sheet, in one file. Each row is registered the

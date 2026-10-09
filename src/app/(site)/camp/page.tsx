@@ -205,7 +205,7 @@ export default async function CampOverviewPage() {
                 Word, Prayer and Impartation. For kingdom influence across territories and nations.
               </p>
               <p>
-                Prepare to be launched into deeper depths of the Word and prayer, where lives are
+                Prepare to be launched into depths of the Word and prayer, where lives are
                 realigned, visions are reawakened, and believers are empowered to take territories
                 locally and globally.
               </p>

@@ -106,7 +106,7 @@ export default async function StaffPage() {
   return (
     <div className="space-y-6">
       <header>
-        <Eyebrow>Who can get into the camp desk</Eyebrow>
+        <Eyebrow>Who can get into the admin desk</Eyebrow>
         <h1 className="display mt-2 text-5xl">Staff</h1>
       </header>
 

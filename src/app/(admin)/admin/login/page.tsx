@@ -21,7 +21,7 @@ export default async function AdminLoginPage() {
       <div className="relative w-full max-w-sm">
         <Logo className="h-12 w-auto" />
         <Eyebrow className="mt-5 text-brass">Dominion House</Eyebrow>
-        <h1 className="display mt-4 text-5xl">Camp desk</h1>
+        <h1 className="display mt-4 text-5xl">Admin desk</h1>
         <p className="mt-3 text-sm leading-relaxed text-white/55">
           The management system for Fresh Fire Camp Meeting 2027. Staff only.
         </p>

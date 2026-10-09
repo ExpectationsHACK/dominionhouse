@@ -64,7 +64,7 @@ export function AdminNav({ role }: { role: AdminRole }) {
       >
         <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-brass">Menu</span>
         <span className="text-sm font-semibold text-white">
-          {visible.flatMap((s) => s.items).find((item) => item.href === pathname)?.label ?? "Camp desk"}
+          {visible.flatMap((s) => s.items).find((item) => item.href === pathname)?.label ?? "Admin desk"}
         </span>
       </button>
 
