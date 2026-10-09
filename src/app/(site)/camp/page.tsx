@@ -247,16 +247,16 @@ export default async function CampOverviewPage() {
       </section>
 
       {/* ── the feel of it, five-second clips ─────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-white/10 bg-ink text-white">
+      <section className="relative overflow-hidden border-b border-ink/12 bg-white">
         <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
-            <Eyebrow className="text-brass">A few seconds in the room</Eyebrow>
+            <Eyebrow className="text-meridian">A few seconds in the room</Eyebrow>
             <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5rem)]">
               What it feels like
             </h2>
           </Reveal>
           <div className="mt-14">
-            <VideoCarousel label="Fresh Fire experience clips" items={clips} />
+            <VideoCarousel label="Fresh Fire experience clips" items={clips} tone="light" />
           </div>
         </div>
       </section>

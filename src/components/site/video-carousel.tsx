@@ -58,10 +58,16 @@ function VideoCard({ item }: { item: VideoCarouselItem }) {
 export function VideoCarousel({
   items,
   label = "Experience clips",
+  tone = "dark",
 }: {
   items: VideoCarouselItem[];
   label?: string;
+  /** The section behind it: arrows are drawn to show on either. */
+  tone?: "light" | "dark";
 }) {
+  const arrow = tone === "dark" ? "border-white/25 text-white" : "border-ink/20 text-ink";
+  const live =
+    tone === "dark" ? "hover:border-brass hover:bg-brass hover:text-ink" : "hover:border-ink hover:bg-ink hover:text-white";
   const trackRef = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -121,8 +127,9 @@ export function VideoCarousel({
           disabled={atStart}
           aria-label="Previous clips"
           className={cn(
-            "flex h-11 w-11 items-center justify-center border border-white/25 text-white transition-colors",
-            atStart ? "opacity-30" : "hover:border-brass hover:bg-brass hover:text-ink",
+            "flex h-11 w-11 items-center justify-center border transition-colors",
+            arrow,
+            atStart ? "opacity-30" : live,
           )}
         >
           <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
@@ -135,8 +142,9 @@ export function VideoCarousel({
           disabled={atEnd}
           aria-label="Next clips"
           className={cn(
-            "flex h-11 w-11 items-center justify-center border border-white/25 text-white transition-colors",
-            atEnd ? "opacity-30" : "hover:border-brass hover:bg-brass hover:text-ink",
+            "flex h-11 w-11 items-center justify-center border transition-colors",
+            arrow,
+            atEnd ? "opacity-30" : live,
           )}
         >
           <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
