@@ -340,7 +340,7 @@ export default async function CampOverviewPage() {
 
           <div className="mt-10">
             <ButtonLink href="/camp/register" size="lg">
-              Pick your ticket <Arrow />
+              Register now <Arrow />
             </ButtonLink>
           </div>
         </div>
