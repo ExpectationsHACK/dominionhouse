@@ -25,7 +25,7 @@ export function TestimonyStories({ items }: { items: Testimony[] }) {
         {items.map((item) => (
           <article
             key={item.id}
-            className="card-lift flex w-[82vw] flex-col border border-white/12 bg-white/[0.04] p-6 sm:w-[380px] sm:p-7"
+            className="card-lift flex w-[82vw] flex-col border border-white bg-white text-ink p-6 sm:w-[380px] sm:p-7"
           >
             <span
               aria-hidden="true"
@@ -33,23 +33,23 @@ export function TestimonyStories({ items }: { items: Testimony[] }) {
             >
               &ldquo;
             </span>
-            <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-brass">
+            <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-meridian">
               {item.title}
             </p>
             {/* The testimony itself, trimmed to a few lines; the rest is a tap away. */}
-            <p className="mt-3 line-clamp-7 text-[16px] leading-relaxed text-white/85">
+            <p className="mt-3 line-clamp-7 text-[16px] leading-relaxed text-ink-70">
               {item.story.join(" ")}
             </p>
             <button
               type="button"
               onClick={() => show(item.id)}
-              className="mt-5 self-start text-[12px] font-semibold uppercase tracking-[0.12em] text-brass underline-offset-4 hover:underline"
+              className="mt-5 self-start text-[12px] font-semibold uppercase tracking-[0.12em] text-meridian underline-offset-4 hover:underline"
             >
               Read the full story &rarr;
             </button>
 
             <div className="mt-auto pt-6">
-              <div className="flex items-center gap-4 border-t border-white/12 pt-5">
+              <div className="flex items-center gap-4 border-t border-ink/12 pt-5">
                 {/* Local files, already sized; shown as a profile photo. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -58,13 +58,13 @@ export function TestimonyStories({ items }: { items: Testimony[] }) {
                   draggable={false}
                   loading="lazy"
                   decoding="async"
-                  className="h-14 w-14 shrink-0 rounded-full border-2 border-brass object-cover object-top"
+                  className="h-14 w-14 shrink-0 rounded-full border-2 border-meridian object-cover object-top"
                 />
                 <div className="min-w-0">
                   <p className="text-base font-semibold leading-tight">
                     {item.name}
                   </p>
-                  <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.14em] text-white/50">
+                  <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-45">
                     {item.camp}
                   </p>
                 </div>
