@@ -43,7 +43,7 @@ export function TestimonyStories({ items }: { items: Testimony[] }) {
             <button
               type="button"
               onClick={() => show(item.id)}
-              className="mt-5 self-start text-[12px] font-semibold uppercase tracking-[0.12em] text-meridian underline-offset-4 hover:underline"
+              className="mt-5 self-start text-[12px] font-semibold uppercase tracking-[0.12em] text-[#0b78c9] underline-offset-4 hover:underline"
             >
               Read the full story &rarr;
             </button>
