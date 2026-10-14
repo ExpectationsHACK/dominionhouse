@@ -9,7 +9,7 @@ import { db } from "@/lib/db";
 import { dateOnly } from "@/lib/dates";
 import { formatKobo, percentPaid } from "@/lib/money";
 import { CATEGORY_LABEL } from "@/lib/pricing";
-import { POSITION_LABEL, POSITION_OPTIONS } from "@/lib/positions";
+import { POSITION_LABEL, POSITION_OPTIONS, positionLabelFor } from "@/lib/positions";
 import { LIGHTHOUSES_OR_MINISTRIES } from "@/lib/church";
 import {
   buildRegistrantOrder,
@@ -208,7 +208,7 @@ export default async function RegistrantsPage({
                     </p>
                   </Td>
                   <Td>
-                    <p className="text-sm">{POSITION_LABEL[registrant.position]}</p>
+                    <p className="text-sm">{positionLabelFor(registrant)}</p>
                     {registrant.department ? (
                       <p className="mt-0.5 text-xs text-ink-45">{registrant.department}</p>
                     ) : null}
@@ -228,9 +228,15 @@ export default async function RegistrantsPage({
                     <div className="flex items-center gap-2">
                       <StatusBadge status={registrant.status} />
                     </div>
-                    <p className="mt-1.5 font-mono text-[11px] text-ink-45">
-                      {formatKobo(totals.paidKobo)} / {formatKobo(totals.dueKobo)}
-                    </p>
+                    {totals.dueKobo === 0 ? (
+                      <p className="mt-1.5 font-mono text-[11px] text-ink-45">Free ticket</p>
+                    ) : (
+                      <p className="mt-1.5 font-mono text-[11px] leading-relaxed text-ink-45">
+                        Paid {formatKobo(totals.paidKobo)}
+                        <br />
+                        Balance {formatKobo(totals.balanceKobo)}
+                      </p>
+                    )}
                     <div className="mt-1.5 w-28">
                       <Meter percent={percentPaid(totals.paidKobo, totals.dueKobo)} />
                     </div>

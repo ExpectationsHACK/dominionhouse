@@ -41,6 +41,14 @@ export const POSITION_LABEL: Record<Position, string> = {
 };
 
 /**
+ * What the admin shows for someone's position: anyone at their first camp is
+ * a guest of the house, whatever role they picked.
+ */
+export function positionLabelFor(registrant: { position: Position; isFirstCamp: boolean }) {
+  return registrant.isFirstCamp ? "Guest" : POSITION_LABEL[registrant.position];
+}
+
+/**
  * Ordered for <select> menus, in the order the house lists them. The original
  * TEAM_COORDINATOR is left out: TEAM_LEADER took over the "Team Co-ordinator"
  * name, and offering both would show the same label twice.

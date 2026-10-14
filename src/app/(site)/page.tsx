@@ -12,7 +12,7 @@ import { StaggerWords } from "@/components/site/stagger-words";
 import { TiltCard } from "@/components/site/tilt-card";
 import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
-import { campLockup } from "@/lib/camp";
+import { CAMP_ENCOUNTER_LINE, campLockup } from "@/lib/camp";
 import {
   ABOUT,
   CAMPUSES,
@@ -40,7 +40,7 @@ export const revalidate = 60;
 const NEXT_STEPS = [
   {
     href: "/locations",
-    title: "Find a lighthouse close to you",
+    title: "Talk to a Missionary close to you",
     body: `Nine lighthouses across ${COUNTRY_COUNT} countries, from Jumofak to Calgary. Tell us you're coming and someone will be looking out for you.`,
     cta: "See all locations",
   },
@@ -226,8 +226,7 @@ export default async function HomePage() {
 
             <Reveal className="mt-12 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
               <p className="max-w-xl text-lg leading-relaxed text-white/70">
-                {camp.tagline} The whole house gathers, every lighthouse, one place. Registration is
-                open, and you can pay in instalments.
+                {camp.tagline} {CAMP_ENCOUNTER_LINE}
               </p>
 
               {/* Aligned from the top: the countdown has its unit labels under the
@@ -255,12 +254,10 @@ export default async function HomePage() {
               </div>
             </Reveal>
 
+            {/* The camp page first, it explains camp, then registration from there. */}
             <div className="mt-10 flex flex-wrap gap-2.5">
-              <ButtonLink href="/camp/register" variant="brass" size="lg">
-                Register now <Arrow />
-              </ButtonLink>
-              <ButtonLink href="/camp" variant="inverse" size="lg">
-                What happens at camp
+              <ButtonLink href="/camp" variant="brass" size="lg">
+                Find out more <Arrow />
               </ButtonLink>
             </div>
           </div>
@@ -271,12 +268,12 @@ export default async function HomePage() {
       <section className="border-b border-ink/12">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
-            <Eyebrow>Our mission</Eyebrow>
-            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">The 5D&apos;s.</h2>
+            <Eyebrow>The 5D&apos;s</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">Our mission</h2>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">{ABOUT}</p>
           </Reveal>
 
-          <MissionCards steps={STRATEGY} />
+          <MissionCards steps={STRATEGY} brief />
         </div>
       </section>
 
@@ -292,7 +289,7 @@ export default async function HomePage() {
         />
         <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
-            <Eyebrow className="text-brass">The leadership of the house</Eyebrow>
+            <Eyebrow className="text-brass">The executive leadership of the vision</Eyebrow>
             <h2 className="display mt-4 max-w-3xl text-[clamp(2.25rem,7vw,5.5rem)]">
               Meet our Senior Pastors
             </h2>

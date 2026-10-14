@@ -37,7 +37,7 @@ import { campDateRange, dateTimeLabel } from "@/lib/dates";
 import { PAYMENT_STATUS } from "@/lib/payment-outcome";
 import { formatKobo, percentPaid, perInstallmentKobo, toNaira } from "@/lib/money";
 import { CATEGORY_LABEL } from "@/lib/pricing";
-import { POSITION_LABEL, POSITION_OPTIONS } from "@/lib/positions";
+import { POSITION_LABEL, POSITION_OPTIONS, positionLabelFor } from "@/lib/positions";
 import { ticketQrDataUrl, totalsFor } from "@/lib/registration";
 
 export const metadata: Metadata = { title: "Registrant", robots: { index: false } };
@@ -103,7 +103,7 @@ export default async function RegistrantDetailPage({
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <StatusBadge status={registrant.status} />
-            <Badge tone="neutral">{POSITION_LABEL[registrant.position]}</Badge>
+            <Badge tone="neutral">{positionLabelFor(registrant)}</Badge>
             <Badge tone="neutral">{CATEGORY_LABEL[registrant.category]}</Badge>
             {registrant.ticket ? (
               <Badge tone={registrant.ticket.status === "REVOKED" ? "danger" : "brand"}>
@@ -124,7 +124,9 @@ export default async function RegistrantDetailPage({
             {totals.balanceKobo > 0 ? formatKobo(totals.balanceKobo) : "Cleared"}
           </p>
           <p className="mt-1 font-mono text-[11px] text-ink-45">
-            {formatKobo(totals.paidKobo)} of {formatKobo(totals.dueKobo)}
+            {totals.dueKobo === 0
+              ? "Free ticket"
+              : `Paid ${formatKobo(totals.paidKobo)} of ${formatKobo(totals.dueKobo)}`}
           </p>
           <div className="mt-2 w-40">
             <Meter percent={percentPaid(totals.paidKobo, totals.dueKobo)} />

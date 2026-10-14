@@ -16,6 +16,9 @@ export const CAMP_NAME = "Fresh Fire Camp Meeting 2027";
 /** The distinctive half of the name, for tight spaces like the nav. */
 export const CAMP_SHORT_NAME = "Fresh Fire";
 
+/** Follows the camp tagline wherever it introduces camp (homepage band, camp hero). */
+export const CAMP_ENCOUNTER_LINE = "An encounter that cannot be explained, it can only be experienced.";
+
 /**
  * Split a camp name for the poster lockup: "Fresh Fire Camp Meeting 2027"
  * becomes { lead: "Fresh Fire Camp Meeting", year: "27" } so the year can be

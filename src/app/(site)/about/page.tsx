@@ -161,7 +161,7 @@ export default function AboutPage() {
                     className="h-32 w-28 shrink-0 border border-ink/12 object-cover sm:h-40 sm:w-32"
                   />
                   <div className="min-w-0 pt-1">
-                    <h3 className="display text-2xl leading-[1.05] sm:text-3xl">{pastor.name}</h3>
+                    <h3 className="display text-2xl sm:text-3xl">{pastor.name}</h3>
                     {/* "Visionary / Founder" as a two-tone tag: the calling in the
                         house blue, the role beside it in black. */}
                     <p className="mt-3 inline-flex items-stretch font-mono text-[11px] font-semibold uppercase tracking-[0.14em]">

@@ -4,7 +4,7 @@ import { requireActiveCamp } from "@/lib/camp";
 import { dateOnly } from "@/lib/dates";
 import { toNaira } from "@/lib/money";
 import { CATEGORY_LABEL } from "@/lib/pricing";
-import { POSITION_LABEL } from "@/lib/positions";
+import { positionLabelFor } from "@/lib/positions";
 import {
   buildRegistrantOrder,
   buildRegistrantWhere,
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
         registrant.phone,
         registrant.gender ?? "",
         CATEGORY_LABEL[registrant.category],
-        POSITION_LABEL[registrant.position],
+        positionLabelFor(registrant),
         registrant.department ?? "",
         registrant.lighthouse ?? "",
         registrant.region ?? "",

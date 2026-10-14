@@ -14,26 +14,27 @@ function subscribe(onChange: () => void) {
 }
 
 /** Which film to load, or none (reduced motion, data saver). Client-only. */
-function chooseSource(): string | null {
+function chooseSource(name: string): string | null {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
     ?.saveData;
   if (reduceMotion || saveData) return null;
-  return mediaUrl(window.matchMedia(PHONE).matches ? "/video/hero-mobile.mp4" : "/video/hero-desktop.mp4");
+  return mediaUrl(`/video/${name}-${window.matchMedia(PHONE).matches ? "mobile" : "desktop"}.mp4`);
 }
 
 /**
- * The homepage hero film: the last ten seconds of the aerial footage, a
- * 1080p cut for wide screens and a portrait crop for phones.
+ * A full-bleed hero film, from public/video/<name>-desktop.mp4 (wide screens)
+ * and <name>-mobile.mp4 (a portrait crop for phones), each with a .jpg poster.
+ * "hero" is the homepage's aerial footage, "camp-hero" the Fresh Fire page's.
  *
  * The poster paints immediately (and is all a no-JS, reduced-motion or
  * data-saver visitor ever gets); the video is only chosen after mount, so a
  * phone never downloads the desktop file, and fades in once it can play.
  */
-export function HeroVideo({ className }: { className?: string }) {
+export function HeroVideo({ name = "hero", className }: { name?: string; className?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   // Null on the server and in the first client render, so hydration matches.
-  const src = useSyncExternalStore(subscribe, chooseSource, () => null);
+  const src = useSyncExternalStore(subscribe, () => chooseSource(name), () => null);
   // Which file has buffered enough to show; a swapped-in one fades in afresh.
   const [readySrc, setReadySrc] = useState<string | null>(null);
   const ready = readySrc !== null && readySrc === src;
@@ -50,10 +51,10 @@ export function HeroVideo({ className }: { className?: string }) {
   return (
     <div aria-hidden="true" className={cn("absolute inset-0 overflow-hidden", className)}>
       <picture>
-        <source media="(max-width: 767px)" srcSet={mediaUrl("/video/hero-mobile.jpg")} />
+        <source media="(max-width: 767px)" srcSet={mediaUrl(`/video/${name}-mobile.jpg`)} />
         {/* A plain poster, sized by CSS: next/image's wrapper fights object-cover here. */}
         <img
-          src={mediaUrl("/video/hero-desktop.jpg")}
+          src={mediaUrl(`/video/${name}-desktop.jpg`)}
           alt=""
           fetchPriority="high"
           className="h-full w-full object-cover"

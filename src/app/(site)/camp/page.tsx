@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import flyer from "../../../../public/fresh-fire-camp.jpeg";
 import { Countdown } from "@/components/site/countdown";
 import { DepthCardCarousel } from "@/components/site/depth-card-carousel";
-import { HillContours } from "@/components/site/hill-contours";
+import { HeroVideo } from "@/components/site/hero-video";
 import { Reveal } from "@/components/site/reveal";
 import { TestimonialCarousel } from "@/components/site/testimonial-carousel";
 import { TestimonyStories } from "@/components/site/testimony-stories";
 import { TicketCards } from "@/components/site/ticket-cards";
 import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
-import { campLockup } from "@/lib/camp";
+import { CAMP_ENCOUNTER_LINE, campLockup } from "@/lib/camp";
 import { getPublicCamp, getPublicMedia, getPublicSchedule } from "@/lib/public-data";
 import { remainingUntil } from "@/lib/countdown";
 import { campDateRange, dayLabel, timeLabel } from "@/lib/dates";
@@ -42,23 +40,25 @@ export const revalidate = 60;
 const INCLUDED = [
   "All meals for the duration of camp",
   "Selected accommodation, bedding provided",
-  "Camp resources, your workbook and track materials",
+  "Camp resources",
 ] as const;
 
+/** "My camping checklist", from the camp team. */
 const BRING = [
-  "A jacket for the evenings",
-  "Torch or headlamp, and a power bank",
-  "Refillable water bottle",
-  "Sandals for the shower block",
-  "Your Bible, a notebook and a pen you like",
+  { group: "Toiletries", items: ["Toothbrush and paste", "Deodorant", "Skin care items"] },
+  { group: "Clothes", items: ["Comfortable wears", "Sleepwear and underwear", "Sunday outfit"] },
+  { group: "Shoes", items: ["Sneakers", "Sandals or slippers", "Comfortable heels"] },
+  { group: "Bedding", items: ["Bedsheet", "Light blanket"] },
+  { group: "Food", items: ["Snacks", "Covered plate, spoon and cup", "Water bottle"] },
+  { group: "Spiritual materials", items: ["Bible", "Notebook or journal", "Pen and highlighter"] },
 ] as const;
 
 const WHAT_TO_EXPECT = [
-  "Intense Word encounters",
-  "Deep, strategic prayer sessions",
-  "Fresh fire for destiny alignment",
-  "Spiritual equipping for global impact",
+  "Long hours of teaching",
+  "Intense and fervent prayer",
+  "Fresh fire for spiritual life",
   "A charged atmosphere of faith, clarity, and divine encounters",
+  "Spiritual equipping for global impact",
 ] as const;
 
 const FAQS = [
@@ -112,15 +112,16 @@ export default async function CampOverviewPage() {
 
   return (
     <>
-      {/* ── hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-ink text-white">
-        <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={20} />
-        <div className="relative mx-auto grid max-w-[1400px] gap-12 px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20 lg:grid-cols-[1.35fr_1fr] lg:items-center">
-          <div>
+      {/* ── hero, over footage from camp ─────────────────────────────────── */}
+      <section className="relative flex min-h-[88svh] flex-col justify-end overflow-hidden bg-ink text-white">
+        <HeroVideo name="camp-hero" />
+        {/* Legibility: darkest where the type sits, lighter up top so the film reads. */}
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/30" />
+        <div className="relative mx-auto w-full max-w-[1400px] px-5 pb-14 pt-32 sm:px-8 sm:pb-20">
           <div className="rise-in flex flex-wrap items-center gap-3">
             <Eyebrow className="text-brass">{camp.theme ?? "Camp Meeting"}</Eyebrow>
             <span aria-hidden="true" className="h-px w-10 bg-white/25" />
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/50">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/60">
               {campDateRange(camp.startsAt, camp.endsAt)}
             </p>
           </div>
@@ -134,10 +135,10 @@ export default async function CampOverviewPage() {
           </h1>
 
           <p
-            className="rise-in mt-8 max-w-2xl text-xl leading-relaxed text-white/70"
+            className="rise-in mt-8 max-w-2xl text-xl leading-relaxed text-white/80"
             style={{ animationDelay: "240ms" }}
           >
-            {camp.tagline}
+            {camp.tagline} {CAMP_ENCOUNTER_LINE}
           </p>
 
           <div className="rise-in mt-12 flex flex-wrap gap-2.5" style={{ animationDelay: "360ms" }}>
@@ -150,11 +151,11 @@ export default async function CampOverviewPage() {
           </div>
 
           <div
-            className="rise-in mt-16 flex flex-wrap items-start gap-x-10 gap-y-8 border-t border-white/15 pt-8"
+            className="rise-in mt-16 flex flex-wrap items-start gap-x-10 gap-y-8 border-t border-white/20 pt-8"
             style={{ animationDelay: "480ms" }}
           >
             <div>
-              <p className="eyebrow flex items-center gap-2 text-white/40">
+              <p className="eyebrow flex items-center gap-2 text-white/60">
                 <span className="pulse-ring relative h-1.5 w-1.5 rounded-full bg-brass text-brass" />
                 Camp starts in
               </p>
@@ -163,25 +164,13 @@ export default async function CampOverviewPage() {
                 initial={remainingUntil(camp.startsAt)}
                 className="mt-3"
                 numberClassName="text-3xl sm:text-4xl"
-                labelClassName="text-white/40"
+                labelClassName="text-white/60"
               />
             </div>
             <dl>
               <Fact label="Venue" value={camp.venue} />
             </dl>
           </div>
-          </div>
-
-          {/* The official flyer, carrying the house's own blue-and-amber treatment. */}
-          <Image
-            src={flyer}
-            alt={`${camp.name}, ${campDateRange(camp.startsAt, camp.endsAt)} at ${camp.venue}`}
-            priority
-            placeholder="blur"
-            sizes="(max-width: 1024px) 100vw, 420px"
-            className="rise-in mx-auto w-full max-w-sm border border-white/15 lg:max-w-none"
-            style={{ animationDelay: "200ms" }}
-          />
         </div>
       </section>
 
@@ -196,17 +185,19 @@ export default async function CampOverviewPage() {
 
             <div className="mt-8 max-w-3xl space-y-5 text-lg leading-relaxed text-white/70">
               <p>
-                Fresh Fire Camp Meeting 2027 is a divine convergence designed to ignite your spirit,
-                sharpen your discernment, and position you for all God has prepared for the year
-                ahead.
+                FFC 2027 is a supernatural convergence designed to ignite fresh passion, birth fresh
+                conviction, sharpen your discernment and position you for all God has prepared for
+                the year ahead.
               </p>
               <p>
-                This is not just a gathering, it is a spiritual awakening. An awakening through the
-                Word, Prayer and Impartation. For kingdom influence across territories and nations.
+                This is not just a gathering, it is a{" "}
+                <strong className="font-semibold text-white">SPIRITUAL AWAKENING</strong>. An
+                Awakening through the Word, Prayer and Impartation for Kingdom influence across
+                territories and nations.
               </p>
               <p>
-                Prepare to be launched into depths of the Word and prayer, where lives are
-                realigned, visions are reawakened, and believers are empowered to take territories
+                Prepare to be launched into deeper depths of the Word and prayer. This is where lives
+                are realigned, visions are reawakened, and believers are empowered to take territories
                 locally and globally.
               </p>
             </div>
@@ -217,7 +208,7 @@ export default async function CampOverviewPage() {
             delay={100}
             className="mt-12 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-3"
           >
-            <Fact label="Camp opens" value="9:00 AM" />
+            <Fact label="Camp opens" value="3:00 PM" />
             <Fact label="Venue" value={camp.venue} accent />
             <Fact label="Dates" value={campDateRange(camp.startsAt, camp.endsAt)} />
           </Reveal>
@@ -239,8 +230,8 @@ export default async function CampOverviewPage() {
             delay={200}
             className="mt-14 max-w-2xl text-lg font-medium leading-relaxed text-white"
           >
-            Come expectant. Come hungry. Come ready to invade new spiritual territories and step
-            fully into God&apos;s agenda for your life.
+            Come expectant. Come hungry. Come ready to step fully into God&apos;s agenda for your
+            life.
           </Reveal>
         </div>
       </section>
@@ -411,14 +402,21 @@ export default async function CampOverviewPage() {
           <Reveal direction="right" delay={100} className="bg-bone px-5 py-16 sm:px-8 sm:py-20">
             <Eyebrow>Your bag</Eyebrow>
             <h2 className="display mt-4 text-4xl">What to bring</h2>
-            <ul className="mt-8 space-y-4">
-              {BRING.map((item) => (
-                <li key={item} className="flex gap-3 text-[15px] leading-relaxed text-ink-70">
-                  <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 bg-meridian" />
-                  {item}
-                </li>
+            <div className="mt-8 grid gap-x-8 gap-y-7 sm:grid-cols-2">
+              {BRING.map(({ group, items }) => (
+                <div key={group}>
+                  <h3 className="eyebrow text-ink-45">{group}</h3>
+                  <ul className="mt-3 space-y-2.5">
+                    {items.map((item) => (
+                      <li key={item} className="flex gap-3 text-[15px] leading-relaxed text-ink-70">
+                        <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 bg-meridian" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
+            </div>
           </Reveal>
         </div>
       </section>

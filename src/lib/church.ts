@@ -37,33 +37,33 @@ export const STRATEGY = [
   {
     key: "D1",
     name: "Discover",
-    summary: "Your God-given gifts and mandate",
+    summary: "Your God-given gifts, purpose and mandate",
     body: "To help you DISCOVER your God-given gifts and mandate. We strategically bring men out from darkness into the Kingdom of God through evangelism, leading to the mass salvation of souls.",
   },
   {
     key: "D2",
     name: "Develop",
-    summary: "Trained for the harvest",
+    summary: "Get trained for life and destiny",
     body: "The harvest is ripe, and God needs laborers. We train men and prepare them to be end-time harvesters as they take their place in destiny and impact the world at large.",
   },
   {
     key: "D3",
     name: "Deploy",
-    summary: "A sending church, not a sitting one",
+    summary: "We are a sending church, not a sitting church",
     body: "We are not a sitting church but a sending church. We believe that everyone is a leader and a minister, and so must be equipped to take on the Great Commission, which is to go.",
     scripture: "Matthew 28:18",
   },
   {
     key: "D4",
     name: "Duplicate",
-    summary: "Disciples who make disciples",
+    summary: "We raise disciples who raise other disciples",
     body: "We reproduce ourselves in others. We duplicate disciples, duplicate leaders, duplicate teams, and duplicate communities, ensuring the continuity of the vision through generations.",
     scripture: "2 Timothy 2:2",
   },
   {
     key: "D5",
     name: "Dominate",
-    summary: "In your sphere of influence",
+    summary: "Empowering you to dominate in your sphere of influence",
     body: "Empowering you to DOMINATE in your sphere of influence for God's glory. We raise leaders who transform their communities and the world, walking in God-given authority and expanding His Kingdom.",
   },
 ] as const;

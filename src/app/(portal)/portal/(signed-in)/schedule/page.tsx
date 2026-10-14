@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Badge, Eyebrow, Panel, type Tone } from "@/components/ui";
+import { Eyebrow, Panel } from "@/components/ui";
 import { requireRegistrant } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { dayLabel, timeLabel } from "@/lib/dates";
@@ -7,16 +7,6 @@ import { dayLabel, timeLabel } from "@/lib/dates";
 export const metadata: Metadata = {
   title: "Camp schedule",
   robots: { index: false, follow: false },
-};
-
-const TYPE_TONE: Record<string, Tone> = {
-  SERVICE: "brand",
-  SESSION: "brand",
-  PRAYER: "brass",
-  MEAL: "neutral",
-  ACTIVITY: "success",
-  BREAKOUT: "brass",
-  LOGISTICS: "neutral",
 };
 
 export default async function PortalSchedulePage() {
@@ -63,7 +53,6 @@ export default async function PortalSchedulePage() {
                     </p>
                   ) : null}
                 </div>
-                <Badge tone={TYPE_TONE[item.type] ?? "neutral"}>{item.type.toLowerCase()}</Badge>
               </li>
             ))}
           </ul>

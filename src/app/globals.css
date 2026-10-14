@@ -36,9 +36,9 @@
   --color-success-soft: #e0f0ff;
   --color-danger: #a62b1f;
   --color-danger-soft: #f6e0dd;
-  /* Warnings, failures and "you missed something" are all red. */
-  --color-warn: #a62b1f;
-  --color-warn-soft: #f6e0dd;
+  /* Failures are red; warnings (a balance to pay, a bed to assign) are orange. */
+  --color-warn: #c2410c;
+  --color-warn-soft: #ffedd5;
 
   --font-display: var(--font-anton), "Arial Narrow", sans-serif;
   --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
@@ -97,7 +97,8 @@
     font-family: var(--font-display);
     text-transform: uppercase;
     letter-spacing: -0.02em;
-    line-height: 0.95;
+    /* Room between lines of a wrapped headline; tighter read as one block. */
+    line-height: 1.08;
     font-weight: 400;
   }
 

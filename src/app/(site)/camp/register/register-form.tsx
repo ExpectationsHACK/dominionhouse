@@ -30,7 +30,7 @@ const FIELD_STEP: Record<string, number> = {
   registeringAs: 1, firstName: 1, lastName: 1, email: 1, phone: 1, gender: 1, childAgeYears: 1,
   position: 2, lighthouse: 2, region: 2, branch: 2, city: 2, state: 2,
   ageGroup: 2, maritalStatus: 2, howHeard: 2, isFirstCamp: 2,
-  wantsPersonalAccommodation: 3, transportNeeded: 3, emergencyName: 3, emergencyPhone: 3,
+  emergencyName: 3, emergencyPhone: 3,
   emergencyRelation: 3, medicalNotes: 3, allergies: 3,
   bringingChildren: 3, childrenUnder5: 3, children5to11: 3,
   paymentPlan: 4, installmentChoice: 4, customFirstAmountNaira: 4, agreeTerms: 4, consentPhoto: 4,
@@ -206,8 +206,6 @@ export function RegisterForm({
       step === 3 &&
       !validateStep(
         [
-          "wantsPersonalAccommodation",
-          "transportNeeded",
           "emergencyName",
           "emergencyPhone",
           "emergencyRelation",
@@ -539,21 +537,8 @@ export function RegisterForm({
           <fieldset className={cn("space-y-6 border-0 p-0", step !== 3 && "hidden")}>
             <legend className="sr-only">Camp logistics</legend>
 
-            <div className="space-y-2.5">
-              <Checkbox
-                name="wantsPersonalAccommodation"
-                label="I need personal accommodation at the campground"
-                description="Every paid registrant gets a bed. Tick this only if you need a personal room rather than a shared one, the camp desk will confirm what's available."
-              />
-              <Checkbox
-                name="transportNeeded"
-                label="I need transport to camp"
-                description="The logistics team will confirm pick-up points nearer the time."
-              />
-            </div>
-
             {registeringAs === "ADULT" ? (
-              <div className="rule pt-6">
+              <div>
                 <Eyebrow>Bringing children</Eyebrow>
                 <div className="mt-4">
                   <Checkbox

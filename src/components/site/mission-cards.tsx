@@ -75,6 +75,7 @@ function MissionCard({
   open,
   lit,
   canTilt,
+  brief,
   dotRef,
 }: {
   step: Step;
@@ -82,6 +83,7 @@ function MissionCard({
   open: boolean;
   lit: boolean;
   canTilt: boolean;
+  brief: boolean;
   dotRef: (node: HTMLSpanElement | null) => void;
 }) {
   const shade = BLUE_SHADES[index % BLUE_SHADES.length];
@@ -129,7 +131,8 @@ function MissionCard({
         onPointerMove={tilt}
         onPointerLeave={settle}
         className={cn(
-          "tilt-sheen relative flex h-full flex-col overflow-hidden xl:min-h-[36rem]",
+          "tilt-sheen relative flex h-full flex-col overflow-hidden",
+          brief ? "xl:min-h-[24rem]" : "xl:min-h-[36rem]",
           shade.text,
         )}
         style={{ background: shadeBackground(shade) }}
@@ -146,13 +149,22 @@ function MissionCard({
 
           {/* Transparent until revealed, but always in the page, so screen
               readers and search engines get the full text either way. */}
-          <p className="mt-3 text-[13px] font-semibold uppercase leading-snug tracking-[0.08em] sm:text-xs">
-            <Words text={step.summary} from={0} />
-          </p>
-          <p className={cn("mt-3 text-[15px] leading-relaxed sm:mt-4 sm:text-sm", shade.muted)}>
-            <Words text={step.body} from={summaryWords} />
-          </p>
-          {step.scripture ? (
+          {brief ? (
+            // Just the one line: the step in a sentence, set to be read.
+            <p className="mt-3 text-[17px] font-medium leading-snug sm:mt-4">
+              <Words text={step.summary} from={0} />
+            </p>
+          ) : (
+            <>
+              <p className="mt-3 text-[13px] font-semibold uppercase leading-snug tracking-[0.08em] sm:text-xs">
+                <Words text={step.summary} from={0} />
+              </p>
+              <p className={cn("mt-3 text-[15px] leading-relaxed sm:mt-4 sm:text-sm", shade.muted)}>
+                <Words text={step.body} from={summaryWords} />
+              </p>
+            </>
+          )}
+          {step.scripture && !brief ? (
             <p className={cn("mt-auto pt-4 font-mono text-xs uppercase tracking-[0.14em] sm:pt-5 sm:text-[11px]", shade.key)}>
               <Words text={step.scripture} from={summaryWords + bodyWords + 4} />
             </p>
@@ -163,7 +175,8 @@ function MissionCard({
   );
 }
 
-export function MissionCards({ steps }: { steps: readonly Step[] }) {
+/** `brief`: name and one line per step, no paragraph or scripture (the homepage). */
+export function MissionCards({ steps, brief = false }: { steps: readonly Step[]; brief?: boolean }) {
   const reduce = useMediaQuery("(prefers-reduced-motion: reduce)", false);
   const canHover = useMediaQuery("(hover: hover) and (pointer: fine)", false);
   // False until hydrated: the server can't know how far down the page is.
@@ -262,6 +275,7 @@ export function MissionCards({ steps }: { steps: readonly Step[] }) {
           open={ready && reached(index)}
           lit={ready && reached(index)}
           canTilt={canHover && !reduce}
+          brief={brief}
           dotRef={(node) => {
             dots.current[index] = node;
           }}

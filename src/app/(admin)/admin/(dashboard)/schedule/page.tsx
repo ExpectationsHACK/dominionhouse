@@ -11,16 +11,6 @@ import { dayLabel, timeLabel, toDateInput } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Schedule", robots: { index: false } };
 
-const TYPES = [
-  "SERVICE",
-  "SESSION",
-  "PRAYER",
-  "MEAL",
-  "ACTIVITY",
-  "BREAKOUT",
-  "LOGISTICS",
-] as const;
-
 export default async function SchedulePage() {
   await requireAdmin(OPS_ROLES);
   const camp = await requireActiveCamp();
@@ -85,7 +75,6 @@ export default async function SchedulePage() {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge tone="neutral">{item.type.toLowerCase()}</Badge>
                           {!item.isPublished ? <Badge tone="warn">hidden</Badge> : null}
                         </div>
                       </div>
@@ -138,15 +127,8 @@ export default async function SchedulePage() {
                                   defaultValue={item.location ?? ""}
                                 />
                               </Field>
-                              <Field label="Type" htmlFor={`type-${item.id}`}>
-                                <Select id={`type-${item.id}`} name="type" defaultValue={item.type}>
-                                  {TYPES.map((type) => (
-                                    <option key={type} value={type}>
-                                      {type.toLowerCase()}
-                                    </option>
-                                  ))}
-                                </Select>
-                              </Field>
+                              {/* Types aren't shown anywhere; the stored one is kept as it is. */}
+                              <input type="hidden" name="type" value={item.type} />
                             </div>
                             <Field label="Description" htmlFor={`desc-${item.id}`}>
                               <Textarea
@@ -221,15 +203,7 @@ export default async function SchedulePage() {
               <Field label="Location" htmlFor="new-location">
                 <Input id="new-location" name="location" placeholder="Main Tent" />
               </Field>
-              <Field label="Type" htmlFor="new-type">
-                <Select id="new-type" name="type" defaultValue="SESSION">
-                  {TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {type.toLowerCase()}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
+<input type="hidden" name="type" value="SESSION" />
               <Field label="Description" htmlFor="new-description">
                 <Textarea id="new-description" name="description" rows={2} />
               </Field>

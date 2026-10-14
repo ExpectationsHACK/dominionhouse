@@ -44,8 +44,9 @@ export default async function PortalOverviewPage({
     }),
     db.announcement.findMany({
       where: { campId: registrant.campId, publishedAt: { not: null } },
+      // Every published announcement, pinned first: the camp desk posts few
+      // enough that none should be cut off.
       orderBy: [{ isPinned: "desc" }, { publishedAt: "desc" }],
-      take: 3,
     }),
   ]);
 
