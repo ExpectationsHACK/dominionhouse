@@ -1,5 +1,6 @@
 "use client";
 
+import { useAutoAdvance } from "@/components/site/use-auto-advance";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +17,13 @@ export type VideoCarouselItem = {
  * only once it's actually in view, so a long row of them doesn't all fight
  * for bandwidth and decode time at once.
  */
-function VideoCard({ item }: { item: VideoCarouselItem }) {
+function VideoCard({
+  item,
+  copy = false,
+}: {
+  item: VideoCarouselItem;
+  copy?: boolean;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -35,7 +42,11 @@ function VideoCard({ item }: { item: VideoCarouselItem }) {
   }, []);
 
   return (
-    <article className="relative aspect-[9/16] w-[62vw] shrink-0 snap-center overflow-hidden border border-white/12 bg-ink sm:w-[240px]">
+    <article
+      aria-hidden={copy || undefined}
+      data-loop-copy={copy ? "" : undefined}
+      className="relative aspect-[9/16] w-[62vw] shrink-0 snap-center overflow-hidden border border-white/12 bg-ink sm:w-[240px]"
+    >
       <video
         ref={videoRef}
         src={item.videoUrl}
@@ -48,9 +59,11 @@ function VideoCard({ item }: { item: VideoCarouselItem }) {
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink via-ink/20 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink/75 via-ink/10 to-transparent"
       />
-      <p className="absolute inset-x-0 bottom-0 p-4 text-sm font-semibold text-white">{item.title}</p>
+      <p className="absolute inset-x-0 bottom-0 p-4 text-sm font-semibold text-white">
+        {item.title}
+      </p>
     </article>
   );
 }
@@ -65,9 +78,12 @@ export function VideoCarousel({
   /** The section behind it: arrows are drawn to show on either. */
   tone?: "light" | "dark";
 }) {
-  const arrow = tone === "dark" ? "border-white/25 text-white" : "border-ink/20 text-ink";
+  const arrow =
+    tone === "dark" ? "border-white/25 text-white" : "border-ink/20 text-ink";
   const live =
-    tone === "dark" ? "hover:border-brass hover:bg-brass hover:text-ink" : "hover:border-ink hover:bg-ink hover:text-white";
+    tone === "dark"
+      ? "hover:border-brass hover:bg-brass hover:text-white"
+      : "hover:border-ink hover:bg-ink hover:text-white";
   const trackRef = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -101,9 +117,21 @@ export function VideoCarousel({
     const track = trackRef.current;
     if (!track) return;
     const card = track.querySelector("article");
-    const step = card ? card.getBoundingClientRect().width + 16 : track.clientWidth * 0.8;
+    const step = card
+      ? card.getBoundingClientRect().width + 16
+      : track.clientWidth * 0.8;
+    const from = track.scrollLeft;
+    const to = Math.max(
+      0,
+      Math.min(from + step * direction, track.scrollWidth - track.clientWidth),
+    );
     track.scrollBy({ left: step * direction, behavior: "smooth" });
+    // Where smooth scrolling never runs, jump instead of doing nothing.
+    window.setTimeout(() => {
+      if (track.scrollLeft === from && from !== to) track.scrollLeft = to;
+    }, 250);
   }
+  const { restart } = useAutoAdvance(trackRef, () => page(1));
 
   if (items.length === 0) return null;
 
@@ -115,15 +143,23 @@ export function VideoCarousel({
         aria-label={label}
         className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {items.map((item) => (
-          <VideoCard key={item.id} item={item} />
+        {/* The clips, then two copies so the row can loop (same files, cached). */}
+        {[...items, ...items, ...items].map((item, position) => (
+          <VideoCard
+            key={`clip-${position}-${item.id}`}
+            item={item}
+            copy={position >= items.length}
+          />
         ))}
       </div>
 
       <div className="mt-6 flex items-center gap-2.5">
         <button
           type="button"
-          onClick={() => page(-1)}
+          onClick={() => {
+            page(-1);
+            restart();
+          }}
           disabled={atStart}
           aria-label="Previous clips"
           className={cn(
@@ -132,13 +168,22 @@ export function VideoCarousel({
             atStart ? "opacity-30" : live,
           )}
         >
-          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
+          <svg
+            viewBox="0 0 16 16"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+          >
             <path d="M14 8H3M7 12L3 8l4-4" strokeLinecap="square" />
           </svg>
         </button>
         <button
           type="button"
-          onClick={() => page(1)}
+          onClick={() => {
+            page(1);
+            restart();
+          }}
           disabled={atEnd}
           aria-label="Next clips"
           className={cn(
@@ -147,7 +192,13 @@ export function VideoCarousel({
             atEnd ? "opacity-30" : live,
           )}
         >
-          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
+          <svg
+            viewBox="0 0 16 16"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+          >
             <path d="M2 8h11M9 4l4 4-4 4" strokeLinecap="square" />
           </svg>
         </button>

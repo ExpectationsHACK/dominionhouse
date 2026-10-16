@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Anton, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { Anton, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 // Latin only: every font file listed here is preloaded on a first visit, and
@@ -12,9 +13,13 @@ const anton = Anton({
   display: "swap",
 });
 
-const interTight = Inter_Tight({
-  subsets: ["latin"],
-  variable: "--font-inter-tight",
+// Body text. General Sans (Indian Type Foundry, via Fontshare, ITF Free Font
+// License, see src/fonts/GeneralSans-LICENSE.txt), self-hosted: one variable
+// file covers every weight the site uses, 200 to 700.
+const generalSans = localFont({
+  src: "../fonts/GeneralSans-Variable.woff2",
+  weight: "200 700",
+  variable: "--font-general-sans",
   display: "swap",
 });
 
@@ -53,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${anton.variable} ${interTight.variable} ${jetbrains.variable}`}
+      className={`${anton.variable} ${generalSans.variable} ${jetbrains.variable}`}
     >
       <body className="min-h-dvh antialiased">
         <a

@@ -1,5 +1,6 @@
 "use client";
 
+import { useAutoAdvance } from "@/components/site/use-auto-advance";
 import { useRef, useState } from "react";
 import { useDragScroll } from "@/components/site/use-drag-scroll";
 import { cn } from "@/lib/utils";
@@ -26,10 +27,10 @@ export type DepthCardItem = {
 
 /** Ember washes, so a card without an image still looks deliberate. */
 const FALLBACK_WASH = [
-  "linear-gradient(150deg,#0b0b0c 0%,#21a1ff 55%,#eef7ff 100%)",
-  "linear-gradient(150deg,#0b0b0c 0%,#21a1ff 100%)",
-  "linear-gradient(150deg,#eef7ff 0%,#21a1ff 50%,#0b0b0c 100%)",
-  "linear-gradient(150deg,#21a1ff 0%,#0b0b0c 100%)",
+  "linear-gradient(150deg,#0b0b0c 0%,#0b57de 55%,#eef7ff 100%)",
+  "linear-gradient(150deg,#0b0b0c 0%,#0b57de 100%)",
+  "linear-gradient(150deg,#eef7ff 0%,#0b57de 50%,#0b0b0c 100%)",
+  "linear-gradient(150deg,#0b57de 0%,#0b0b0c 100%)",
 ];
 
 function DepthCard({
@@ -38,12 +39,15 @@ function DepthCard({
   still,
   numbered,
   centred,
+  copy = false,
 }: {
   item: DepthCardItem;
   index: number;
   still: boolean;
   numbered: boolean;
   centred: boolean;
+  /** The looping copy after the real cards (see loopCopies). */
+  copy?: boolean;
 }) {
   const ref = useRef<HTMLElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0, active: false });
@@ -62,11 +66,15 @@ function DepthCard({
   }
 
   const wash = FALLBACK_WASH[index % FALLBACK_WASH.length];
-  const transition = tilt.active ? "none" : "transform 600ms var(--ease-out-expo, ease-out)";
+  const transition = tilt.active
+    ? "none"
+    : "transform 600ms var(--ease-out-expo, ease-out)";
 
   return (
     <article
       ref={ref}
+      aria-hidden={copy || undefined}
+      data-loop-copy={copy ? "" : undefined}
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
       className={cn(
@@ -113,7 +121,7 @@ function DepthCard({
         {/* mid plane, legibility wash */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent"
+          className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/15 to-transparent"
           style={{ transform: "translateZ(0px)" }}
         />
 
@@ -139,9 +147,13 @@ function DepthCard({
               {String(index + 1).padStart(2, "0")}
             </p>
           ) : null}
-          <h3 className={cn("display text-3xl text-white", numbered && "mt-2")}>{item.title}</h3>
+          <h3 className={cn("display text-3xl text-white", numbered && "mt-2")}>
+            {item.title}
+          </h3>
           {item.subtitle ? (
-            <p className="mt-2 text-sm leading-relaxed text-white/70">{item.subtitle}</p>
+            <p className="mt-2 text-sm leading-relaxed text-white/70">
+              {item.subtitle}
+            </p>
           ) : null}
         </div>
       </div>
@@ -163,10 +175,15 @@ export function DepthCardCarousel({
   /** Accessible name for the scrolling track. */
   label?: string;
 }) {
-  const { trackRef, still, atStart, atEnd, centred, dragging, page, handlers } = useDragScroll();
-  const arrow = tone === "dark" ? "border-white/25 text-white" : "border-ink/20 text-ink";
+  const { trackRef, still, atStart, atEnd, centred, dragging, page, handlers } =
+    useDragScroll();
+  const { restart } = useAutoAdvance(trackRef, () => page(1));
+  const arrow =
+    tone === "dark" ? "border-white/25 text-white" : "border-ink/20 text-ink";
   const live =
-    tone === "dark" ? "hover:border-brass hover:bg-brass hover:text-ink" : "hover:border-ink hover:bg-ink hover:text-white";
+    tone === "dark"
+      ? "hover:border-brass hover:bg-brass hover:text-white"
+      : "hover:border-ink hover:bg-ink hover:text-white";
 
   if (items.length === 0) return null;
 
@@ -183,14 +200,16 @@ export function DepthCardCarousel({
           dragging ? "cursor-grabbing" : "cursor-grab",
         )}
       >
-        {items.map((item, index) => (
+        {/* The cards, then two copies so the row can loop (see loopCopies). */}
+        {[...items, ...items, ...items].map((item, position) => (
           <DepthCard
-            key={item.id}
+            key={`card-${position}-${item.id}`}
             item={item}
-            index={index}
+            index={position % items.length}
             still={still}
             numbered={numbered}
-            centred={index === centred}
+            centred={position === centred}
+            copy={position >= items.length}
           />
         ))}
       </div>
@@ -198,7 +217,10 @@ export function DepthCardCarousel({
       <div className="mt-6 flex items-center gap-2.5">
         <button
           type="button"
-          onClick={() => page(-1)}
+          onClick={() => {
+            page(-1);
+            restart();
+          }}
           disabled={atStart}
           aria-label="Previous cards"
           className={cn(
@@ -207,13 +229,22 @@ export function DepthCardCarousel({
             atStart ? "opacity-30" : live,
           )}
         >
-          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
+          <svg
+            viewBox="0 0 16 16"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+          >
             <path d="M14 8H3M7 12L3 8l4-4" strokeLinecap="square" />
           </svg>
         </button>
         <button
           type="button"
-          onClick={() => page(1)}
+          onClick={() => {
+            page(1);
+            restart();
+          }}
           disabled={atEnd}
           aria-label="Next cards"
           className={cn(
@@ -222,7 +253,13 @@ export function DepthCardCarousel({
             atEnd ? "opacity-30" : live,
           )}
         >
-          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
+          <svg
+            viewBox="0 0 16 16"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+          >
             <path d="M2 8h11M9 4l4 4-4 4" strokeLinecap="square" />
           </svg>
         </button>

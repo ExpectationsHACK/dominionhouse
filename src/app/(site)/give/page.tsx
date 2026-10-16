@@ -218,22 +218,22 @@ export default async function GivePage() {
       </section>
 
       {/* ── the 1 million mandate ────────────────────────────────────────── */}
-      <section className="border-b border-white/10 bg-meridian text-white">
+      <section className="border-b border-ink/15 bg-sky text-ink">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
             <Eyebrow className="text-brass">The 5-year goal</Eyebrow>
             <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">The 1 million mandate</h2>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/70">
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-70">
               In the next five years, we are committing to reaching 1,000,000 young people through
               transformational discipleship experiences, raising leaders who raise leaders.
             </p>
           </Reveal>
-          <ol className="mt-12 grid gap-px bg-white/15 sm:grid-cols-3">
+          <ol className="mt-12 grid gap-px bg-ink/5 sm:grid-cols-3">
             {LEGACY_MANDATE_STEPS.map((step, index) => (
               <Reveal as="li" key={step.name} delay={index * 120} className="bg-meridian p-7">
                 <p className="display text-6xl text-brass">{index + 1}</p>
                 <h3 className="display mt-4 text-3xl">{step.name}</h3>
-                <p className="mt-1 text-white/65">{step.body}</p>
+                <p className="mt-1 text-ink-70">{step.body}</p>
               </Reveal>
             ))}
           </ol>
@@ -292,7 +292,7 @@ export default async function GivePage() {
               <p className="eyebrow text-white/50">Estimated completion</p>
               <p className="display mt-2 text-4xl">{naira(LEGACY_TOTAL_COST_NAIRA)}</p>
             </div>
-            <div className="border border-brass bg-brass p-7 text-ink">
+            <div className="border border-brass bg-brass p-7 text-white">
               <p className="eyebrow text-ink/70">Current phase: seed goal</p>
               <p className="display mt-2 text-4xl">{naira(LEGACY_SEED_GOAL_NAIRA)}</p>
               <p className="mt-2 text-sm text-ink/75">Commencement of construction</p>
@@ -395,12 +395,12 @@ export default async function GivePage() {
       </section>
 
       {/* ── close ────────────────────────────────────────────────────────── */}
-      <section className="bg-ink text-white">
+      <section className="bg-sky text-ink">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-24">
           <h2 className="display max-w-4xl text-[clamp(2.25rem,6vw,4.5rem)]">
             You may not go to the nations, but your giving can
           </h2>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/70">
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-70">
             This is your invitation to be part of a holy work. Build what God is birthing. Fuel a
             generation on fire for Jesus. Leave a legacy that echoes in eternity.
           </p>
@@ -408,13 +408,13 @@ export default async function GivePage() {
             <ButtonLink href="#partner" variant="brass" size="lg">
               Become an Angel Partner <Arrow />
             </ButtonLink>
-            <ButtonLink href={PARTNERSHIP_MAILTO} variant="inverse" size="lg">
+            <ButtonLink href={PARTNERSHIP_MAILTO} variant="solid" size="lg">
               Talk to the partnership team
             </ButtonLink>
           </div>
-          <p className="mt-10 border-t border-white/15 pt-6 text-sm text-white/50">
+          <p className="mt-10 border-t border-ink/15 pt-6 text-sm text-ink-45">
             Paying your own Fresh Fire camp fee? That goes through the{" "}
-            <Link href="/camp/payment" className="font-semibold text-white underline underline-offset-4">
+            <Link href="/camp/payment" className="font-semibold text-ink underline underline-offset-4">
               camp payment page
             </Link>
             , so your balance and ticket update automatically.

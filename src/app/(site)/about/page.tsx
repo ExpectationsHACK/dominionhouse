@@ -61,7 +61,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── mandate ──────────────────────────────────────────────────────── */}
-      <section className="border-b border-ink/12 bg-meridian text-white">
+      <section className="border-b border-ink/12 bg-sky text-ink">
         <Reveal as="div" className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Eyebrow className="text-brass">Our mandate</Eyebrow>
           <p className="display mt-6 max-w-4xl text-[clamp(1.75rem,5vw,3.75rem)]">{MANDATE}</p>
@@ -70,7 +70,7 @@ export default function AboutPage() {
           </p>
 
           <figure className="mt-12 max-w-2xl border-l-2 border-brass pl-6">
-            <blockquote className="text-lg leading-relaxed italic text-white/75">
+            <blockquote className="text-lg leading-relaxed italic text-ink-70">
               &ldquo;{CHURCH.mandateScripture.text}&rdquo;
             </blockquote>
             <figcaption className="mt-3 font-mono text-[11px] uppercase tracking-[0.16em] text-brass">
@@ -78,7 +78,7 @@ export default function AboutPage() {
             </figcaption>
           </figure>
 
-          <p className="mt-12 max-w-3xl text-[15px] leading-relaxed text-white/60">
+          <p className="mt-12 max-w-3xl text-[15px] leading-relaxed text-ink-70">
             {MANDATE_OBJECTIVE}
           </p>
         </Reveal>
@@ -169,7 +169,7 @@ export default function AboutPage() {
                         <span
                           key={part}
                           className={
-                            partIndex === 0 ? "bg-brass px-3 py-1.5 text-ink" : "bg-ink px-3 py-1.5 text-white"
+                            partIndex === 0 ? "bg-brass px-3 py-1.5 text-white" : "bg-ink px-3 py-1.5 text-white"
                           }
                         >
                           {part}
@@ -189,7 +189,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── close ────────────────────────────────────────────────────────── */}
-      <section className="bg-ink text-white">
+      <section className="bg-sky text-ink">
         <Reveal
           as="div"
           className="mx-auto flex max-w-[1400px] flex-col gap-8 px-5 py-20 sm:px-8 sm:py-24 lg:flex-row lg:items-end lg:justify-between"
@@ -204,7 +204,7 @@ export default function AboutPage() {
             <ButtonLink href="/locations" variant="brass" size="lg">
               Find a lighthouse <Arrow />
             </ButtonLink>
-            <ButtonLink href="/camp" variant="inverse" size="lg">
+            <ButtonLink href="/camp" variant="solid" size="lg">
               Fresh Fire 2027
             </ButtonLink>
           </div>

@@ -481,7 +481,7 @@ function Preview({ item }: { item: Media }) {
   return (
     <div
       className={box}
-      style={{ background: "linear-gradient(150deg,#0b0b0c 0%,#21a1ff 55%,#eef7ff 100%)" }}
+      style={{ background: "linear-gradient(150deg,#0b0b0c 0%,#0b57de 55%,#eef7ff 100%)" }}
     />
   );
 }

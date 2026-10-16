@@ -87,7 +87,7 @@ function Actions({ onRetry, retryLabel }: { onRetry: () => void; retryLabel: str
       {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <a
         href="/"
-        className="inline-flex items-center gap-2 border border-ink bg-ink px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:border-brass hover:bg-brass hover:text-ink"
+        className="inline-flex items-center gap-2 border border-ink bg-ink px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:border-brass hover:bg-brass hover:text-white"
       >
         Go to the homepage &rarr;
       </a>

@@ -115,19 +115,13 @@ export default async function CampOverviewPage() {
       {/* ── hero, over footage from camp ─────────────────────────────────── */}
       <section className="relative flex min-h-[88svh] flex-col justify-end overflow-hidden bg-ink text-white">
         <HeroVideo name="camp-hero" />
-        {/* Legibility: darkest where the type sits, lighter up top so the film reads. */}
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/30" />
-        <div className="relative mx-auto w-full max-w-[1400px] px-5 pb-14 pt-32 sm:px-8 sm:pb-20">
-          <div className="rise-in flex flex-wrap items-center gap-3">
-            <Eyebrow className="text-brass">{camp.theme ?? "Camp Meeting"}</Eyebrow>
-            <span aria-hidden="true" className="h-px w-10 bg-white/25" />
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/60">
-              {campDateRange(camp.startsAt, camp.endsAt)}
-            </p>
-          </div>
-
+        {/* Kept light so the film reads bright: dark only along the bottom and
+            the left, where the type sits, with a soft shadow under the type. */}
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-ink/55 via-ink/15 to-transparent" />
+        <div className="relative mx-auto w-full max-w-[1400px] px-5 pb-14 pt-32 sm:px-8 sm:pb-20 [text-shadow:0_2px_18px_rgba(11,11,12,0.55)]">
           <h1
-            className="display rise-in mt-6 text-[clamp(3rem,11vw,9.5rem)]"
+            className="display rise-in text-[clamp(3rem,11vw,9.5rem)]"
             style={{ animationDelay: "120ms" }}
           >
             {lockup.lead}
@@ -175,7 +169,7 @@ export default async function CampOverviewPage() {
       </section>
 
       {/* ── the invasion ─────────────────────────────────────────────────── */}
-      <section className="border-b border-ink/12 bg-meridian text-white">
+      <section className="border-b border-ink/12 bg-sky text-ink">
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
             <Eyebrow className="text-brass">Dominion House annual camp is always an experience</Eyebrow>
@@ -183,7 +177,7 @@ export default async function CampOverviewPage() {
               Get ready for an unforgettable spiritual encounter
             </h2>
 
-            <div className="mt-8 max-w-3xl space-y-5 text-lg leading-relaxed text-white/70">
+            <div className="mt-8 max-w-3xl space-y-5 text-lg leading-relaxed text-ink-70">
               <p>
                 FFC 2027 is a supernatural convergence designed to ignite fresh passion, birth fresh
                 conviction, sharpen your discernment and position you for all God has prepared for
@@ -191,7 +185,7 @@ export default async function CampOverviewPage() {
               </p>
               <p>
                 This is not just a gathering, it is a{" "}
-                <strong className="font-semibold text-white">SPIRITUAL AWAKENING</strong>. An
+                <strong className="font-semibold text-ink">SPIRITUAL AWAKENING</strong>. An
                 Awakening through the Word, Prayer and Impartation for Kingdom influence across
                 territories and nations.
               </p>
@@ -206,9 +200,9 @@ export default async function CampOverviewPage() {
           <Reveal
             as="dl"
             delay={100}
-            className="mt-12 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-3"
+            className="mt-12 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-ink/15 pt-8 sm:grid-cols-3"
           >
-            <Fact label="Camp opens" value="3:00 PM" />
+            <Fact label="Camp opens" value="9:00 AM" />
             <Fact label="Venue" value={camp.venue} accent />
             <Fact label="Dates" value={campDateRange(camp.startsAt, camp.endsAt)} />
           </Reveal>
@@ -217,7 +211,7 @@ export default async function CampOverviewPage() {
             <Eyebrow className="text-brass">What to expect</Eyebrow>
             <ul className="mt-6 grid gap-4 sm:grid-cols-2">
               {WHAT_TO_EXPECT.map((item) => (
-                <li key={item} className="flex gap-3 text-[15px] leading-relaxed text-white/80">
+                <li key={item} className="flex gap-3 text-[15px] leading-relaxed text-ink-70">
                   <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 bg-brass" />
                   {item}
                 </li>
@@ -228,7 +222,7 @@ export default async function CampOverviewPage() {
           <Reveal
             as="p"
             delay={200}
-            className="mt-14 max-w-2xl text-lg font-medium leading-relaxed text-white"
+            className="mt-14 max-w-2xl text-lg font-medium leading-relaxed text-ink"
           >
             Come expectant. Come hungry. Come ready to step fully into God&apos;s agenda for your
             life.
@@ -448,7 +442,7 @@ export default async function CampOverviewPage() {
       </section>
 
       {/* ── close ────────────────────────────────────────────────────────── */}
-      <section className="bg-meridian text-white">
+      <section className="bg-sky text-ink">
         <Reveal
           as="div"
           className="mx-auto flex max-w-[1400px] flex-col gap-8 px-5 py-20 sm:px-8 sm:py-24 lg:flex-row lg:items-end lg:justify-between"
@@ -460,7 +454,7 @@ export default async function CampOverviewPage() {
             <ButtonLink href="/camp/register" variant="brass" size="lg">
               Register <Arrow />
             </ButtonLink>
-            <ButtonLink href="/camp/payment" variant="inverse" size="lg">
+            <ButtonLink href="/camp/payment" variant="solid" size="lg">
               Pay a balance
             </ButtonLink>
           </div>
@@ -473,7 +467,8 @@ export default async function CampOverviewPage() {
 function Fact({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div>
-      <dt className="eyebrow text-white/40">{label}</dt>
+      {/* Takes the colour of the section it sits in, black or light. */}
+      <dt className="eyebrow opacity-60">{label}</dt>
       <dd
         className={`display mt-2 hyphens-auto break-words text-2xl sm:text-3xl ${accent ? "text-brass" : ""}`}
       >

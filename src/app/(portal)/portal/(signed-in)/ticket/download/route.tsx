@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const INK = "#0b0b0c";
-const BLUE = "#21a1ff";
+const BLUE = "#0b57de";
 
 export async function GET() {
   const registrant = await requireRegistrant();

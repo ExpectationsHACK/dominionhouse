@@ -23,11 +23,15 @@
   --color-meridian-deep: #0b0b0c;
   --color-meridian-soft: #e0f0ff;
 
-  --color-brass: #21a1ff;
+  --color-brass: #0b57de;
+  /* The house blue for small labels on black: #0b57de is too dark to read there. */
+  --color-brass-on-dark: #7aa7f5;
+  /* Light blue for sections that would otherwise be black. */
+  --color-sky: #caddff;
   --color-brass-soft: #d3eaff;
 
   /* Fresh Fire — was orange fire, now the same blue family as everything else. */
-  --color-ember: #21a1ff;
+  --color-ember: #0b57de;
   --color-ember-deep: #0b0b0c;
   --color-flame: #eef7ff;
 
@@ -41,7 +45,7 @@
   --color-warn-soft: #ffedd5;
 
   --font-display: var(--font-anton), "Arial Narrow", sans-serif;
-  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-general-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
   --radius-none: 0px;
@@ -63,7 +67,6 @@
     background: var(--color-bone);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
     /* Panels that slide in from the side start 32px past the edge; clip, not
        hidden, so the page never scrolls sideways and sticky still works. */
@@ -184,10 +187,10 @@
 @keyframes splash-glow {
   0%,
   100% {
-    filter: drop-shadow(0 0 0 rgba(33, 161, 255, 0));
+    filter: drop-shadow(0 0 0 rgba(11, 87, 222, 0));
   }
   50% {
-    filter: drop-shadow(0 0 22px rgba(33, 161, 255, 0.55));
+    filter: drop-shadow(0 0 22px rgba(11, 87, 222, 0.55));
   }
 }
 
@@ -393,4 +396,17 @@
   .tilt-sheen::after {
     display: none;
   }
+}
+
+/* Small blue labels on the black sections take a lighter step of the same
+   blue; large blue headline words keep the house blue itself. Unlayered, so
+   it wins over the text-brass utility it refines. */
+:is(.bg-ink, .bg-meridian, .bg-black) :is(.eyebrow, .font-mono).text-brass {
+  color: var(--color-brass-on-dark);
+}
+
+/* Every photo and film on the public site, a touch brighter and livelier:
+   the house's footage is mostly shot indoors and reads dim on screen. */
+#main :is(img, video):not([data-keep-tone]) {
+  filter: brightness(1.1) saturate(1.08);
 }

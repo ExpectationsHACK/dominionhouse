@@ -107,7 +107,7 @@ export function ArcCard({
       )}
       style={
         variant === "blue"
-          ? { background: "linear-gradient(180deg,#21a1ff 0%,#21a1ff 40%,#0b0b0c 135%)" }
+          ? { background: "linear-gradient(180deg,#0b57de 0%,#0b57de 40%,#0b0b0c 135%)" }
           : undefined
       }
     >

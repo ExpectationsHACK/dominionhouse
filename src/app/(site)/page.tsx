@@ -123,13 +123,12 @@ export default async function HomePage() {
       {/* ── hero, over the house's own aerial footage ─────────────────────── */}
       <section className="relative flex min-h-[88svh] flex-col justify-end overflow-hidden border-b border-ink/12 bg-ink text-white">
         <HeroVideo />
-        {/* Legibility: darkest where the type sits, lighter up top so the film reads. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-ink via-ink/65 to-ink/25"
-        />
-        <div className="relative mx-auto w-full max-w-[1400px] px-5 pb-12 pt-32 sm:px-8 sm:pb-16">
-          <Eyebrow className="rise-in text-brass">{CHURCH.descriptor}</Eyebrow>
+        {/* Kept light so the film reads bright: dark only along the bottom and
+            the left, where the type sits, with a soft shadow under the type. */}
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-ink/55 via-ink/15 to-transparent" />
+        <div className="relative mx-auto w-full max-w-[1400px] px-5 pb-12 pt-32 sm:px-8 sm:pb-16 [text-shadow:0_2px_18px_rgba(11,11,12,0.55)]">
+          <Eyebrow className="rise-in text-white">{CHURCH.descriptor}</Eyebrow>
           <h1 className="display mt-6 text-[clamp(2.5rem,8.5vw,7rem)]">
             <StaggerWords
               start={120}
@@ -190,7 +189,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── the feel of a service, five-second clips ─────────────────────── */}
-      <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
+      <section className="relative overflow-hidden border-b border-ink/12 bg-sky text-ink">
         <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
             <Eyebrow className="text-brass">A few seconds in the room</Eyebrow>
@@ -199,7 +198,7 @@ export default async function HomePage() {
             </h2>
           </Reveal>
           <div className="mt-14">
-            <VideoCarousel label="Service experience clips" items={clips} />
+            <VideoCarousel label="Service experience clips" items={clips} tone="light" />
           </div>
         </div>
       </section>
@@ -284,7 +283,7 @@ export default async function HomePage() {
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 70% 60% at 15% 0%, rgba(33,161,255,.28), transparent 70%)",
+              "radial-gradient(ellipse 70% 60% at 15% 0%, rgba(11,87,222,.28), transparent 70%)",
           }}
         />
         <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
@@ -337,7 +336,7 @@ export default async function HomePage() {
         </div>
       </section>
       {/* ── campuses ─────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-t border-white/10 bg-meridian text-white">
+      <section className="relative overflow-hidden border-t border-ink/15 bg-sky text-ink">
         <HillContours className="absolute inset-x-0 top-0 h-[60%] w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal className="flex flex-wrap items-end justify-between gap-6">

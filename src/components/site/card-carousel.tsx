@@ -1,5 +1,7 @@
 "use client";
 
+import { useAutoAdvance } from "@/components/site/use-auto-advance";
+import { loopCopies } from "@/components/site/loop-copies";
 import { useDragScroll } from "@/components/site/use-drag-scroll";
 import { cn } from "@/lib/utils";
 
@@ -21,13 +23,18 @@ export function CardCarousel({
   tone?: "light" | "dark";
   className?: string;
 }) {
-  const { trackRef, atStart, atEnd, dragging, page, handlers } = useDragScroll();
+  const { trackRef, atStart, atEnd, dragging, page, handlers } =
+    useDragScroll();
+  const { restart } = useAutoAdvance(trackRef, () => page(1));
 
   const arrow = cn(
     "flex h-11 w-11 items-center justify-center border transition-colors",
     tone === "dark" ? "border-white/25 text-white" : "border-ink/20 text-ink",
   );
-  const live = tone === "dark" ? "hover:border-brass hover:bg-brass hover:text-ink" : "hover:border-ink hover:bg-ink hover:text-white";
+  const live =
+    tone === "dark"
+      ? "hover:border-brass hover:bg-brass hover:text-white"
+      : "hover:border-ink hover:bg-ink hover:text-white";
 
   return (
     <div className={cn("relative", className)}>
@@ -46,29 +53,47 @@ export function CardCarousel({
           dragging ? "cursor-grabbing" : "cursor-grab",
         )}
       >
-        {children}
+        {loopCopies(children)}
       </div>
 
       <div className="mt-6 flex items-center gap-2.5">
         <button
           type="button"
-          onClick={() => page(-1)}
+          onClick={() => {
+            page(-1);
+            restart();
+          }}
           disabled={atStart}
           aria-label="Previous card"
           className={cn(arrow, atStart ? "opacity-30" : live)}
         >
-          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
+          <svg
+            viewBox="0 0 16 16"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+          >
             <path d="M14 8H3M7 12L3 8l4-4" strokeLinecap="square" />
           </svg>
         </button>
         <button
           type="button"
-          onClick={() => page(1)}
+          onClick={() => {
+            page(1);
+            restart();
+          }}
           disabled={atEnd}
           aria-label="Next card"
           className={cn(arrow, atEnd ? "opacity-30" : live)}
         >
-          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
+          <svg
+            viewBox="0 0 16 16"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+          >
             <path d="M2 8h11M9 4l4 4-4 4" strokeLinecap="square" />
           </svg>
         </button>

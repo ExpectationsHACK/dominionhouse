@@ -115,28 +115,28 @@ export default async function EventsPage() {
 
       {/* ── the headline event ───────────────────────────────────────────── */}
       {camp ? (
-        <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
+        <section className="relative overflow-hidden border-b border-ink/12 bg-sky text-ink">
           <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={18} />
           <div className="relative mx-auto max-w-[1400px] px-5 py-16 sm:px-8 sm:py-24">
             <div className="flex flex-wrap items-center gap-3">
               <Eyebrow className="text-brass">The one to plan around</Eyebrow>
-              <span aria-hidden="true" className="h-px w-10 bg-white/25" />
-              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/50">
+              <span aria-hidden="true" className="h-px w-10 bg-ink/5" />
+              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-45">
                 25 to 28 February 2027
               </p>
             </div>
 
             <h2 className="display mt-6 text-[clamp(2.75rem,10vw,8rem)]">{camp.name}</h2>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/70">{camp.tagline}</p>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">{camp.tagline}</p>
 
             <div className="mt-10 flex flex-wrap items-center gap-6">
               <ButtonLink href="/camp/register" variant="brass" size="lg">
                 Register <Arrow />
               </ButtonLink>
-              <ButtonLink href="/camp" variant="inverse" size="lg">
+              <ButtonLink href="/camp" variant="solid" size="lg">
                 Read more
               </ButtonLink>
-              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/45">
+              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-45">
                 {daysUntil(camp.startsAt)} days away
               </p>
             </div>

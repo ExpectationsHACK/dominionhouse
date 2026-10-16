@@ -3,7 +3,7 @@ import { formatKobo } from "@/lib/money";
 
 const INK = "#0b0b0c";
 const BONE = "#eef7ff";
-const BRASS = "#21a1ff";
+const BRASS = "#0b57de";
 
 /**
  * Every field below that comes from a registration form (names, room notes,

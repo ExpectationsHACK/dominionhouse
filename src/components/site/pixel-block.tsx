@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
 export const BLUE_SHADES = [
   { from: "#a8dbff", to: "#8ecdf9", text: "text-ink", muted: "text-ink/75", key: "text-[#0a3d75]", art: "text-white", dot: "bg-[#a8dbff]", glow: "rgba(168,219,255,0.55)" },
   { from: "#5cbcff", to: "#44aef5", text: "text-ink", muted: "text-ink/75", key: "text-[#0a3d75]", art: "text-white", dot: "bg-[#5cbcff]", glow: "rgba(92,188,255,0.55)" },
-  { from: "#21a1ff", to: "#1990ea", text: "text-ink", muted: "text-ink/80", key: "text-[#0a3d75]", art: "text-ink", dot: "bg-[#21a1ff]", glow: "rgba(33,161,255,0.55)" },
-  { from: "#1170c9", to: "#0c5aa6", text: "text-white", muted: "text-white/85", key: "text-[#a8dbff]", art: "text-[#5cbcff]", dot: "bg-[#1170c9]", glow: "rgba(17,112,201,0.55)" },
-  { from: "#0a3d75", to: "#072a52", text: "text-white", muted: "text-white/80", key: "text-brass", art: "text-brass", dot: "bg-[#0a3d75]", glow: "rgba(10,61,117,0.6)" },
+  { from: "#2f7af0", to: "#1f69e6", text: "text-white", muted: "text-white/85", key: "text-[#dbe7fc]", art: "text-white", dot: "bg-[#2f7af0]", glow: "rgba(47,122,240,0.55)" },
+  { from: "#0b57de", to: "#0947b8", text: "text-white", muted: "text-white/85", key: "text-[#a8dbff]", art: "text-[#5cbcff]", dot: "bg-[#0b57de]", glow: "rgba(11,87,222,0.55)" },
+  { from: "#0a3d75", to: "#072a52", text: "text-white", muted: "text-white/80", key: "text-[#5cbcff]", art: "text-[#5cbcff]", dot: "bg-[#0a3d75]", glow: "rgba(10,61,117,0.6)" },
 ] as const;
 
 export type BlueShade = (typeof BLUE_SHADES)[number];

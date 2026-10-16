@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
  * carousels, the foundational scriptures as a row of cards.
  */
 
-const BLUE_GRADIENT = "linear-gradient(180deg,#21a1ff 0%,#21a1ff 40%,#0b0b0c 135%)";
+const BLUE_GRADIENT = "linear-gradient(180deg,#0b57de 0%,#0b57de 40%,#0b0b0c 135%)";
 
 /** The seven pillars, one tall card each, cycling the three arc treatments. */
 export function PillarCarousel({ tone = "light" }: { tone?: "light" | "dark" }) {

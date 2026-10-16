@@ -86,6 +86,7 @@ export function TicketStub({
           width={132}
           height={132}
           unoptimized
+          data-keep-tone
           className="h-[132px] w-[132px] shrink-0 border border-ink/10"
         />
         <div className="min-w-0 flex-1 text-center sm:text-left">

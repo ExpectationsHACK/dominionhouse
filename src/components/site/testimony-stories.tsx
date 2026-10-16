@@ -33,7 +33,7 @@ export function TestimonyStories({ items }: { items: Testimony[] }) {
             >
               &ldquo;
             </span>
-            <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#0b78c9]">
+            <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-brass">
               {item.title}
             </p>
             {/* The testimony itself, trimmed to a few lines; the rest is a tap away. */}
@@ -43,7 +43,7 @@ export function TestimonyStories({ items }: { items: Testimony[] }) {
             <button
               type="button"
               onClick={() => show(item.id)}
-              className="mt-5 self-start text-[12px] font-semibold uppercase tracking-[0.12em] text-[#0b78c9] underline-offset-4 hover:underline"
+              className="mt-5 self-start text-[12px] font-semibold uppercase tracking-[0.12em] text-brass underline-offset-4 hover:underline"
             >
               Read the full story &rarr;
             </button>

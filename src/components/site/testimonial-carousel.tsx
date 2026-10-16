@@ -1,5 +1,6 @@
 "use client";
 
+import { useAutoAdvance } from "@/components/site/use-auto-advance";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -19,10 +20,22 @@ function initials(name: string) {
     .join("");
 }
 
-function TestimonialCard({ item }: { item: Testimonial }) {
+function TestimonialCard({
+  item,
+  copy = false,
+}: {
+  item: Testimonial;
+  copy?: boolean;
+}) {
   return (
-    <article className="flex w-[82vw] shrink-0 snap-center flex-col justify-between border border-ink/12 bg-paper p-6 sm:w-[380px] sm:p-7">
-      <p className="text-lg leading-relaxed text-ink">&ldquo;{item.testimony}&rdquo;</p>
+    <article
+      aria-hidden={copy || undefined}
+      data-loop-copy={copy ? "" : undefined}
+      className="flex w-[82vw] shrink-0 snap-center flex-col justify-between border border-ink/12 bg-paper p-6 sm:w-[380px] sm:p-7"
+    >
+      <p className="text-lg leading-relaxed text-ink">
+        &ldquo;{item.testimony}&rdquo;
+      </p>
       <div className="mt-6 flex items-center gap-3 border-t border-ink/10 pt-5">
         {item.imageUrl ? (
           // Admin-supplied URLs from arbitrary hosts.
@@ -83,9 +96,21 @@ export function TestimonialCarousel({
     const track = trackRef.current;
     if (!track) return;
     const card = track.querySelector("article");
-    const step = card ? card.getBoundingClientRect().width + 20 : track.clientWidth * 0.8;
+    const step = card
+      ? card.getBoundingClientRect().width + 20
+      : track.clientWidth * 0.8;
+    const from = track.scrollLeft;
+    const to = Math.max(
+      0,
+      Math.min(from + step * direction, track.scrollWidth - track.clientWidth),
+    );
     track.scrollBy({ left: step * direction, behavior: "smooth" });
+    // Where smooth scrolling never runs, jump instead of doing nothing.
+    window.setTimeout(() => {
+      if (track.scrollLeft === from && from !== to) track.scrollLeft = to;
+    }, 250);
   }
+  const { restart } = useAutoAdvance(trackRef, () => page(1));
 
   if (items.length === 0) return null;
 
@@ -97,37 +122,64 @@ export function TestimonialCarousel({
         aria-label={label}
         className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-2 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {items.map((item) => (
-          <TestimonialCard key={item.id} item={item} />
+        {/* The testimonies, then two copies so the row can loop (see loopCopies). */}
+        {[...items, ...items, ...items].map((item, position) => (
+          <TestimonialCard
+            key={`card-${position}-${item.id}`}
+            item={item}
+            copy={position >= items.length}
+          />
         ))}
       </div>
 
       <div className="mt-6 flex items-center gap-2.5">
         <button
           type="button"
-          onClick={() => page(-1)}
+          onClick={() => {
+            page(-1);
+            restart();
+          }}
           disabled={atStart}
           aria-label="Previous testimonials"
           className={cn(
             "flex h-11 w-11 items-center justify-center border border-ink/20 text-ink transition-colors",
-            atStart ? "opacity-30" : "hover:border-ink hover:bg-ink hover:text-white",
+            atStart
+              ? "opacity-30"
+              : "hover:border-ink hover:bg-ink hover:text-white",
           )}
         >
-          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
+          <svg
+            viewBox="0 0 16 16"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+          >
             <path d="M14 8H3M7 12L3 8l4-4" strokeLinecap="square" />
           </svg>
         </button>
         <button
           type="button"
-          onClick={() => page(1)}
+          onClick={() => {
+            page(1);
+            restart();
+          }}
           disabled={atEnd}
           aria-label="Next testimonials"
           className={cn(
             "flex h-11 w-11 items-center justify-center border border-ink/20 text-ink transition-colors",
-            atEnd ? "opacity-30" : "hover:border-ink hover:bg-ink hover:text-white",
+            atEnd
+              ? "opacity-30"
+              : "hover:border-ink hover:bg-ink hover:text-white",
           )}
         >
-          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
+          <svg
+            viewBox="0 0 16 16"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+          >
             <path d="M2 8h11M9 4l4 4-4 4" strokeLinecap="square" />
           </svg>
         </button>
