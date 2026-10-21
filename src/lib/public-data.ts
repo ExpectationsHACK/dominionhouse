@@ -77,8 +77,3 @@ export const getPublicLegacyRaised = shared("public-legacy-raised", async () => 
   const value = Number(setting?.value);
   return Number.isFinite(value) && value >= 0 ? value : null;
 });
-
-/** Places taken at a camp: everyone registered except cancelled and waitlisted. */
-export const getPublicSpotsTaken = shared("public-spots-taken", (campId: string) =>
-  db.registrant.count({ where: { campId, status: { notIn: ["CANCELLED", "WAITLISTED"] } } }),
-);

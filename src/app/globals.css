@@ -46,9 +46,11 @@
   --color-warn: #c2410c;
   --color-warn-soft: #ffedd5;
 
-  --font-display: var(--font-anton), "Arial Narrow", sans-serif;
+  /* The naira faces cover ₦ alone (see layout.tsx); everything else falls
+     through to the house font. Body text's ₦ comes from the system font. */
+  --font-display: var(--font-naira-display), var(--font-anton), "Arial Narrow", sans-serif;
   --font-sans: var(--font-general-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-mono: var(--font-naira-mono), var(--font-jetbrains), ui-monospace, monospace;
 
   --radius-none: 0px;
 

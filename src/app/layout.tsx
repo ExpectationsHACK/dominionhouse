@@ -29,6 +29,33 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
+// The naira sign alone (see src/fonts/Naira-LICENSE.txt). None of the fonts
+// above has ₦, and a phone's fallback monospace often lacks it too, so it
+// showed as a box. Each face covers U+20A6 only, so every other character
+// keeps its own font, and the browser downloads it only on pages showing ₦.
+const nairaDisplay = localFont({
+  src: "../fonts/Naira-Anton.woff2",
+  variable: "--font-naira-display",
+  display: "swap",
+  preload: false,
+  // No generated fallback face: it would cover every character and, sitting
+  // ahead of the house font in the stack, take over all the text.
+  adjustFontFallback: false,
+  declarations: [{ prop: "unicode-range", value: "U+20A6" }],
+});
+
+const nairaMono = localFont({
+  src: "../fonts/Naira-SourceCodePro.woff2",
+  weight: "200 900",
+  variable: "--font-naira-mono",
+  display: "swap",
+  preload: false,
+  // No generated fallback face: it would cover every character and, sitting
+  // ahead of the house font in the stack, take over all the text.
+  adjustFontFallback: false,
+  declarations: [{ prop: "unicode-range", value: "U+20A6" }],
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
   title: {
@@ -58,7 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${anton.variable} ${generalSans.variable} ${jetbrains.variable}`}
+      className={`${anton.variable} ${generalSans.variable} ${jetbrains.variable} ${nairaDisplay.variable} ${nairaMono.variable}`}
     >
       <body className="min-h-dvh antialiased">
         <a

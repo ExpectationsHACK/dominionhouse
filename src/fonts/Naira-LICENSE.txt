@@ -1,0 +1,16 @@
+Naira sign (₦) fonts
+
+The site's Anton and JetBrains Mono files (latin subset) and General Sans have
+no naira sign, so on phones whose fallback font lacks it too, ₦ showed as a
+box. These two files hold only that one character, as served by Google Fonts
+(fonts.googleapis.com/css2?family=...&text=₦), unmodified, and are used for
+U+20A6 alone (see src/app/layout.tsx):
+
+- Naira-Anton.woff2: Anton.
+  Copyright 2020 The Anton Project Authors (https://github.com/googlefonts/AntonFont)
+- Naira-SourceCodePro.woff2: Source Code Pro (variable, weights 200-900),
+  standing in for JetBrains Mono in the small mono labels.
+  Copyright 2023 Adobe (http://www.adobe.com/), with Reserved Font Name "Source".
+
+Both are licensed under the SIL Open Font License, Version 1.1:
+https://openfontlicense.org

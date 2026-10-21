@@ -3,7 +3,7 @@ import { Countdown } from "@/components/site/countdown";
 import { DepthCardCarousel } from "@/components/site/depth-card-carousel";
 import { HeroVideo } from "@/components/site/hero-video";
 import { Embers } from "@/components/site/embers";
-import { CountUp, FanIn, Highlight, LightLines, Magnetic, MeterBar, StaggerLetters, Timeline } from "@/components/site/motion";
+import { FanIn, Highlight, LightLines, Magnetic, StaggerLetters, Timeline } from "@/components/site/motion";
 import { highlightWord } from "@/components/site/highlight-word";
 import { Reveal } from "@/components/site/reveal";
 import { TestimonialCarousel } from "@/components/site/testimonial-carousel";
@@ -12,7 +12,7 @@ import { TicketCards } from "@/components/site/ticket-cards";
 import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { CAMP_ENCOUNTER_LINE, campLockup } from "@/lib/camp";
-import { getPublicCamp, getPublicMedia, getPublicSchedule, getPublicSpotsTaken } from "@/lib/public-data";
+import { getPublicCamp, getPublicMedia, getPublicSchedule } from "@/lib/public-data";
 import { remainingUntil } from "@/lib/countdown";
 import { campDateRange, dayLabel, timeLabel } from "@/lib/dates";
 import { formatKobo } from "@/lib/money";
@@ -95,12 +95,11 @@ export default async function CampOverviewPage() {
   const camp = await getPublicCamp();
   if (!camp) throw new Error("No active camp found.");
 
-  const [schedule, cards, testimonialRows, clipRows, spotsTaken] = await Promise.all([
+  const [schedule, cards, testimonialRows, clipRows] = await Promise.all([
     getPublicSchedule(camp.id),
     getPublicMedia("CAMP_CARDS"),
     getPublicMedia("TESTIMONIALS"),
     getPublicMedia("CAMP_VIDEOS").then((rows) => rows.filter((row) => row.videoUrl)),
-    getPublicSpotsTaken(camp.id),
   ]);
   const clips = clipRows.length
     ? clipRows.map((row) => ({
@@ -164,21 +163,6 @@ export default async function CampOverviewPage() {
                 labelClassName="text-white/60"
               />
             </div>
-            {camp.capacity ? (
-              <div className="w-full max-w-xs">
-                <p className="eyebrow text-white/60">Spots filling</p>
-                <p className="display mt-3 text-3xl leading-none sm:text-4xl">
-                  <CountUp to={spotsTaken} />
-                  <span className="text-xl text-white/50 sm:text-2xl"> / {camp.capacity.toLocaleString("en-NG")}</span>
-                </p>
-                <MeterBar
-                  percent={(spotsTaken / camp.capacity) * 100}
-                  label="Camp places taken"
-                  className="mt-3 h-1.5 w-full bg-white/15"
-                  barClassName="bg-skyblue text-skyblue"
-                />
-              </div>
-            ) : null}
             <dl>
               <Fact label="Venue" value={camp.venue} />
             </dl>

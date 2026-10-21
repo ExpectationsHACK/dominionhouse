@@ -66,8 +66,8 @@ live in `src/app/globals.css`; use them, not raw hex values.
   slide-in, hero parallax, rotating hero word, count-ups, highlighter sweep,
   letter-by-letter camp title, lines lighting up, photo wipes, programme
   timeline, magnetic and shining main buttons, pricing-card glow, embers
-  (the only fire colours on the site), flip-clock countdown, spots and Legacy
-  Place meters, testimony fan-out, step bar, success check with confetti,
+  (the only fire colours on the site), flip-clock countdown, the Legacy Place
+  meter, testimony fan-out, step bar, success check with confetti,
   ticket flip, and the next-field pulse on phones.
 - A server page can't call a function from motion.tsx; helpers that build
   JSX on the server (like `highlightWord`) live in their own file.

@@ -94,14 +94,15 @@ export function GiveForm() {
         error={errorFor("amount")}
         hint={`From ${formatMoney(toMinor(minimum), currency)}${kind === "MONTHLY" ? " a month" : ""}.`}
       >
-        <div className="grid grid-cols-4 gap-2">
+        {/* Two to a row on phones: four "₦250,000"s don't fit across one. */}
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {MONTHLY_PRESETS_MAJOR[currency].map((preset) => (
             <button
               key={preset}
               type="button"
               onClick={() => setAmount(String(preset))}
               className={cn(
-                "border px-2 py-2.5 font-mono text-[13px] transition-colors",
+                "min-w-0 whitespace-nowrap border px-2 py-2.5 font-mono text-[13px] transition-colors",
                 Number(amount) === preset
                   ? "border-ink bg-ink text-white"
                   : "border-ink/20 bg-paper hover:border-ink",
