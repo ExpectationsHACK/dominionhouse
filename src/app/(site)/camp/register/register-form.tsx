@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { registerForCamp, type RegisterState } from "./actions";
 import { Arrow, ArrowLeft, Button, Eyebrow } from "@/components/ui";
 import {
@@ -21,6 +21,7 @@ import { CAMPUS_REGIONS, LIGHTHOUSES_OR_MINISTRIES } from "@/lib/church";
 import { cn } from "@/lib/utils";
 import { fieldErrors, identityStep, logisticsStep } from "@/lib/validation";
 import { KeepValuesForm } from "@/components/ui/keep-values-form";
+import { NextFieldHint } from "@/components/site/motion";
 
 /** Which step a schema field lives on, so a server-side error (or an error
  * caught before ever reaching the server) always lands the wizard on the
@@ -116,6 +117,23 @@ export function RegisterForm({
     registeringAs === "ADULT" && bringingChildren && childCountUnder5 + childCount5to11 > 0;
   const totalTicketCount = 1 + (bringingAnyChildren ? childCountUnder5 + childCount5to11 : 0);
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+  // First-timers are guests: they skip the church-position question.
+  const [firstCamp, setFirstCamp] = useState(false);
+  const stepperRef = useRef<HTMLOListElement>(null);
+
+  /**
+   * Each new step starts at its own top. An instant jump to the step tabs,
+   * not a smooth scroll to the page top: on phones a smooth scroll can be cut
+   * short, leaving people at the bottom of the next step with its first
+   * (often required) fields out of sight above them.
+   */
+  function showStepTop() {
+    // "instant" overrides the site-wide smooth scrolling (globals.css), which
+    // is what lets a phone cut the move short.
+    requestAnimationFrame(() =>
+      stepperRef.current?.scrollIntoView({ block: "start", behavior: "instant" }),
+    );
+  }
 
   // A server-side rejection (or a check caught before ever submitting) always
   // has its field on some step; jump there so the error is actually visible
@@ -222,12 +240,12 @@ export function RegisterForm({
     }
 
     setStep((current) => Math.min(4, current + 1));
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    showStepTop();
   }
 
   function goBack() {
     setStep((current) => Math.max(1, current - 1));
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    showStepTop();
   }
 
   /** A pre-submit local catch and a post-submit server error both surface the
@@ -246,7 +264,11 @@ export function RegisterForm({
     <div className="grid gap-10 lg:grid-cols-[1fr_320px] lg:gap-14">
       <div>
         {/* stepper */}
-        <ol className="mb-10 grid grid-cols-4 gap-px bg-ink/12" aria-label="Registration steps">
+        <ol
+          ref={stepperRef}
+          className="grid scroll-mt-20 grid-cols-4 gap-px bg-ink/12"
+          aria-label="Registration steps"
+        >
           {STEPS.map((item) => {
             const done = item.id < step;
             const current = item.id === step;
@@ -281,6 +303,13 @@ export function RegisterForm({
             );
           })}
         </ol>
+        {/* How far along: slides on with each step. */}
+        <div aria-hidden="true" className="mb-10 h-1 bg-ink/10">
+          <div
+            className="h-full bg-brass transition-[width] duration-500 ease-[var(--ease-out-expo)] motion-reduce:transition-none"
+            style={{ width: `${(step / STEPS.length) * 100}%` }}
+          />
+        </div>
 
         {state.error ? (
           <div className="mb-6">
@@ -305,6 +334,7 @@ export function RegisterForm({
         ) : null}
 
         <KeepValuesForm id="register-form" action={formAction} className="space-y-8">
+          <NextFieldHint />
           {/* ── step 1 ─────────────────────────────────────────────────── */}
           <fieldset className={cn("space-y-6 border-0 p-0", step !== 1 && "hidden")}>
             <legend className="sr-only">About you</legend>
@@ -403,24 +433,37 @@ export function RegisterForm({
           <fieldset className={cn("space-y-6 border-0 p-0", step !== 2 && "hidden")}>
             <legend className="sr-only">Your place in the church</legend>
 
-            <Field
-              label="Your position"
-              htmlFor="position"
-              required
-              error={state.errors?.position}
-              hint="This shapes your breakout track and where you're roomed."
-            >
-              <Select id="position" name="position" required defaultValue="">
-                <option value="" disabled>
-                  Choose your position
-                </option>
-                {POSITION_OPTIONS.map((position) => (
-                  <option key={position} value={position}>
-                    {POSITION_LABEL[position]}
+            <Checkbox
+              name="isFirstCamp"
+              label="This is my first Dominion House camp"
+              description="New here? Tick this and you'll come as our guest, no church position needed."
+              checked={firstCamp}
+              onChange={(event) => setFirstCamp(event.target.checked)}
+            />
+
+            {firstCamp ? (
+              // Guests are recorded as disciples; the admin shows them as Guest.
+              <input type="hidden" name="position" value="DISCIPLE" />
+            ) : (
+              <Field
+                label="Your position"
+                htmlFor="position"
+                required
+                error={state.errors?.position}
+                hint="This shapes your breakout track and where you're roomed."
+              >
+                <Select id="position" name="position" required defaultValue="">
+                  <option value="" disabled>
+                    Choose your position
                   </option>
-                ))}
-              </Select>
-            </Field>
+                  {POSITION_OPTIONS.map((position) => (
+                    <option key={position} value={position}>
+                      {POSITION_LABEL[position]}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            )}
 
             {registeringAs === "STUDENT" ? (
               <Field
@@ -502,10 +545,10 @@ export function RegisterForm({
 
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="City" htmlFor="city" error={state.errors?.city}>
-                <Input id="city" name="city" autoComplete="address-level2" placeholder="Lagos" />
+                <Input id="city" name="city" autoComplete="address-level2" />
               </Field>
               <Field label="State" htmlFor="state" error={state.errors?.state}>
-                <Input id="state" name="state" autoComplete="address-level1" placeholder="Lagos" />
+                <Input id="state" name="state" autoComplete="address-level1" />
               </Field>
             </div>
 
@@ -527,10 +570,6 @@ export function RegisterForm({
               </Select>
             </Field>
 
-            <Checkbox
-              name="isFirstCamp"
-              label="This is my first Dominion House camp"
-            />
           </fieldset>
 
           {/* ── step 3 ─────────────────────────────────────────────────── */}

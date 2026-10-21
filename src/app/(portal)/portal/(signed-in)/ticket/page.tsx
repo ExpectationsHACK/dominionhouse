@@ -51,26 +51,28 @@ export default async function PortalTicketPage() {
             </svg>
           </a>
         ) : null}
-        <TicketStub
-          name={`${registrant.firstName} ${registrant.lastName}`}
-          category={CATEGORY_LABEL[registrant.category]}
-          registrationCode={registrant.registrationCode}
-          ticketCode={registrant.ticket.code}
-          qrDataUrl={qrDataUrl}
-          campName={registrant.camp.name}
-          dates={campDateRange(registrant.camp.startsAt, registrant.camp.endsAt)}
-          venue={registrant.camp.venue}
-          status={registrant.ticket.status}
-          room={
-            registrant.roomAssignment
-              ? {
-                  block: registrant.roomAssignment.room.block,
-                  name: registrant.roomAssignment.room.name,
-                  bedLabel: registrant.roomAssignment.bedLabel,
-                }
-              : null
-          }
-        />
+        <div className="ticket-reveal">
+          <TicketStub
+            name={`${registrant.firstName} ${registrant.lastName}`}
+            category={CATEGORY_LABEL[registrant.category]}
+            registrationCode={registrant.registrationCode}
+            ticketCode={registrant.ticket.code}
+            qrDataUrl={qrDataUrl}
+            campName={registrant.camp.name}
+            dates={campDateRange(registrant.camp.startsAt, registrant.camp.endsAt)}
+            venue={registrant.camp.venue}
+            status={registrant.ticket.status}
+            room={
+              registrant.roomAssignment
+                ? {
+                    block: registrant.roomAssignment.room.block,
+                    name: registrant.roomAssignment.room.name,
+                    bedLabel: registrant.roomAssignment.bedLabel,
+                  }
+                : null
+            }
+          />
+        </div>
       </div>
 
       <div className="space-y-5">

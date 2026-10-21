@@ -1,7 +1,7 @@
-import { Fragment } from "react";
+import { Fragment, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type Word = string | { text: string; className?: string };
+type Word = string | { text: string; className?: string } | { node: ReactNode; className?: string };
 
 /**
  * A headline whose words rise in one after another on load. Pure CSS (the
@@ -27,7 +27,7 @@ export function StaggerWords({
         <Fragment key={lineIndex}>
           {lineIndex > 0 ? <br /> : null}
           {line.map((word, wordIndex) => {
-            const text = typeof word === "string" ? word : word.text;
+            const text = typeof word === "string" ? word : "node" in word ? word.node : word.text;
             const className = typeof word === "string" ? undefined : word.className;
             const delay = start + index++ * step;
             return (

@@ -5,6 +5,7 @@ import { failGift, settleGift } from "@/lib/giving";
 import { formatMoney } from "@/lib/giving-rules";
 import { isMockPayments, verifyTransaction } from "@/lib/paystack";
 import { classifyGatewayOutcome } from "@/lib/payment-outcome";
+import { SuccessBurst } from "@/components/site/motion";
 
 export const metadata: Metadata = {
   title: "Thank you",
@@ -76,6 +77,7 @@ export default async function GiveThankYouPage({
   if (fresh.status === "SUCCESS") {
     return (
       <Shell>
+        <SuccessBurst className="mb-6" />
         <Eyebrow className="text-success">{monthly ? "Covenant begun" : "Seed received"}</Eyebrow>
         <h1 className="display mt-3 text-[clamp(2.5rem,8vw,6rem)]">
           {monthly ? "Welcome, Angel Partner" : "Thank you"}

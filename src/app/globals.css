@@ -27,7 +27,9 @@
   /* The house blue for small labels on black: #0b57de is too dark to read there. */
   --color-brass-on-dark: #7aa7f5;
   /* Light blue for sections that would otherwise be black. */
-  --color-sky: #caddff;
+  --color-sky: #e1ecff;
+  /* Sky blue: buttons and accents on light-blue sections and the two heroes. */
+  --color-skyblue: #229bf2;
   --color-brass-soft: #d3eaff;
 
   /* Fresh Fire — was orange fire, now the same blue family as everything else. */
@@ -409,4 +411,277 @@
    the house's footage is mostly shot indoors and reads dim on screen. */
 #main :is(img, video):not([data-keep-tone]) {
   filter: brightness(1.1) saturate(1.08);
+}
+
+/* ── motion: page and menu ─────────────────────────────────────────────── */
+.page-in {
+  animation: page-in 360ms var(--ease-out-expo, ease-out) both;
+}
+@keyframes page-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.menu-in {
+  animation: menu-in 420ms var(--ease-out-expo, ease-out) both;
+}
+@keyframes menu-in {
+  from { opacity: 0; transform: translateX(-18px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-in,
+  .menu-in {
+    animation: none;
+  }
+}
+
+/* ── motion: text ───────────────────────────────────────────────────────── */
+/* #7 a blue underline swept across a key word once it's in view. */
+.sweep {
+  background-image: linear-gradient(var(--color-skyblue), var(--color-skyblue));
+  background-repeat: no-repeat;
+  background-position: 0 92%;
+  background-size: 0% 0.16em;
+  transition: background-size 900ms var(--ease-out-expo, ease-out) 150ms;
+}
+.sweep[data-on] {
+  background-size: 100% 0.16em;
+}
+/* #3 lines dimmed until they reach the middle of the screen. */
+[data-lines] > * {
+  opacity: 0.32;
+  transition: opacity 700ms ease;
+}
+[data-lines] > [data-lit] {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sweep {
+    background-size: 100% 0.16em;
+    transition: none;
+  }
+  [data-lines] > * {
+    opacity: 1;
+  }
+}
+
+
+/* ── motion: photos, buttons, cards ─────────────────────────────────────── */
+/* #5 a photo uncovered left to right. */
+[data-wipe] {
+  transition: clip-path 1100ms var(--ease-out-expo, ease-out);
+}
+[data-wipe="hidden"] {
+  clip-path: inset(0 100% 0 0);
+}
+[data-wipe="shown"] {
+  clip-path: inset(0 0 0 0);
+}
+/* #6 the programme line and its dots (lit once the line passes them). */
+[data-timeline] > ul > li {
+  position: relative;
+}
+[data-timeline] > ul > li::before {
+  content: "";
+  position: absolute;
+  left: calc(-1.75rem - 5px);
+  top: 1.55rem;
+  width: 11px;
+  height: 11px;
+  border-radius: 9999px;
+  border: 2px solid var(--color-brass);
+  background: var(--color-brass);
+  transition: background-color 300ms ease, transform 400ms var(--ease-out-expo, ease-out);
+}
+[data-timeline="live"] > ul > li:not([data-lit])::before {
+  background: var(--color-bone);
+  border-color: rgb(11 11 12 / 0.25);
+  transform: scale(0.8);
+}
+[data-timeline="live"] .timeline-fill {
+  transition: transform 120ms linear;
+}
+/* #10 magnetic buttons ease back when the cursor leaves. */
+.magnetic {
+  transition: transform 450ms var(--ease-out-expo, ease-out);
+  will-change: transform;
+}
+/* #11 a light sweeping across the main buttons every few seconds. */
+.shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgb(255 255 255 / 0.55) 50%, transparent 70%);
+  transform: translateX(-130%);
+  animation: shine 5.5s ease-in-out 1.8s infinite;
+}
+@keyframes shine {
+  0% { transform: translateX(-130%); }
+  22%, 100% { transform: translateX(130%); }
+}
+/* #13 pricing cards lift with a glow in their own blue. */
+.card-glow:hover {
+  box-shadow: 0 28px 54px -24px rgb(11 87 222 / 0.6);
+}
+.card-glow img {
+  transition: transform 700ms var(--ease-out-expo, ease-out);
+}
+.card-glow:hover img {
+  transform: scale(1.05);
+}
+/* #27 the Angel Partner heart, beating. */
+.heart-beat {
+  animation: heart-beat 1.6s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes heart-beat {
+  0%, 40%, 100% { transform: scale(1); }
+  12% { transform: scale(1.28); }
+  26% { transform: scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-wipe] {
+    clip-path: none;
+    transition: none;
+  }
+  .magnetic {
+    transform: none !important;
+  }
+  .shine::after,
+  .heart-beat {
+    animation: none;
+  }
+  .shine::after {
+    display: none;
+  }
+  .card-glow:hover img {
+    transform: none;
+  }
+}
+
+/* ── motion: Fresh Fire ─────────────────────────────────────────────────── */
+/* #15 embers rising behind the hero and the camp band (fire colours, used
+   only here). */
+.embers span {
+  position: absolute;
+  bottom: -12px;
+  border-radius: 9999px;
+  background: #ffc46b;
+  box-shadow: 0 0 10px 3px rgb(255 128 32 / 0.55);
+  opacity: 0;
+  animation: ember linear infinite;
+  will-change: transform, opacity;
+}
+@keyframes ember {
+  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0; }
+  12% { opacity: 0.85; }
+  65% { opacity: 0.55; }
+  100% { transform: translate3d(var(--drift, 0px), -70vh, 0) scale(0.4); opacity: 0; }
+}
+@media (max-width: 639px) {
+  .embers span:nth-child(n + 10) {
+    display: none;
+  }
+}
+/* #16 countdown digits flipping over as they change. */
+.flip-digit {
+  perspective: 400px;
+}
+.flip-in {
+  animation: flip-in 560ms var(--ease-out-expo, ease-out) both;
+  transform-origin: 50% 40%;
+  backface-visibility: hidden;
+}
+@keyframes flip-in {
+  from { transform: rotateX(-100deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+/* #17 / #26 meters: fill, then a pulse at the end. */
+.meter-fill {
+  transition: width 1400ms var(--ease-out-expo, ease-out);
+}
+.meter-mark {
+  transition: opacity 300ms ease;
+}
+.meter:not([data-done]) .meter-mark {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .embers {
+    display: none;
+  }
+  .flip-in {
+    animation: none;
+  }
+  .meter-fill {
+    transition: none;
+  }
+}
+
+/* ── motion: registration and payment ───────────────────────────────────── */
+/* #19 the check draws itself, then one burst of confetti. */
+.check-ring {
+  stroke-dasharray: 158;
+  stroke-dashoffset: 158;
+  animation: draw 600ms var(--ease-out-expo, ease-out) 80ms forwards;
+}
+.check-mark {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: draw 420ms var(--ease-out-expo, ease-out) 520ms forwards;
+}
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+.confetti {
+  opacity: 0;
+  border-radius: 1px;
+  animation: confetti 1100ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+@keyframes confetti {
+  0% { opacity: 1; transform: translate(-50%, -50%) rotate(0deg) scale(0.6); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y) + 40px)) rotate(var(--spin)) scale(1); }
+}
+/* #20 the ticket turns over into view in the camp profile. */
+.ticket-reveal {
+  perspective: 1200px;
+}
+.ticket-reveal > * {
+  animation: ticket-in 900ms var(--ease-out-expo, ease-out) 150ms both;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+}
+@keyframes ticket-in {
+  from { transform: rotateY(-75deg) scale(0.94); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+/* #21 the next field to fill pulses on phones. */
+[data-hint] {
+  animation: hint 1.2s ease-in-out 2;
+}
+@keyframes hint {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(11 87 222 / 0); }
+  50% { box-shadow: 0 0 0 4px rgb(11 87 222 / 0.28); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .check-ring,
+  .check-mark {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .confetti {
+    display: none;
+  }
+  .ticket-reveal > *,
+  [data-hint] {
+    animation: none;
+  }
 }

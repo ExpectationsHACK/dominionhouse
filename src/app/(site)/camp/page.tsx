@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Countdown } from "@/components/site/countdown";
 import { DepthCardCarousel } from "@/components/site/depth-card-carousel";
 import { HeroVideo } from "@/components/site/hero-video";
+import { Embers } from "@/components/site/embers";
+import { CountUp, FanIn, Highlight, LightLines, Magnetic, MeterBar, StaggerLetters, Timeline } from "@/components/site/motion";
+import { highlightWord } from "@/components/site/highlight-word";
 import { Reveal } from "@/components/site/reveal";
 import { TestimonialCarousel } from "@/components/site/testimonial-carousel";
 import { TestimonyStories } from "@/components/site/testimony-stories";
@@ -9,7 +12,7 @@ import { TicketCards } from "@/components/site/ticket-cards";
 import { VideoCarousel } from "@/components/site/video-carousel";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { CAMP_ENCOUNTER_LINE, campLockup } from "@/lib/camp";
-import { getPublicCamp, getPublicMedia, getPublicSchedule } from "@/lib/public-data";
+import { getPublicCamp, getPublicMedia, getPublicSchedule, getPublicSpotsTaken } from "@/lib/public-data";
 import { remainingUntil } from "@/lib/countdown";
 import { campDateRange, dayLabel, timeLabel } from "@/lib/dates";
 import { formatKobo } from "@/lib/money";
@@ -92,11 +95,12 @@ export default async function CampOverviewPage() {
   const camp = await getPublicCamp();
   if (!camp) throw new Error("No active camp found.");
 
-  const [schedule, cards, testimonialRows, clipRows] = await Promise.all([
+  const [schedule, cards, testimonialRows, clipRows, spotsTaken] = await Promise.all([
     getPublicSchedule(camp.id),
     getPublicMedia("CAMP_CARDS"),
     getPublicMedia("TESTIMONIALS"),
     getPublicMedia("CAMP_VIDEOS").then((rows) => rows.filter((row) => row.videoUrl)),
+    getPublicSpotsTaken(camp.id),
   ]);
   const clips = clipRows.length
     ? clipRows.map((row) => ({
@@ -119,26 +123,25 @@ export default async function CampOverviewPage() {
             the left, where the type sits, with a soft shadow under the type. */}
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-ink/55 via-ink/15 to-transparent" />
+        <Embers />
         <div className="relative mx-auto w-full max-w-[1400px] px-5 pb-14 pt-32 sm:px-8 sm:pb-20 [text-shadow:0_2px_18px_rgba(11,11,12,0.55)]">
-          <h1
-            className="display rise-in text-[clamp(3rem,11vw,9.5rem)]"
-            style={{ animationDelay: "120ms" }}
-          >
-            {lockup.lead}
-            {lockup.year ? <span className="text-brass"> {lockup.year}</span> : null}
+          <h1 className="display text-[clamp(3rem,11vw,9.5rem)]">
+            <StaggerLetters text={lockup.lead} start={120} accent={lockup.year ?? undefined} accentClassName="text-skyblue" />
           </h1>
 
           <p
             className="rise-in mt-8 max-w-2xl text-xl leading-relaxed text-white/80"
             style={{ animationDelay: "240ms" }}
           >
-            {camp.tagline} {CAMP_ENCOUNTER_LINE}
+            {highlightWord(camp.tagline ?? "", "Reawakening")} {CAMP_ENCOUNTER_LINE}
           </p>
 
           <div className="rise-in mt-12 flex flex-wrap gap-2.5" style={{ animationDelay: "360ms" }}>
-            <ButtonLink href="/camp/register" variant="brass" size="lg">
-              Register now <Arrow />
-            </ButtonLink>
+            <Magnetic>
+              <ButtonLink href="/camp/register" variant="sky" size="lg" className="shine">
+                Register now <Arrow />
+              </ButtonLink>
+            </Magnetic>
             <ButtonLink href="/camp/payment" variant="inverse" size="lg">
               Already registered? Pay
             </ButtonLink>
@@ -150,7 +153,7 @@ export default async function CampOverviewPage() {
           >
             <div>
               <p className="eyebrow flex items-center gap-2 text-white/60">
-                <span className="pulse-ring relative h-1.5 w-1.5 rounded-full bg-brass text-brass" />
+                <span className="pulse-ring relative h-1.5 w-1.5 rounded-full bg-skyblue text-skyblue" />
                 Camp starts in
               </p>
               <Countdown
@@ -161,6 +164,21 @@ export default async function CampOverviewPage() {
                 labelClassName="text-white/60"
               />
             </div>
+            {camp.capacity ? (
+              <div className="w-full max-w-xs">
+                <p className="eyebrow text-white/60">Spots filling</p>
+                <p className="display mt-3 text-3xl leading-none sm:text-4xl">
+                  <CountUp to={spotsTaken} />
+                  <span className="text-xl text-white/50 sm:text-2xl"> / {camp.capacity.toLocaleString("en-NG")}</span>
+                </p>
+                <MeterBar
+                  percent={(spotsTaken / camp.capacity) * 100}
+                  label="Camp places taken"
+                  className="mt-3 h-1.5 w-full bg-white/15"
+                  barClassName="bg-skyblue text-skyblue"
+                />
+              </div>
+            ) : null}
             <dl>
               <Fact label="Venue" value={camp.venue} />
             </dl>
@@ -177,7 +195,7 @@ export default async function CampOverviewPage() {
               Get ready for an unforgettable spiritual encounter
             </h2>
 
-            <div className="mt-8 max-w-3xl space-y-5 text-lg leading-relaxed text-ink-70">
+            <LightLines className="mt-8 max-w-3xl space-y-5 text-lg leading-relaxed text-ink-70">
               <p>
                 FFC 2027 is a supernatural convergence designed to ignite fresh passion, birth fresh
                 conviction, sharpen your discernment and position you for all God has prepared for
@@ -185,7 +203,10 @@ export default async function CampOverviewPage() {
               </p>
               <p>
                 This is not just a gathering, it is a{" "}
-                <strong className="font-semibold text-ink">SPIRITUAL AWAKENING</strong>. An
+                <strong className="font-semibold text-ink">
+                  <Highlight>SPIRITUAL AWAKENING</Highlight>
+                </strong>
+                . An
                 Awakening through the Word, Prayer and Impartation for Kingdom influence across
                 territories and nations.
               </p>
@@ -194,7 +215,7 @@ export default async function CampOverviewPage() {
                 are realigned, visions are reawakened, and believers are empowered to take territories
                 locally and globally.
               </p>
-            </div>
+            </LightLines>
           </Reveal>
 
           <Reveal
@@ -257,7 +278,7 @@ export default async function CampOverviewPage() {
             </p>
           </Reveal>
 
-          <div className="mt-12">
+          <FanIn className="mt-12">
             {testimonialRows.length > 0 ? (
               <TestimonialCarousel
                 items={testimonialRows.map((row) => ({
@@ -270,7 +291,7 @@ export default async function CampOverviewPage() {
             ) : (
               <TestimonyStories items={TESTIMONIES} />
             )}
-          </div>
+          </FanIn>
         </div>
       </section>
 
@@ -344,7 +365,7 @@ export default async function CampOverviewPage() {
                 <h3 className="display sticky top-20 self-start text-3xl text-meridian">
                   {dayLabel.format(new Date(day))}
                 </h3>
-                <ul className="border-t border-ink/12">
+                <Timeline className="border-t border-ink/12">
                   {items.map((item) => (
                     <li
                       key={item.id}
@@ -371,7 +392,7 @@ export default async function CampOverviewPage() {
                       ) : null}
                     </li>
                   ))}
-                </ul>
+                </Timeline>
               </Reveal>
             ))}
           </div>
@@ -451,7 +472,7 @@ export default async function CampOverviewPage() {
             The house is expecting you
           </h2>
           <div className="flex flex-wrap gap-2.5">
-            <ButtonLink href="/camp/register" variant="brass" size="lg">
+            <ButtonLink href="/camp/register" variant="sky" size="lg">
               Register <Arrow />
             </ButtonLink>
             <ButtonLink href="/camp/payment" variant="solid" size="lg">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { HillContours } from "@/components/site/hill-contours";
 import { BeliefCarousel, PillarCarousel, ScriptureCards } from "@/components/site/house-cards";
+import { WipeIn } from "@/components/site/motion";
 import { Reveal } from "@/components/site/reveal";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import {
@@ -153,13 +154,15 @@ export default function AboutPage() {
                 className="card-lift border border-ink/15 bg-paper p-5 sm:p-7"
               >
                 <div className="flex items-start gap-5">
-                  <Image
-                    src={pastor.imageUrl}
-                    alt={pastor.name}
-                    width={160}
-                    height={190}
-                    className="h-32 w-28 shrink-0 border border-ink/12 object-cover sm:h-40 sm:w-32"
-                  />
+                  <WipeIn className="shrink-0">
+                    <Image
+                      src={pastor.imageUrl}
+                      alt={pastor.name}
+                      width={160}
+                      height={190}
+                      className="h-32 w-28 border border-ink/12 object-cover sm:h-40 sm:w-32"
+                    />
+                  </WipeIn>
                   <div className="min-w-0 pt-1">
                     <h3 className="display text-2xl sm:text-3xl">{pastor.name}</h3>
                     {/* "Visionary / Founder" as a two-tone tag: the calling in the
@@ -201,7 +204,7 @@ export default function AboutPage() {
             </h2>
           </div>
           <div className="flex flex-wrap gap-2.5">
-            <ButtonLink href="/locations" variant="brass" size="lg">
+            <ButtonLink href="/locations" variant="sky" size="lg">
               Find a lighthouse <Arrow />
             </ButtonLink>
             <ButtonLink href="/camp" variant="solid" size="lg">

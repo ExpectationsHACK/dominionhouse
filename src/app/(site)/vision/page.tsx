@@ -129,7 +129,7 @@ export default function VisionPage() {
             </h2>
           </div>
           <div className="flex flex-wrap gap-2.5">
-            <ButtonLink href="/locations" variant="brass" size="lg">
+            <ButtonLink href="/locations" variant="sky" size="lg">
               Find a campus <Arrow />
             </ButtonLink>
             <ButtonLink href="/camp" variant="solid" size="lg">

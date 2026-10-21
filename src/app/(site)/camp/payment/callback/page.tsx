@@ -7,6 +7,7 @@ import { formatKobo } from "@/lib/money";
 import { isMockPayments, verifyTransaction } from "@/lib/paystack";
 import { classifyGatewayOutcome } from "@/lib/payment-outcome";
 import { recordUnsuccessfulPayment, settlePayment } from "@/lib/registration";
+import { SuccessBurst } from "@/components/site/motion";
 
 export const metadata: Metadata = {
   title: "Payment result",
@@ -115,6 +116,7 @@ export default async function PaymentCallbackPage({
     <Shell>
       {success ? (
         <>
+          <SuccessBurst className="mb-6" />
           <Eyebrow className="text-success">Payment received</Eyebrow>
           <h1 className="display mt-3 text-[clamp(2.5rem,8vw,6rem)]">
             {balanceKobo === 0 ? "You're paid in full" : "Thank you"}

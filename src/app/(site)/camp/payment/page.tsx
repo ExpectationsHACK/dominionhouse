@@ -22,6 +22,7 @@ import { isMockPayments } from "@/lib/paystack";
 import { installmentPlanFor, minimumPayableKobo, totalsFor } from "@/lib/registration";
 import { getPortalSession } from "@/lib/session";
 import { normalizeEmail } from "@/lib/utils";
+import { SuccessBurst } from "@/components/site/motion";
 
 export const metadata: Metadata = {
   title: "Camp payment",
@@ -83,10 +84,13 @@ export default async function PaymentPage({ searchParams }: { searchParams: Sear
         </ButtonLink>
 
         {params.welcome ? (
-          <Notice tone="success" title="You're registered." className="mb-8">
-            Your camp profile is open and a confirmation is on its way to your inbox. Last step,
-            payment.
-          </Notice>
+          <div className="mb-8 flex items-center gap-4">
+            <SuccessBurst />
+            <Notice tone="success" title="You're registered." className="flex-1">
+              Your camp profile is open and a confirmation is on its way to your inbox. Last step,
+              payment.
+            </Notice>
+          </div>
         ) : null}
 
         {isMockPayments ? (
@@ -263,9 +267,13 @@ function Account({
         <Panel className="p-6 sm:p-8">
           <Eyebrow>Step two</Eyebrow>
           <h2 className="display mt-2 text-3xl">
-            {plan.count && plan.paidCount > 0
+            {/* Matches the plan they chose, so someone paying in parts never
+                reads the whole balance as what's due now. */}
+            {plan.count
               ? `Instalment ${Math.min(plan.count, plan.paidCount + 1)} of ${plan.count}`
-              : `Pay ${formatKobo(totals.balanceKobo)}`}
+              : registrant.paymentPlan === "INSTALLMENT"
+                ? "Make a payment"
+                : `Pay ${formatKobo(totals.balanceKobo)}`}
           </h2>
           <div className="mt-6">
             <PayForm

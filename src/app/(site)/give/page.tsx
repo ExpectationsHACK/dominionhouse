@@ -3,6 +3,7 @@ import Link from "next/link";
 import { GiveForm } from "./give-form";
 import { HillContours } from "@/components/site/hill-contours";
 import { BLUE_SHADES, PixelBlock, shadeBackground } from "@/components/site/pixel-block";
+import { CountUp, Magnetic, MeterBar } from "@/components/site/motion";
 import { Reveal } from "@/components/site/reveal";
 import { Arrow, ButtonLink, Eyebrow, Panel } from "@/components/ui";
 import { CONTACT_EMAIL } from "@/lib/church";
@@ -83,9 +84,11 @@ export default async function GivePage() {
             ))}
           </ul>
           <div className="rise-in mt-9 flex flex-wrap gap-2.5" style={{ animationDelay: "420ms" }}>
-            <ButtonLink href="#partner" variant="brass" size="lg">
-              Become an Angel Partner <Arrow />
-            </ButtonLink>
+            <Magnetic>
+              <ButtonLink href="#partner" variant="brass" size="lg" className="shine">
+                <Heart /> Become an Angel Partner <Arrow />
+              </ButtonLink>
+            </Magnetic>
             {LEGACY_LINKS.visionVideo ? (
               <ButtonLink href={LEGACY_LINKS.visionVideo} variant="inverse" size="lg">
                 Watch the vision video
@@ -110,7 +113,9 @@ export default async function GivePage() {
           <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="eyebrow text-ink-45">Raised</p>
-              <p className="display mt-1 text-[clamp(2.25rem,6vw,4rem)]">{naira(raised)}</p>
+              <p className="display mt-1 text-[clamp(2.25rem,6vw,4rem)]">
+                <CountUp to={raised} prefix="₦" duration={1600} />
+              </p>
             </div>
             <div className="text-right">
               <p className="eyebrow text-ink-45">Seed goal</p>
@@ -119,16 +124,12 @@ export default async function GivePage() {
               </p>
             </div>
           </div>
-          <div
+          <MeterBar
+            percent={percent}
+            label="Progress toward the seed goal"
             className="mt-5 h-3 w-full bg-white"
-            role="progressbar"
-            aria-valuenow={Math.round(percent)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Progress toward the seed goal"
-          >
-            <div className="h-full bg-brass" style={{ width: `${percent}%` }} />
-          </div>
+            barClassName="bg-brass text-brass"
+          />
           <p className="mt-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ink-70">
             {percent.toFixed(1)}% of the seed goal (commencement phase)
           </p>
@@ -224,7 +225,7 @@ export default async function GivePage() {
             <Eyebrow className="text-brass">The 5-year goal</Eyebrow>
             <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5rem)]">The 1 million mandate</h2>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-70">
-              In the next five years, we are committing to reaching 1,000,000 young people through
+              In the next five years, we are committing to reaching <CountUp to={1000000} className="font-semibold" /> young people through
               transformational discipleship experiences, raising leaders who raise leaders.
             </p>
           </Reveal>
@@ -405,8 +406,8 @@ export default async function GivePage() {
             generation on fire for Jesus. Leave a legacy that echoes in eternity.
           </p>
           <div className="mt-9 flex flex-wrap gap-2.5">
-            <ButtonLink href="#partner" variant="brass" size="lg">
-              Become an Angel Partner <Arrow />
+            <ButtonLink href="#partner" variant="sky" size="lg">
+              <Heart /> Become an Angel Partner <Arrow />
             </ButtonLink>
             <ButtonLink href={PARTNERSHIP_MAILTO} variant="solid" size="lg">
               Talk to the partnership team
@@ -422,5 +423,14 @@ export default async function GivePage() {
         </div>
       </section>
     </>
+  );
+}
+
+/** #27 a small heart that beats on the Angel Partner buttons. */
+function Heart() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true" className="heart-beat h-4 w-4 fill-current">
+      <path d="M8 14.2 6.9 13.2C3 9.7.5 7.5.5 4.8.5 2.6 2.2 1 4.3 1c1.2 0 2.4.6 3.2 1.5h1C9.3 1.6 10.5 1 11.7 1c2.1 0 3.8 1.6 3.8 3.8 0 2.7-2.5 4.9-6.4 8.4L8 14.2Z" />
+    </svg>
   );
 }

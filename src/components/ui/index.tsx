@@ -11,6 +11,8 @@ const BUTTON_VARIANTS = {
   solid: "border-ink bg-ink text-white hover:bg-brass hover:border-brass",
   outline: "border-ink/25 bg-transparent text-ink hover:border-ink hover:bg-ink hover:text-white",
   brass: "border-brass bg-brass text-white hover:bg-ink hover:border-ink",
+  // Dark text: white on this lighter blue is too faint to read.
+  sky: "border-skyblue bg-skyblue text-ink hover:bg-ink hover:border-ink hover:text-white",
   inverse: "border-white bg-white text-ink hover:bg-brass hover:border-brass hover:text-white",
   ghost: "border-transparent bg-transparent text-ink hover:bg-ink/6",
   danger: "border-danger bg-danger text-white hover:bg-ink hover:border-ink",

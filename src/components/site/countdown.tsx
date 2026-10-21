@@ -4,21 +4,16 @@ import { useEffect, useState } from "react";
 import { remainingUntil, type Remaining } from "@/lib/countdown";
 import { cn } from "@/lib/utils";
 
-const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-/** One odometer wheel: a 0–9 strip slid so the current digit shows. */
+/**
+ * One flip-clock digit: when it changes, the new figure flips down into
+ * place (the `flip-in` keyframe). Keyed by value, so only digits that
+ * actually changed flip.
+ */
 function Digit({ value }: { value: number }) {
   return (
-    <span className="relative inline-block h-[1em] w-[0.6em] overflow-hidden text-center align-top">
-      <span
-        className="absolute inset-x-0 top-0 flex flex-col transition-transform duration-500 ease-[var(--ease-out-expo)]"
-        style={{ transform: `translateY(-${value * 10}%)` }}
-      >
-        {DIGITS.map((digit) => (
-          <span key={digit} className="block h-[1em] leading-none">
-            {digit}
-          </span>
-        ))}
+    <span className="flip-digit relative inline-block h-[1em] w-[0.6em] text-center align-top">
+      <span key={value} className="flip-in block h-[1em] leading-none">
+        {value}
       </span>
     </span>
   );
@@ -41,7 +36,7 @@ function Wheels({ value, pad }: { value: number; pad: number }) {
 /**
  * A live countdown to camp. The server renders the moment it was built (so
  * the page is never empty and hydration matches); once mounted it ticks every
- * second and each digit rolls to its new value like an odometer.
+ * second and each digit that changes flips over like a flip clock.
  */
 export function Countdown({
   target,

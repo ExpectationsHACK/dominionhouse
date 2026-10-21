@@ -28,8 +28,10 @@ export default async function PortalLoginPage({
     : null;
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-2 lg:gap-16">
-      <div className="relative overflow-hidden bg-ink px-7 py-12 text-white sm:px-10 sm:py-16">
+    // Phones: the sign-in form first, the "what's in your profile" panel after
+    // it, so the boxes people came for are on the first screen.
+    <div className="mx-auto grid max-w-6xl gap-10 px-5 py-8 sm:px-8 sm:py-20 lg:grid-cols-2 lg:gap-16">
+      <div className="relative order-2 overflow-hidden bg-ink px-7 py-12 text-white sm:px-10 sm:py-16 lg:order-1">
         <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={16} />
         <div className="relative">
           <Eyebrow className="text-brass">Your camp profile</Eyebrow>
@@ -55,7 +57,7 @@ export default async function PortalLoginPage({
         </div>
       </div>
 
-      <div className="lg:pt-6">
+      <div className="order-1 lg:order-2 lg:pt-6">
         {signedIn ? (
           <>
             <Notice tone="success" title="You're already signed in" className="mb-8">

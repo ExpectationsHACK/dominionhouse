@@ -130,7 +130,7 @@ export default async function EventsPage() {
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">{camp.tagline}</p>
 
             <div className="mt-10 flex flex-wrap items-center gap-6">
-              <ButtonLink href="/camp/register" variant="brass" size="lg">
+              <ButtonLink href="/camp/register" variant="sky" size="lg">
                 Register <Arrow />
               </ButtonLink>
               <ButtonLink href="/camp" variant="solid" size="lg">

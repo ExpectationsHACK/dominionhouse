@@ -1,4 +1,5 @@
 import type { AgeCategory } from "@/generated/prisma/enums";
+import { WipeIn } from "@/components/site/motion";
 import { formatKobo } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
@@ -52,20 +53,22 @@ export function TicketCards({
           <li
             key={tier.id}
             className={cn(
-              "card-lift relative flex min-h-[10.5rem] overflow-hidden rounded-[1.25rem] sm:min-h-[13rem]",
+              "card-lift card-glow relative flex min-h-[10.5rem] overflow-hidden rounded-[1.25rem] sm:min-h-[13rem]",
               look.card,
             )}
           >
             {/* The photo across the left half, face at its centre (the files are
                 cropped that way), the card colour fading over its outer half. */}
-            {/* eslint-disable-next-line @next/next/no-img-element -- local, pre-sized */}
-            <img
-              src={photo.src}
-              alt={photo.alt}
-              loading="lazy"
-              decoding="async"
-              className="absolute inset-y-0 left-0 h-full w-1/2 object-cover object-center"
-            />
+            <WipeIn className="absolute inset-y-0 left-0 w-1/2 overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element -- local, pre-sized */}
+              <img
+                src={photo.src}
+                alt={photo.alt}
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover object-center"
+              />
+            </WipeIn>
             <div
               aria-hidden="true"
               className="absolute inset-0"

@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Countdown } from "@/components/site/countdown";
+import { Embers } from "@/components/site/embers";
 import { DepthCardCarousel, type DepthCardItem } from "@/components/site/depth-card-carousel";
 import { HeroVideo } from "@/components/site/hero-video";
 import { HillContours } from "@/components/site/hill-contours";
 import { LighthouseCards } from "@/components/site/lighthouse-cards";
 import { MissionCards } from "@/components/site/mission-cards";
+import { CountUp, Highlight, RotatingWord } from "@/components/site/motion";
+import { highlightWord } from "@/components/site/highlight-word";
 import { Reveal } from "@/components/site/reveal";
 import { SplashLoader } from "@/components/site/splash-loader";
 import { StaggerWords } from "@/components/site/stagger-words";
@@ -134,7 +137,11 @@ export default async function HomePage() {
               start={120}
               lines={[
                 ["A", "people", "of", "purpose,"],
-                ["passion", "and", { text: "power", className: "text-brass" }],
+                [
+                  "passion",
+                  "and",
+                  { node: <RotatingWord words={["power", "faith", "impact"]} />, className: "text-skyblue" },
+                ],
               ]}
             />
           </h1>
@@ -143,10 +150,10 @@ export default async function HomePage() {
             style={{ animationDelay: "760ms" }}
           >
             <p className="max-w-xl text-lg leading-relaxed text-white/80">
-              We have a mandate to raise one million leaders.
+              We have a mandate to raise <CountUp to={1000000} className="font-semibold text-white" /> leaders.
             </p>
             <div className="flex flex-wrap gap-2.5">
-              <ButtonLink href="/locations" variant="brass" size="lg">
+              <ButtonLink href="/locations" variant="sky" size="lg">
                 Plan a visit <Arrow />
               </ButtonLink>
               <ButtonLink href="/vision" variant="inverse" size="lg">
@@ -182,7 +189,8 @@ export default async function HomePage() {
         <h2 className="sr-only">The church that never sleeps</h2>
         <div className="mx-auto mt-6 max-w-[1400px] px-5 sm:px-8">
           <p className="max-w-xl text-sm leading-relaxed text-ink-70">
-            A missional movement, {CAMPUSES.length} lighthouses across {COUNTRY_COUNT} countries,
+            A missional movement, <CountUp to={CAMPUSES.length} /> lighthouses across{" "}
+            <CountUp to={COUNTRY_COUNT} /> countries,
             reaching the world one person and one community at a time.
           </p>
         </div>
@@ -207,6 +215,7 @@ export default async function HomePage() {
       {camp ? (
         <section className="relative overflow-hidden bg-ink text-white">
           <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={18} />
+          <Embers />
           <div className="relative mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
             <div className="flex flex-wrap items-center gap-3">
               <Eyebrow className="text-brass">{camp.theme ?? "Camp Meeting"}</Eyebrow>
@@ -225,7 +234,7 @@ export default async function HomePage() {
 
             <Reveal className="mt-12 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
               <p className="max-w-xl text-lg leading-relaxed text-white/70">
-                {camp.tagline} {CAMP_ENCOUNTER_LINE}
+                {highlightWord(camp.tagline ?? "", "Reawakening")} {CAMP_ENCOUNTER_LINE}
               </p>
 
               {/* Aligned from the top: the countdown has its unit labels under the
@@ -268,7 +277,9 @@ export default async function HomePage() {
         <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
             <Eyebrow>The 5D&apos;s</Eyebrow>
-            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">Our mission</h2>
+            <h2 className="display mt-4 text-[clamp(2.25rem,7vw,5.5rem)]">
+              <Highlight>Our mission</Highlight>
+            </h2>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">{ABOUT}</p>
           </Reveal>
 

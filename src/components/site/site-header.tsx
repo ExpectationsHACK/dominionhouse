@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/site/logo";
+import { Magnetic } from "@/components/site/motion";
+import { ScrollProgress } from "@/components/site/scroll-progress";
 import { Arrow } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +27,16 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
   const [openOnPath, setOpenOnPath] = useState<string | null>(null);
   const open = openOnPath === pathname;
 
+  // Slimmer once the page is scrolled, more room to read on a phone. Only
+  // flips state when crossing the threshold, not on every scroll frame.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -34,14 +46,28 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/20 bg-brass text-white">
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between gap-6 px-5 sm:px-8">
+      <ScrollProgress />
+      <div
+        className={cn(
+          "mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-5 transition-[height] duration-300 ease-[var(--ease-out-expo)] motion-reduce:transition-none sm:px-8",
+          scrolled ? "h-12" : "h-16",
+        )}
+      >
         <Link
           href="/"
           aria-label="Dominion House, home"
           className="flex shrink-0 items-center gap-2.5"
         >
-          <Logo className="h-9 w-auto brightness-0 invert" priority />
-          <span className="display text-xl leading-none">Dominion House</span>
+          <Logo
+            className={cn(
+              "w-auto brightness-0 invert transition-[height] duration-300 motion-reduce:transition-none",
+              scrolled ? "h-7" : "h-9",
+            )}
+            priority
+          />
+          <span className={cn("display leading-none transition-[font-size] duration-300 motion-reduce:transition-none", scrolled ? "text-lg" : "text-xl")}>
+            Dominion House
+          </span>
         </Link>
 
         {/* Seven links, "My camp" and Register need about 1,130px side by side;
@@ -79,12 +105,14 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
           >
             {signedInFirstName ? `Hi, ${signedInFirstName}` : "My camp"}
           </Link>
-          <Link
-            href="/camp/register"
-            className="hidden items-center gap-2 whitespace-nowrap border border-ink bg-ink px-5 py-2.5 text-[12px] font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:border-white hover:bg-white hover:text-ink sm:inline-flex"
-          >
-            Register <Arrow />
-          </Link>
+          <Magnetic className="hidden sm:inline-flex">
+            <Link
+              href="/camp/register"
+              className="shine inline-flex items-center gap-2 whitespace-nowrap border border-ink bg-ink px-5 py-2.5 text-[12px] font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:border-white hover:bg-white hover:text-ink"
+            >
+              Register <Arrow />
+            </Link>
+          </Magnetic>
 
           <button
             type="button"
@@ -126,14 +154,16 @@ export function SiteHeader({ signedInFirstName }: { signedInFirstName?: string }
               anything longer scrolls inside it. */}
           <div
             id="mobile-nav"
-            className="max-h-[calc(90dvh-4rem)] overflow-y-auto border-t border-ink/12 bg-bone text-ink xl:hidden"
+            className="max-h-[calc(90dvh-3rem)] overflow-y-auto border-t border-ink/12 bg-bone text-ink xl:hidden"
           >
           <nav aria-label="Mobile" className="mx-auto max-w-[1400px] px-5 py-2 sm:px-8">
-            {NAV.map((item) => (
+            {NAV.map((item, index) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="display flex items-center justify-between border-b border-ink/10 py-2.5 text-xl"
+                // One after another as the menu opens.
+                style={{ animationDelay: `${index * 45}ms` }}
+                className="menu-in display flex items-center justify-between border-b border-ink/10 py-2.5 text-xl"
               >
                 {item.label}
                 <Arrow className="h-4 w-4 text-ink-45" />

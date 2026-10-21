@@ -2,7 +2,11 @@
 
 import { useEffect, useRef } from "react";
 
-/** A hairline across the top of the screen that fills as the page is read. */
+/**
+ * A line along the bottom edge of the header that fills as the page is read.
+ * Rendered inside the (sticky) header, so it sits just under it in the house
+ * blue, visible against the page rather than lost in the blue header.
+ */
 export function ScrollProgress() {
   const bar = useRef<HTMLDivElement>(null);
 
@@ -33,7 +37,7 @@ export function ScrollProgress() {
     <div
       ref={bar}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-[3px] origin-left scale-x-0 bg-brass"
+      className="pointer-events-none absolute inset-x-0 -bottom-[4px] h-[3px] origin-left scale-x-0 bg-brass"
     />
   );
 }
