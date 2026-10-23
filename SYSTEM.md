@@ -63,7 +63,8 @@ the camp flows; this file records what's true now and the traps.
 
 | Script | Use |
 |---|---|
-| `import-lark.ts` | Imported 128 LARK-form registrants (`importedFrom = "LARK form"`) |
+| `import-lark.ts` | Imports LARK-form registrants (`importedFrom = "LARK form"`): 128 in October, 13 more from the 22 October export. Skips anyone already registered by email, phone or name; dry run unless `--commit`; sends no email |
+| `import-cim.ts` | Imports the Fresh Fire Camp 2027 CIM form CSV as pending campus-student registrations; skips existing attendees, sends no email, and does not record payments or issue tickets. Dry run unless `--commit` |
 | `record-paystack-payments.ts` | Records payments made on the Paystack page "2027 FRESH FIRE CAMP - DH" against registrants, credits `requested_amount` (not the fee), settles through `settlePayment`. Run with `npx tsx --conditions=react-server …`; dry run unless `--commit` |
 | `replace-schedule.ts` | The 2027 programme import (guarded, see above) |
 
