@@ -3,8 +3,7 @@ import { Countdown } from "@/components/site/countdown";
 import { DepthCardCarousel } from "@/components/site/depth-card-carousel";
 import { HeroVideo } from "@/components/site/hero-video";
 import { Embers } from "@/components/site/embers";
-import { FanIn, Highlight, LightLines, Magnetic, StaggerLetters, Timeline } from "@/components/site/motion";
-import { highlightWord } from "@/components/site/highlight-word";
+import { FanIn, LightLines, Magnetic, StaggerLetters, Timeline } from "@/components/site/motion";
 import { Reveal } from "@/components/site/reveal";
 import { TestimonialCarousel } from "@/components/site/testimonial-carousel";
 import { TestimonyStories } from "@/components/site/testimony-stories";
@@ -14,7 +13,7 @@ import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { CAMP_ENCOUNTER_LINE, campLockup } from "@/lib/camp";
 import { getPublicCamp, getPublicMedia, getPublicSchedule } from "@/lib/public-data";
 import { remainingUntil } from "@/lib/countdown";
-import { campDateRange, dayLabel, timeLabel } from "@/lib/dates";
+import { campDateRange, dayLabel, timeLabel, toDateInput } from "@/lib/dates";
 import { formatKobo } from "@/lib/money";
 import { CAMP_CLIPS } from "@/lib/site-videos";
 import { TESTIMONIES } from "@/lib/testimonies";
@@ -132,7 +131,7 @@ export default async function CampOverviewPage() {
             className="rise-in mt-8 max-w-2xl text-xl leading-relaxed text-white/80"
             style={{ animationDelay: "240ms" }}
           >
-            {highlightWord(camp.tagline ?? "", "Reawakening")} {CAMP_ENCOUNTER_LINE}
+            {camp.tagline} {CAMP_ENCOUNTER_LINE}
           </p>
 
           <div className="rise-in mt-12 flex flex-wrap gap-2.5" style={{ animationDelay: "360ms" }}>
@@ -188,7 +187,7 @@ export default async function CampOverviewPage() {
               <p>
                 This is not just a gathering, it is a{" "}
                 <strong className="font-semibold text-ink">
-                  <Highlight>SPIRITUAL AWAKENING</Highlight>
+                  SPIRITUAL AWAKENING
                 </strong>
                 . An
                 Awakening through the Word, Prayer and Impartation for Kingdom influence across
@@ -347,7 +346,7 @@ export default async function CampOverviewPage() {
             {days.map(({ day, items }, dayIndex) => (
               <Reveal as="div" key={day} delay={dayIndex * 80} className="grid gap-6 lg:grid-cols-[220px_1fr]">
                 <h3 className="display sticky top-20 self-start text-3xl text-meridian">
-                  {dayLabel.format(new Date(day))}
+                  {dayLabel.format(new Date(`${day}T12:00:00Z`))}
                 </h3>
                 <Timeline className="border-t border-ink/12">
                   {items.map((item) => (
@@ -483,10 +482,15 @@ function Fact({ label, value, accent }: { label: string; value: string; accent?:
   );
 }
 
-function groupByDay<T extends { day: Date }>(items: T[]) {
+/**
+ * Sessions by the Lagos date they start on ("2027-02-25"). Not the stored
+ * `day`: the import saved it as Lagos midnight and the admin desk saves UTC
+ * midnight, an hour apart, which split each day of the programme in two.
+ */
+function groupByDay<T extends { startsAt: Date }>(items: T[]) {
   const map = new Map<string, T[]>();
   for (const item of items) {
-    const key = item.day.toISOString();
+    const key = toDateInput(item.startsAt);
     const bucket = map.get(key);
     if (bucket) bucket.push(item);
     else map.set(key, [item]);

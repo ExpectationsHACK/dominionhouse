@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Eyebrow, Panel } from "@/components/ui";
 import { requireRegistrant } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { dayLabel, timeLabel } from "@/lib/dates";
+import { dayLabel, timeLabel, toDateInput } from "@/lib/dates";
 
 export const metadata: Metadata = {
   title: "Camp schedule",
@@ -19,7 +19,10 @@ export default async function PortalSchedulePage() {
 
   const days = new Map<string, typeof items>();
   for (const item of items) {
-    const key = item.day.toISOString();
+    // By the Lagos date each session starts on, not the stored `day`: rows
+    // saved by the import (Lagos midnight) and by the admin desk (UTC midnight)
+    // hold the same date an hour apart, which split each day in two.
+    const key = toDateInput(item.startsAt);
     const bucket = days.get(key);
     if (bucket) bucket.push(item);
     else days.set(key, [item]);
@@ -32,7 +35,7 @@ export default async function PortalSchedulePage() {
       {[...days.entries()].map(([day, dayItems]) => (
         <Panel key={day}>
           <div className="border-b border-ink/12 bg-ink px-5 py-4">
-            <h2 className="display text-2xl text-white">{dayLabel.format(new Date(day))}</h2>
+            <h2 className="display text-2xl text-white">{dayLabel.format(new Date(`${day}T12:00:00Z`))}</h2>
           </div>
           <ul>
             {dayItems.map((item) => (

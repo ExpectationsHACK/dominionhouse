@@ -161,9 +161,23 @@ function tidyName(name: string) {
     : trimmed;
 }
 
-/** Excel stores dates as days since 1899-12-30. */
-const fromExcelDate = (serial: string) =>
-  Number.isFinite(Number(serial)) && serial ? new Date((Number(serial) - 25569) * 86_400_000) : null;
+/**
+ * Excel stores dates as days since 1899-12-30; later exports write the text
+ * "2026-09-01 10:39:38" instead, which is Lagos time.
+ */
+function fromExcelDate(value: string) {
+  if (!value) return null;
+  if (Number.isFinite(Number(value))) return new Date((Number(value) - 25569) * 86_400_000);
+  const text = /^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}(?::\d{2})?)$/.exec(value.trim());
+  return text ? new Date(`${text[1]}T${text[2]}+01:00`) : null;
+}
+
+/** The last ten digits: 0803…, +234803… and 234803… all match. */
+const phoneKey = (phone: string) => phone.replace(/\D/g, "").slice(-10);
+
+/** "Gladys  Adegbola " and "gladys adegbola" match. */
+const nameKey = (first: string, last: string) =>
+  `${first} ${last}`.toLowerCase().replace(/[^\p{L}\s]/gu, "").replace(/\s+/g, " ").trim();
 
 type Planned = {
   row: number;
@@ -226,15 +240,17 @@ async function main() {
     const skipped: { row: number; name: string; reason: string }[] = [];
     const planned = new Map<string, Planned>();
 
-    const sheetEmails = rows.map((cells) => (cells[C.email] ?? "").toLowerCase().replace(/\s+/g, ""));
-    const existing = new Set(
-      (
-        await db.registrant.findMany({
-          where: { campId: camp.id, email: { in: sheetEmails.filter((email) => EMAIL.test(email)) } },
-          select: { email: true },
-        })
-      ).map((registrant) => registrant.email),
+    // Everyone already on the camp register, matched three ways: someone who
+    // registered on the site with another email still has their name or phone.
+    const registered = await db.registrant.findMany({
+      where: { campId: camp.id },
+      select: { email: true, phone: true, firstName: true, lastName: true },
+    });
+    const existing = new Set(registered.map((registrant) => registrant.email.toLowerCase()));
+    const byPhone = new Map(
+      registered.filter((r) => phoneKey(r.phone).length >= 7).map((r) => [phoneKey(r.phone), r.email]),
     );
+    const byName = new Map(registered.map((r) => [nameKey(r.firstName, r.lastName), r.email]));
 
     rows.forEach((cells, index) => {
       const row = index + 2; // the sheet's own row number, header is 1
@@ -245,6 +261,11 @@ async function main() {
 
       if (!EMAIL.test(email)) return skipped.push({ row, name, reason: `no usable email ("${get(C.email)}")` });
       if (existing.has(email)) return skipped.push({ row, name, reason: "already registered, left as it is" });
+      const samePhone = byPhone.get(phoneKey(phone));
+      if (phoneKey(phone).length >= 7 && samePhone)
+        return skipped.push({ row, name, reason: `same phone already registered as ${samePhone}, left as it is` });
+      const sameName = byName.get(nameKey(get(C.first), get(C.last)));
+      if (sameName) return skipped.push({ row, name, reason: `same name already registered as ${sameName}, left as it is` });
       if (phone.replace(/\D/g, "").length < 7) return skipped.push({ row, name, reason: "no phone number, so they couldn't sign in" });
 
       const age = AGE_GROUPS[get(C.ageGroup)];

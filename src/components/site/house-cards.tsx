@@ -67,13 +67,40 @@ export function PillarCarousel({ tone = "light" }: { tone?: "light" | "dark" }) 
 /** What we believe, in the 5D cards' portrait design, stepping through the blues. */
 export function BeliefCarousel({ tone = "light" }: { tone?: "light" | "dark" }) {
   return (
-    <CardCarousel label="What we believe" tone={tone} className="mt-12">
-      {WHAT_WE_BELIEVE.map((belief, index) => {
+    <NumberedCardsCarousel
+      label="What we believe"
+      cardLabel="We believe"
+      tone={tone}
+      items={WHAT_WE_BELIEVE.map((text) => ({ text }))}
+    />
+  );
+}
+
+export type NumberedCardItem = {
+  title?: string;
+  text: string;
+};
+
+/** Numbered, pixel-topped cards shared by the belief and expectation carousels. */
+export function NumberedCardsCarousel({
+  items,
+  label,
+  cardLabel,
+  tone = "light",
+}: {
+  items: readonly NumberedCardItem[];
+  label: string;
+  cardLabel: string;
+  tone?: "light" | "dark";
+}) {
+  return (
+    <CardCarousel label={label} tone={tone} className="mt-12">
+      {items.map((item, index) => {
         const shade = BLUE_SHADES[index % BLUE_SHADES.length];
         return (
           <Reveal
             as="article"
-            key={belief}
+            key={`${index}-${item.title ?? item.text}`}
             delay={(index % 3) * 80}
             className={cn(
               "card-lift flex min-h-[22rem] w-[78vw] flex-col overflow-hidden sm:w-[300px]",
@@ -86,10 +113,11 @@ export function BeliefCarousel({ tone = "light" }: { tone?: "light" | "dark" }) 
               <PixelBlock seed={index + 1} className={shade.art} />
             </div>
             <div className="flex flex-1 flex-col p-6 pt-4">
-              <p className={cn("font-mono text-sm font-semibold", shade.key)}>We believe</p>
+              <p className={cn("font-mono text-sm font-semibold", shade.key)}>{cardLabel}</p>
               <p className="display mt-2 text-4xl">{String(index + 1).padStart(2, "0")}</p>
-              <p className={cn("mt-4 text-[15px] font-medium leading-relaxed", shade.muted)}>
-                {belief}
+              {item.title ? <h3 className="display mt-2 text-3xl">{item.title}</h3> : null}
+              <p className={cn("text-[15px] font-medium leading-relaxed", shade.muted, item.title ? "mt-3" : "mt-4")}>
+                {item.text}
               </p>
             </div>
           </Reveal>
@@ -102,22 +130,43 @@ export function BeliefCarousel({ tone = "light" }: { tone?: "light" | "dark" }) 
 /** The foundational scriptures as cards, a beat apart as they arrive. */
 export function ScriptureCards() {
   return (
+    <QuoteCards
+      items={SCRIPTURES.map((scripture) => ({
+        text: scripture.text,
+        reference: scripture.reference,
+        version: scripture.version,
+      }))}
+    />
+  );
+}
+
+/** The About page's quote-card treatment, also used for short numbered steps. */
+export function QuoteCards({
+  items,
+  darkCardIndexes = [1],
+}: {
+  items: readonly { text: string; reference: string; version?: string }[];
+  darkCardIndexes?: readonly number[];
+}) {
+  return (
     <div className="mt-12 grid gap-4 lg:grid-cols-3">
-      {SCRIPTURES.map((scripture, index) => (
+      {items.map((item, index) => (
         <Reveal
           as="figure"
-          key={scripture.reference}
+          key={item.reference}
           delay={index * 110}
           className={cn(
             "card-lift relative flex flex-col overflow-hidden p-7 sm:p-8",
-            index === 1 ? "bg-ink text-white" : "border border-ink/12 bg-paper text-ink",
+            darkCardIndexes.includes(index)
+              ? "bg-ink text-white"
+              : "border border-ink/12 bg-paper text-ink",
           )}
         >
           <span
             aria-hidden="true"
             className={cn(
               "display pointer-events-none absolute -right-2 -top-8 text-[9rem] leading-none",
-              index === 1 ? "text-brass/30" : "text-brass/25",
+              darkCardIndexes.includes(index) ? "text-brass/30" : "text-brass/25",
             )}
           >
             &ldquo;
@@ -125,13 +174,14 @@ export function ScriptureCards() {
           <blockquote
             className={cn(
               "relative text-[15px] italic leading-relaxed",
-              index === 1 ? "text-white/80" : "text-ink-70",
+              darkCardIndexes.includes(index) ? "text-white/80" : "text-ink-70",
             )}
           >
-            &ldquo;{scripture.text}&rdquo;
+            &ldquo;{item.text}&rdquo;
           </blockquote>
           <figcaption className="relative mt-auto pt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-brass">
-            {scripture.reference} ({scripture.version})
+            {item.reference}
+            {item.version ? ` (${item.version})` : null}
           </figcaption>
         </Reveal>
       ))}

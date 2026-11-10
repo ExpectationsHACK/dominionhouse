@@ -18,7 +18,7 @@ export const LEGACY_TOTAL_COST_NAIRA = 4_000_000_000;
 export const LEGACY_DEFAULT_RAISED_NAIRA = 45_000_000;
 export const LEGACY_PARTNER_TARGET = 500;
 
-export const LEGACY_MILESTONES = ["Land secured", "3D design ready", "51 interns graduated"] as const;
+export const LEGACY_MILESTONES = ["Land secured", "3D design ready", "41 interns graduated"] as const;
 
 export const LEGACY_WHY = [
   "Construction doesn’t move on inspiration; it moves on consistency.",
@@ -42,7 +42,7 @@ export const LEGACY_MANDATE_STEPS = [
 ] as const;
 
 export const LEGACY_IMPACT = [
-  { value: "51", label: "Mission interns graduated" },
+  { value: "41", label: "Mission interns graduated" },
   { value: "10k+", label: "Lives reached in 10 months" },
   { value: "15", label: "Outreach activations" },
   { value: "3", label: "Communities impacted" },

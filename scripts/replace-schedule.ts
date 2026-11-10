@@ -136,7 +136,8 @@ async function main() {
   const rows = DAYS.flatMap(({ date, items }) =>
     items.map(([start, end, title, speaker, type, description]) => ({
       campId: camp.id,
-      day: lagos(date, "00:00"),
+      // UTC midnight of the date, as the admin desk saves it.
+      day: new Date(`${date}T00:00:00Z`),
       startsAt: lagos(date, start),
       endsAt: end ? lagos(date, end) : null,
       title,

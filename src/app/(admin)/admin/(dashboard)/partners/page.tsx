@@ -18,10 +18,25 @@ export const metadata: Metadata = { title: "Angel Partners", robots: { index: fa
 const STATUS_TONE = { ACTIVE: "success", PENDING: "warn", CANCELLED: "neutral" } as const;
 const GIFT_TONE = { SUCCESS: "success", PENDING: "warn", FAILED: "danger" } as const;
 
+// The interest form's answers, in short.
+const INTEREST_MONTHLY = { WILLING: "Willing", NEEDS_CLARITY: "Needs clarity" } as const;
+const INTEREST_MORE = { YES: "Yes", POSSIBLY: "Possibly, to discuss", NO: "No, ₦20,000/$20 for now" } as const;
+const INTEREST_LONG_TERM = {
+  COMMITTED: "Committed long term",
+  START_AND_GROW: "Start and grow",
+  NEEDS_CLARITY: "Needs clarity",
+} as const;
+
+const birthdayLabel = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", timeZone: "UTC" });
+const monthLabel = (value: string) =>
+  new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(
+    new Date(`${value}-01T00:00:00Z`),
+  );
+
 export default async function PartnersPage() {
   await requireAdmin(FINANCE_ROLES);
 
-  const [totals, partners, gifts, raisedSetting] = await Promise.all([
+  const [totals, partners, gifts, raisedSetting, interests] = await Promise.all([
     givingTotals(),
     db.partner.findMany({
       orderBy: { createdAt: "desc" },
@@ -30,6 +45,7 @@ export default async function PartnersPage() {
     }),
     db.gift.findMany({ orderBy: { createdAt: "desc" }, take: 50 }),
     db.setting.findUnique({ where: { key: LEGACY_RAISED_SETTING } }),
+    db.partnerInterest.findMany({ orderBy: { createdAt: "desc" }, take: 200 }),
   ]);
   const raised = Number(raisedSetting?.value ?? LEGACY_DEFAULT_RAISED_NAIRA);
 
@@ -117,6 +133,56 @@ export default async function PartnersPage() {
                       </ActionForm>
                     ) : null}
                   </Td>
+                </Tr>
+              ))
+            )}
+          </tbody>
+        </TableWrap>
+      </section>
+
+      <section>
+        <h2 className="display text-3xl">Interest form</h2>
+        <p className="mt-1 text-sm text-ink-45">
+          From &ldquo;Register your interest&rdquo; on the Give page. No payment yet: follow up
+          on WhatsApp with the next steps.
+        </p>
+        <TableWrap>
+          <thead>
+            <tr>
+              <Th>Name</Th>
+              <Th>WhatsApp</Th>
+              <Th>₦20,000/$20 monthly</Th>
+              <Th>Give more</Th>
+              <Th>Start</Th>
+              <Th>Long term</Th>
+              <Th>When</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {interests.length === 0 ? (
+              <TableEmpty colSpan={7} message="No one has filled in the form yet." />
+            ) : (
+              interests.map((interest) => (
+                <Tr key={interest.id}>
+                  <Td>
+                    <p className="font-semibold">
+                      {interest.firstName} {interest.lastName}
+                    </p>
+                    <p className="text-xs text-ink-45">{interest.email}</p>
+                    {interest.country ? <p className="text-xs text-ink-45">{interest.country}</p> : null}
+                    {interest.birthday ? (
+                      <p className="text-xs text-ink-45">Birthday {birthdayLabel.format(interest.birthday)}</p>
+                    ) : null}
+                  </Td>
+                  <Td className="font-mono text-xs">{interest.whatsapp}</Td>
+                  <Td>{INTEREST_MONTHLY[interest.monthly]}</Td>
+                  <Td>
+                    {INTEREST_MORE[interest.giveMore]}
+                    {interest.moreAmount ? <p className="text-xs text-ink-45">{interest.moreAmount}</p> : null}
+                  </Td>
+                  <Td className="text-xs">{interest.startMonth ? monthLabel(interest.startMonth) : "–"}</Td>
+                  <Td>{INTEREST_LONG_TERM[interest.longTerm]}</Td>
+                  <Td className="text-xs text-ink-45">{dateTimeLabel.format(interest.createdAt)}</Td>
                 </Tr>
               ))
             )}

@@ -18,7 +18,7 @@ site: dominionhs@gmail.com.
 | Registration | `/camp/register` | Four steps: You, Church, Camp, Confirm |
 | Payment | `/camp/payment` | Paystack checkout; instalments from ₦10,000 (lower for cheap tickets, up to 5 parts) |
 | Camp profile | `/portal` | Sign in with email + phone, no password. Ticket, payments, room, schedule, announcements |
-| Giving | `/give` | Legacy Place, Angel Partner monthly giving (Paystack subscriptions) |
+| Giving | `/give` | Legacy Place, Angel Partner monthly giving (Paystack subscriptions), and "Register your interest" (the Angel Partners form, no payment; answers in the Admin desk under Partners) |
 | Admin | `/admin` ("Admin desk") | Registrants, payments, rooms, tickets, check-in scanner, schedule, announcements, content, partners, staff |
 
 Ticket prices: Adult ₦50,000 · Campus Student ₦35,000 · Teenager ₦20,000 ·
@@ -53,6 +53,12 @@ registration ("I'm coming with children": under 5 free, 5–11 ₦15,000 each).
   accounts still used a password that was once in the public repo (October
   2026). Reset or disable them at `/admin/users`; consider making the GitHub
   repo private.
+- **LARK registrants without an email** (from the October 2026 export, not
+  imported because sign-in needs one): Glory Oluyinka 09072124744, Goodness
+  Ifinedo 07012198737, Favour Friday 08028389123, Sophie Heaven 07015451397.
+  Get their emails, then add them at `/admin/registrants/new`. Re-run
+  `scripts/import-lark.ts` on any newer export: it skips everyone already
+  registered (by email, phone or name).
 - **One email per registration** (database rule). Parents coming to camp
   should add children inside their own registration; a child registered on
   their own needs an email that isn't already used.
@@ -69,6 +75,8 @@ with friction notes, an 82-second all-in-one explainer, and a series of five
 one-minute films (adults, parents with children, campus students, teenagers,
 children), each vertical 1080×1920 and landscape 1920×1080, with `.srt`
 subtitles and voiceover scripts. Built with Remotion; see
-`walkthrough-video/README.md`. Copies of every MP4 are in the owner's
+`walkthrough-video/README.md`. A sixth film, "Registered on LARK? Sign in"
+(46.5 s), shows LARK registrants how to sign in instead of registering again.
+Copies of every MP4 are in the owner's
 Downloads folder. The films are silent with captions until a voiceover is
 recorded.

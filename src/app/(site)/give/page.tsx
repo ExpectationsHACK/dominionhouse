@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GiveForm } from "./give-form";
+import { InterestForm } from "./interest-form";
 import { HillContours } from "@/components/site/hill-contours";
 import { BLUE_SHADES, PixelBlock, shadeBackground } from "@/components/site/pixel-block";
 import { CountUp, Magnetic, MeterBar } from "@/components/site/motion";
@@ -313,6 +314,33 @@ export default async function GivePage() {
         </div>
       </section>
 
+      {/* ── register interest: the team's Angel Partners form, no payment ── */}
+      <section id="register" className="scroll-mt-20 border-b border-ink/12 bg-sky">
+        <div className="mx-auto grid max-w-[1400px] gap-12 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[1fr_560px]">
+          <Reveal>
+            <Eyebrow>Angel Partners</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">Register your interest</h2>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">
+              Thank you for your interest in becoming an Angel Partner! This form is for individuals
+              who desire to partner with H2:14 Global Missions in advancing the vision of Habakkuk
+              2:14.
+            </p>
+            <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-70">
+              Submitting this form does not process payment. It simply helps us register your
+              interest and share the next steps towards becoming an active Angel Partner.
+            </p>
+            <p className="mt-6 text-sm text-ink-70">
+              Ready to give now?{" "}
+              <Link href="#partner" className="font-semibold text-brass underline underline-offset-4">
+                Start your partnership below
+              </Link>
+              .
+            </p>
+          </Reveal>
+          <InterestForm months={startMonths()} />
+        </div>
+      </section>
+
       {/* ── the covenant + the form ──────────────────────────────────────── */}
       <section id="partner" className="scroll-mt-20 border-b border-ink/12">
         <div className="mx-auto grid max-w-[1400px] gap-12 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[1fr_480px]">
@@ -433,4 +461,14 @@ function Heart() {
       <path d="M8 14.2 6.9 13.2C3 9.7.5 7.5.5 4.8.5 2.6 2.2 1 4.3 1c1.2 0 2.4.6 3.2 1.5h1C9.3 1.6 10.5 1 11.7 1c2.1 0 3.8 1.6 3.8 3.8 0 2.7-2.5 4.9-6.4 8.4L8 14.2Z" />
     </svg>
   );
+}
+
+/** The next twelve months, from this one (Lagos time), for "when would you like to start". */
+function startMonths() {
+  const lagosNow = new Date(Date.now() + 60 * 60 * 1000);
+  const label = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
+  return Array.from({ length: 12 }, (_, i) => {
+    const month = new Date(Date.UTC(lagosNow.getUTCFullYear(), lagosNow.getUTCMonth() + i, 1));
+    return { value: month.toISOString().slice(0, 7), label: label.format(month) };
+  });
 }

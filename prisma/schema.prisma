@@ -505,6 +505,20 @@ model Visitor {
   @@index([email])
 }
 
+/// Registrations for the Spiritual Growth Bootcamp.
+model SgbRegistration {
+  id        String   @id @default(cuid())
+  firstName String   @map("first_name")
+  lastName  String   @map("last_name")
+  phone     String   @unique
+  gender    String
+  age       Int
+  location  String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("sgb_registrations")
+}
+
 // ─────────────────────────────────────────────────────────────── system ───────
 
 model EmailLog {
@@ -676,4 +690,51 @@ model GivingPlan {
   createdAt DateTime @default(now())
 
   @@unique([currency, amountMinor])
+}
+
+// ─────────────────────────────────────────── angel partner interest form ──────
+
+/// "Are you willing to commit to ₦20,000/$20 monthly?"
+enum MonthlyCommitment {
+  WILLING
+  NEEDS_CLARITY
+}
+
+/// "Would you be willing to give more than ₦20,000/$20/£20 monthly?"
+enum GiveMoreAnswer {
+  YES
+  POSSIBLY
+  NO
+}
+
+/// "This partnership is a long-term commitment (up to 2030)."
+enum LongTermCommitment {
+  COMMITTED
+  START_AND_GROW
+  NEEDS_CLARITY
+}
+
+/// Someone who filled in the Angel Partners interest form on the Give page.
+/// No payment is taken: the team follows up with the next steps.
+model PartnerInterest {
+  id         String             @id @default(cuid())
+  firstName  String
+  lastName   String
+  birthday   DateTime?          @db.Date
+  email      String
+  /// WhatsApp number with its country code.
+  whatsapp   String
+  country    String?
+  monthly    MonthlyCommitment
+  giveMore   GiveMoreAnswer
+  /// "If yes, how much?", in their own words and currency.
+  moreAmount String?
+  /// The month they'd like to start, "2026-11".
+  startMonth String?
+  longTerm   LongTermCommitment
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([email])
 }
