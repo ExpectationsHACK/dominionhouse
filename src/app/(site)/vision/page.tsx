@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { HillContours } from "@/components/site/hill-contours";
 import { PillarCarousel, ScriptureCards } from "@/components/site/house-cards";
 import { MissionCards } from "@/components/site/mission-cards";
+import { LightLines } from "@/components/site/motion";
 import { Reveal } from "@/components/site/reveal";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import {
@@ -15,6 +16,7 @@ import {
 } from "@/lib/church";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/vision" },
   title: "Our vision",
   description:
     "Dominion House is a disciple-making movement raising kingdom leaders. Our vision, the 5D strategy, our mandate, and the seven pillars that form our culture.",
@@ -27,11 +29,16 @@ export default function VisionPage() {
       <section className="relative overflow-hidden border-b border-ink/12 bg-meridian text-white">
         <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
-          <Eyebrow className="text-brass">{CHURCH.descriptor}</Eyebrow>
-          <h1 className="display mt-5 max-w-5xl text-[clamp(2.5rem,9vw,7.5rem)]">
+          <Eyebrow className="rise-in text-brass">{CHURCH.descriptor}</Eyebrow>
+          <h1
+            className="display rise-in mt-5 max-w-5xl text-[clamp(2.5rem,9vw,7.5rem)]"
+            style={{ animationDelay: "120ms" }}
+          >
             A disciple-making movement
           </h1>
-          <p className="mt-8 max-w-2xl text-lg leading-relaxed text-white/70">{ABOUT}</p>
+          <p className="rise-in mt-8 max-w-2xl text-lg leading-relaxed text-white/70" style={{ animationDelay: "240ms" }}>
+            {ABOUT}
+          </p>
         </div>
       </section>
 
@@ -39,12 +46,12 @@ export default function VisionPage() {
       <section className="border-b border-ink/12 bg-brass-soft text-ink">
         <div className="mx-auto grid max-w-[1400px] gap-10 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[280px_1fr]">
           <Eyebrow className="lg:pt-3">Our vision</Eyebrow>
-          <div>
+          <LightLines>
             <p className="text-[clamp(1.375rem,3vw,2rem)] font-medium leading-[1.35]">{VISION}</p>
             <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-70">
               {VISION_SUPPORT}
             </p>
-          </div>
+          </LightLines>
         </div>
       </section>
 

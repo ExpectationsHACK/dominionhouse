@@ -19,6 +19,7 @@ import { CAMP_CLIPS } from "@/lib/site-videos";
 import { TESTIMONIES } from "@/lib/testimonies";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/camp" },
   title: "Fresh Fire Camp Meeting 2027",
   description:
     "Fresh Fire Camp Meeting 2027, February 2027. The whole house gathers, teaching, prayer and worship. Registration is open for adults, students, teenagers and children, with instalment payments available.",

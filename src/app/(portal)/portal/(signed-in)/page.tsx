@@ -5,11 +5,11 @@ import {
   ButtonLink,
   DataRow,
   Eyebrow,
-  Meter,
   Notice,
   Panel,
   PanelHeader,
 } from "@/components/ui";
+import { CountUp, MeterBar } from "@/components/site/motion";
 import { WhatsAppCta } from "@/components/site/whatsapp-cta";
 import { CompleteProfile } from "./complete-profile";
 import { requireRegistrant } from "@/lib/auth";
@@ -77,7 +77,7 @@ export default async function PortalOverviewPage({
         </Notice>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="rise-in grid gap-6 lg:grid-cols-3" style={{ animationDelay: "60ms" }}>
         <Panel className="p-6 lg:col-span-2">
           <Eyebrow>Camp account</Eyebrow>
           <p className="display mt-3 text-5xl">
@@ -99,7 +99,12 @@ export default async function PortalOverviewPage({
               </p>
             </div>
             <div className="mt-2.5">
-              <Meter percent={percentPaid(totals.paidKobo, totals.dueKobo)} />
+              <MeterBar
+                percent={percentPaid(totals.paidKobo, totals.dueKobo)}
+                label="Payment progress"
+                className="h-1.5 w-full bg-ink/10"
+                barClassName={totals.isSettled ? "bg-brass text-brass" : "bg-ink text-ink"}
+              />
             </div>
           </div>
 
@@ -121,7 +126,9 @@ export default async function PortalOverviewPage({
 
         <Panel className="p-6">
           <Eyebrow>Counting down</Eyebrow>
-          <p className="display mt-3 text-6xl text-meridian">{daysUntil(registrant.camp.startsAt)}</p>
+          <p className="display mt-3 text-6xl text-meridian">
+            <CountUp to={daysUntil(registrant.camp.startsAt)} />
+          </p>
           <p className="mt-1 text-sm text-ink-45">days until camp opens</p>
 
           <div className="mt-6">
@@ -139,7 +146,7 @@ export default async function PortalOverviewPage({
         </Panel>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="rise-in grid gap-6 lg:grid-cols-2" style={{ animationDelay: "180ms" }}>
         <Panel>
           <PanelHeader
             title="First on the programme"

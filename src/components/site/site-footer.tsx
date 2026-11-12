@@ -27,6 +27,7 @@ const COLUMNS = [
       { href: "/vision", label: "Our vision" },
       { href: "/vision#pillars", label: "The seven pillars" },
       { href: "/events", label: "What's on" },
+      { href: "/spiritual-growth-bootcamp", label: "Spiritual Growth Bootcamp" },
       { href: "/give", label: "Give" },
     ],
   },

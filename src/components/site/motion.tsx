@@ -551,3 +551,40 @@ export function FanIn({ children, className }: { children: ReactNode; className?
     </div>
   );
 }
+
+// ── cards that build themselves when seen ──────────────────────────────────
+
+/**
+ * Opens a card the first time it's on screen: `data-open` drives the CSS
+ * (`.pixel-assemble` squares landing, `.reveal-word` words rising from a
+ * blur). The server renders it open, so nothing is ever hidden without
+ * JavaScript; once mounted, a card that isn't on screen yet closes and waits.
+ * Works for cards off to the side in a carousel too: they open as they slide
+ * in. Reduced motion: always open.
+ */
+export function OpenOnView({ children, className }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || prefersReducedMotion()) return;
+    const box = node.getBoundingClientRect();
+    const onScreen = box.top < window.innerHeight * 0.92 && box.bottom > 0 && box.left < window.innerWidth && box.right > 0;
+    if (onScreen) return;
+    node.dataset.open = "false";
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        node.dataset.open = "true";
+        observer.disconnect();
+      },
+      { threshold: 0.35 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <div ref={ref} data-open="true" className={className}>
+      {children}
+    </div>
+  );
+}

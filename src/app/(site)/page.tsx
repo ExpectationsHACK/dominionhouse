@@ -29,6 +29,7 @@ import { getPublicCamp, getPublicMedia } from "@/lib/public-data";
 import { SERVICE_CLIPS } from "@/lib/site-videos";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/" },
   title: { absolute: "Dominion House, the church that never sleeps" },
   description:
     "A new frontier church raising kingdom leaders, a people of purpose, passion and power. Nine lighthouses across Nigeria, the UK, Canada and Trinidad.",

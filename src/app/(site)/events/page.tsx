@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { HillContours } from "@/components/site/hill-contours";
+import { CountUp, Magnetic } from "@/components/site/motion";
+import { Reveal } from "@/components/site/reveal";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { getPublicCamp } from "@/lib/public-data";
 import { CAMPUSES, COUNTRY_COUNT, GATHERINGS } from "@/lib/church";
 import { daysUntil } from "@/lib/dates";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/events" },
   title: "What's on",
   description:
     "Morning Dew on Mondays, Bible Study on Wednesdays, Night of Encounters on Thursdays and the Sunday Worship Experience. Plus Fresh Fire Camp Meeting 2027.",
@@ -54,11 +57,13 @@ export default async function EventsPage() {
       <section className="relative overflow-hidden border-b border-ink/12 bg-meridian text-white">
         <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
-          <Eyebrow className="text-brass">
-            {CAMPUSES.length} lighthouses · {COUNTRY_COUNT} countries
+          <Eyebrow className="rise-in text-brass">
+            <CountUp to={CAMPUSES.length} /> lighthouses · <CountUp to={COUNTRY_COUNT} /> countries
           </Eyebrow>
-          <h1 className="display mt-5 text-[clamp(2.5rem,9vw,7.5rem)]">What&apos;s on</h1>
-          <p className="mt-8 max-w-xl text-lg leading-relaxed text-white/70">
+          <h1 className="display rise-in mt-5 text-[clamp(2.5rem,9vw,7.5rem)]" style={{ animationDelay: "120ms" }}>
+            What&apos;s on
+          </h1>
+          <p className="rise-in mt-8 max-w-xl text-lg leading-relaxed text-white/70" style={{ animationDelay: "240ms" }}>
             Four gatherings carry the week, from Monday morning prayer to Sunday worship. Every one
             of them is open to you.
           </p>
@@ -68,13 +73,17 @@ export default async function EventsPage() {
       {/* ── the week ─────────────────────────────────────────────────────── */}
       <section className="border-b border-ink/12">
         <div className="mx-auto max-w-[1400px] px-5 py-16 sm:px-8 sm:py-24">
-          <Eyebrow>Join us</Eyebrow>
-          <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">Every week</h2>
+          <Reveal>
+            <Eyebrow>Join us</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">Every week</h2>
+          </Reveal>
 
           <div className="mt-14 space-y-px bg-ink/12">
-            {GATHERINGS.map((gathering) => (
-              <article
+            {GATHERINGS.map((gathering, index) => (
+              <Reveal
+                as="article"
                 key={gathering.slug}
+                delay={(index % 2) * 80}
                 className="grid gap-x-10 gap-y-5 bg-bone p-7 sm:p-9 lg:grid-cols-[280px_1fr]"
               >
                 <div>
@@ -107,7 +116,7 @@ export default async function EventsPage() {
                     </ButtonLink>
                   ) : null}
                 </div>
-              </article>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -130,9 +139,11 @@ export default async function EventsPage() {
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-70">{camp.tagline}</p>
 
             <div className="mt-10 flex flex-wrap items-center gap-6">
-              <ButtonLink href="/camp/register" variant="sky" size="lg">
-                Register <Arrow />
-              </ButtonLink>
+              <Magnetic>
+                <ButtonLink href="/camp/register" variant="sky" size="lg" className="shine">
+                  Register <Arrow />
+                </ButtonLink>
+              </Magnetic>
               <ButtonLink href="/camp" variant="solid" size="lg">
                 Read more
               </ButtonLink>
@@ -144,10 +155,30 @@ export default async function EventsPage() {
         </section>
       ) : null}
 
+      {/* ── Spiritual Growth Bootcamp ────────────────────────────────────── */}
+      <section className="border-b border-ink/12 bg-ink text-white">
+        <Reveal className="mx-auto grid max-w-[1400px] gap-8 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <Eyebrow className="text-brass">One-week intensive</Eyebrow>
+            <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">Spiritual Growth Bootcamp</h2>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/70">
+              A transformative one-week intensive designed to awaken spiritual hunger, establish
+              strong spiritual foundations, and set you on a purposeful journey of spiritual growth
+              and destiny fulfilment.
+            </p>
+          </div>
+          <ButtonLink href="/spiritual-growth-bootcamp" variant="brass" size="lg" className="shrink-0">
+            Find out more <Arrow />
+          </ButtonLink>
+        </Reveal>
+      </section>
+
       {/* ── the rhythm ───────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-[1400px] px-5 py-16 sm:px-8 sm:py-24">
-        <Eyebrow>How this house moves</Eyebrow>
-        <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">The ordinary rhythm</h2>
+        <Reveal>
+          <Eyebrow>How this house moves</Eyebrow>
+          <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">The ordinary rhythm</h2>
+        </Reveal>
 
         <ul className="mt-12 border-t border-ink/12">
           {RHYTHMS.map((item) => (

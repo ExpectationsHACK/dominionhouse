@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { planAVisit, type VisitState } from "./actions";
+import { NextFieldHint, SuccessBurst } from "@/components/site/motion";
 import { Eyebrow } from "@/components/ui";
 import { Checkbox, Field, FormError, Input, Select, Textarea } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -14,6 +15,7 @@ export function VisitForm({ defaultCampus = "" }: { defaultCampus?: string }) {
   if (state.ok) {
     return (
       <div className="border border-success/30 bg-success-soft p-7">
+        <SuccessBurst className="mb-5" />
         <Eyebrow className="text-success">We&apos;ve got it</Eyebrow>
         <p className="display mt-3 text-4xl text-ink">See you soon, {state.firstName}</p>
         <p className="mt-4 text-sm leading-relaxed text-ink-70">
@@ -26,6 +28,7 @@ export function VisitForm({ defaultCampus = "" }: { defaultCampus?: string }) {
 
   return (
     <KeepValuesForm action={formAction} className="space-y-5">
+      <NextFieldHint />
       <FormError message={state.error} />
 
       <div className="grid gap-5 sm:grid-cols-2">

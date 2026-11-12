@@ -69,6 +69,17 @@ live in `src/app/globals.css`; use them, not raw hex values.
   (the only fire colours on the site), flip-clock countdown, the Legacy Place
   meter, testimony fan-out, step bar, success check with confetti,
   ticket flip, and the next-field pulse on phones.
+- Every public page opens with the hero entrance (`rise-in`) and reveals its
+  sections on scroll. Lighthouse and country numbers count up wherever they
+  appear. Main Register buttons are magnetic and shine (Fresh Fire, Events,
+  Bootcamp, Give). Every form has the next-field pulse on phones and ends in
+  the success check. The Bootcamp page mirrors Fresh Fire: letter-by-letter
+  title, lines lighting up, timeline. The camp profile's panels rise in, its
+  paid bar fills and the days to camp count up.
+- The numbered blue cards ("What to expect" on the Bootcamp page, "What we
+  believe") build like the home page's 5D cards: when a card comes into view
+  (or slides in), its squares land one by one, the title and text rise out of
+  a blur, and a sheen passes on hover (`OpenOnView` in motion.tsx).
 - A server page can't call a function from motion.tsx; helpers that build
   JSX on the server (like `highlightWord`) live in their own file.
 - Steps in the registration form jump instantly to the step tabs

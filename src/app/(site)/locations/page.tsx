@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CountUp } from "@/components/site/motion";
 import Link from "next/link";
 import { VisitForm } from "./visit-form";
 import { ARC_VARIANTS, ArcCard, BODY_TONE, REGION_TONE } from "@/components/site/arc-card";
@@ -15,6 +16,7 @@ import {
 } from "@/lib/church";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/locations" },
   title: "Locations",
   description:
     "Dominion House gathers at nine lighthouses across Nigeria, the United Kingdom, Canada and Trinidad. Find the one nearest you and tell us you're coming.",
@@ -37,7 +39,7 @@ export default async function LocationsPage({
         <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
           <Eyebrow className="rise-in text-brass">
-            {CAMPUSES.length} lighthouses · {COUNTRY_COUNT} countries
+            <CountUp to={CAMPUSES.length} /> lighthouses · <CountUp to={COUNTRY_COUNT} /> countries
           </Eyebrow>
           <h1
             className="display rise-in mt-5 text-[clamp(2.5rem,9vw,7.5rem)]"

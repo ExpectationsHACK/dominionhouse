@@ -1,5 +1,6 @@
 import { Arcs, ARC_VARIANTS, BODY_TONE, CARD, REGION_TONE } from "@/components/site/arc-card";
 import { CardCarousel } from "@/components/site/card-carousel";
+import { OpenOnView } from "@/components/site/motion";
 import { BLUE_SHADES, PixelBlock, shadeBackground } from "@/components/site/pixel-block";
 import { Reveal } from "@/components/site/reveal";
 import { PILLARS, SCRIPTURES, WHAT_WE_BELIEVE } from "@/lib/church";
@@ -81,6 +82,26 @@ export type NumberedCardItem = {
   text: string;
 };
 
+/** Gap between one word rising and the next, and the wait for the first squares. */
+const WORD_STEP_MS = 22;
+const WORDS_START_MS = 220;
+
+/**
+ * Text as words that rise out of a blur, one after another, once the card
+ * around them opens (`.reveal-word` in globals.css). Always laid out, so the
+ * card never changes size and screen readers get every word.
+ */
+function RisingWords({ text, from }: { text: string; from: number }) {
+  return text.split(/\s+/).map((word, index, all) => (
+    <span key={index}>
+      <span className="reveal-word" style={{ transitionDelay: `${WORDS_START_MS + (from + index) * WORD_STEP_MS}ms` }}>
+        {word}
+      </span>
+      {index < all.length - 1 ? " " : null}
+    </span>
+  ));
+}
+
 /** Numbered, pixel-topped cards shared by the belief and expectation carousels. */
 export function NumberedCardsCarousel({
   items,
@@ -108,18 +129,26 @@ export function NumberedCardsCarousel({
             )}
             style={{ background: shadeBackground(shade) }}
           >
-            {/* Exactly three rows of squares at any card width, no half-cut row. */}
-            <div className="aspect-[10/3] w-full overflow-hidden">
-              <PixelBlock seed={index + 1} className={shade.art} />
-            </div>
-            <div className="flex flex-1 flex-col p-6 pt-4">
-              <p className={cn("font-mono text-sm font-semibold", shade.key)}>{cardLabel}</p>
-              <p className="display mt-2 text-4xl">{String(index + 1).padStart(2, "0")}</p>
-              {item.title ? <h3 className="display mt-2 text-3xl">{item.title}</h3> : null}
-              <p className={cn("text-[15px] font-medium leading-relaxed", shade.muted, item.title ? "mt-3" : "mt-4")}>
-                {item.text}
-              </p>
-            </div>
+            {/* Builds itself as it comes into view: the squares land one by one,
+                then the words rise out of a blur; a sheen passes on hover. */}
+            <OpenOnView className="tilt-sheen relative flex flex-1 flex-col">
+              {/* Exactly three rows of squares at any card width, no half-cut row. */}
+              <div className="aspect-[10/3] w-full overflow-hidden">
+                <PixelBlock seed={index + 1} className={cn("pixel-assemble", shade.art)} />
+              </div>
+              <div className="flex flex-1 flex-col p-6 pt-4">
+                <p className={cn("font-mono text-sm font-semibold", shade.key)}>{cardLabel}</p>
+                <p className="display mt-2 text-4xl">{String(index + 1).padStart(2, "0")}</p>
+                {item.title ? (
+                  <h3 className="display mt-2 text-3xl">
+                    <RisingWords text={item.title} from={0} />
+                  </h3>
+                ) : null}
+                <p className={cn("text-[15px] font-medium leading-relaxed", shade.muted, item.title ? "mt-3" : "mt-4")}>
+                  <RisingWords text={item.text} from={item.title ? item.title.split(/\s+/).length : 0} />
+                </p>
+              </div>
+            </OpenOnView>
           </Reveal>
         );
       })}

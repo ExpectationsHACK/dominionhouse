@@ -19,6 +19,7 @@ site: dominionhs@gmail.com.
 | Payment | `/camp/payment` | Paystack checkout; instalments from ₦10,000 (lower for cheap tickets, up to 5 parts) |
 | Camp profile | `/portal` | Sign in with email + phone, no password. Ticket, payments, room, schedule, announcements |
 | Giving | `/give` | Legacy Place, Angel Partner monthly giving (Paystack subscriptions), and "Register your interest" (the Angel Partners form, no payment; answers in the Admin desk under Partners) |
+| Spiritual Growth Bootcamp | `/spiritual-growth-bootcamp` | One-week intensive: about, what to expect, how to join, schedule, registration (name, WhatsApp number, gender, age, location; no payment). Linked from Events and the footer. Sign-ups in the Admin desk under Visitors |
 | Admin | `/admin` ("Admin desk") | Registrants, payments, rooms, tickets, check-in scanner, schedule, announcements, content, partners, staff |
 
 Ticket prices: Adult ₦50,000 · Campus Student ₦35,000 · Teenager ₦20,000 ·
@@ -44,6 +45,10 @@ registration ("I'm coming with children": under 5 free, 5–11 ₦15,000 each).
 
 ## Open items
 
+- **Bootcamp dates, time and venue** aren't set: the hero's facts row stays
+  hidden until they're added to `FACTS` in
+  `src/app/(site)/spiritual-growth-bootcamp/page.tsx`. Three schedule items
+  have no time yet and read "During the week".
 - **Flip cards (animation #12) waiting on content:** Lighthouse service
   times and a scripture for each "What we believe" line. Not in
   `src/lib/church.ts`; don't invent them.

@@ -6,6 +6,7 @@ import { registrationIsOpen, requireActiveCamp } from "@/lib/camp";
 import { campDateRange } from "@/lib/dates";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/camp/register" },
   title: "Register for Fresh Fire Camp Meeting 2027",
   description:
     "Register for Fresh Fire Camp Meeting 2027. Four short steps, then pay in full or in instalments.",

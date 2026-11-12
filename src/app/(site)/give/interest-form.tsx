@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState, type ReactNode } from "react";
 import { registerInterest, type InterestState } from "./interest-actions";
-import { SuccessBurst } from "@/components/site/motion";
+import { NextFieldHint, SuccessBurst } from "@/components/site/motion";
 import { Field, FormError, Input, RadioCard, Select } from "@/components/ui/form";
 import { KeepValuesForm } from "@/components/ui/keep-values-form";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -88,6 +88,7 @@ export function InterestForm({ months }: { months: { value: string; label: strin
 
   return (
     <KeepValuesForm action={formAction} className="space-y-6 border border-ink/12 bg-paper p-6 sm:p-8">
+      <NextFieldHint />
       <FormError message={state.error} />
 
       <div className="grid gap-5 sm:grid-cols-2">

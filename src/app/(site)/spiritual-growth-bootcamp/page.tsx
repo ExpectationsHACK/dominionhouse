@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { HillContours } from "@/components/site/hill-contours";
-import { NumberedCardsCarousel, QuoteCards } from "@/components/site/house-cards";
+import { NumberedCardsCarousel } from "@/components/site/house-cards";
 import { Reveal } from "@/components/site/reveal";
-import { Timeline } from "@/components/site/motion";
+import { LightLines, Magnetic, StaggerLetters, Timeline } from "@/components/site/motion";
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { SgbRegistrationForm } from "./registration-form";
 import { MobileRegisterButton } from "./mobile-register-button";
@@ -11,19 +11,29 @@ const description =
   "The Spiritual Growth Bootcamp (SGB) is a transformative one-week intensive designed to awaken spiritual hunger, establish strong spiritual foundations, and set you on a purposeful journey of spiritual growth and destiny fulfilment.";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/spiritual-growth-bootcamp" },
   title: { absolute: "Spiritual Growth Bootcamp · Dominion House" },
   description,
   openGraph: {
     title: "Spiritual Growth Bootcamp · Dominion House",
     description,
     type: "website",
+    images: [{ url: "/video/camp-prayer.jpg", alt: "Prayer at a Dominion House gathering" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
+    images: ["/video/camp-prayer.jpg"],
     title: "Spiritual Growth Bootcamp · Dominion House",
     description,
   },
 };
+
+/**
+ * Dates, time and venue for the hero. Add them as they're announced, e.g.
+ * { label: "Dates", value: "1–7 December" }; the row stays hidden while empty
+ * so the page never shows a placeholder.
+ */
+const FACTS: { label: string; value: string; accent?: boolean }[] = [];
 
 const EXPECTATIONS = [
   {
@@ -106,15 +116,12 @@ const WEEK = [
 export default function SpiritualGrowthBootcampPage() {
   return (
     <>
-      <section className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
+      <section id="sgb-hero" className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
         <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
           <Eyebrow className="rise-in text-brass">One-week intensive</Eyebrow>
-          <h1
-            className="display rise-in mt-5 max-w-5xl text-[clamp(2.5rem,9vw,7.5rem)]"
-            style={{ animationDelay: "120ms" }}
-          >
-            Spiritual Growth Bootcamp
+          <h1 className="display mt-5 max-w-5xl text-[clamp(2.5rem,9vw,7.5rem)]">
+            <StaggerLetters text="Spiritual Growth Bootcamp" start={120} />
           </h1>
           <p
             className="rise-in mt-8 max-w-2xl text-lg leading-relaxed text-white/70"
@@ -123,22 +130,26 @@ export default function SpiritualGrowthBootcampPage() {
             {description}
           </p>
           <div className="rise-in mt-8 flex flex-wrap gap-2.5" style={{ animationDelay: "340ms" }}>
-            <ButtonLink href="#register" variant="brass" size="lg">
-              Register for the Bootcamp <Arrow />
-            </ButtonLink>
+            <Magnetic>
+              <ButtonLink href="#register" variant="brass" size="lg" className="shine">
+                Register for the Bootcamp <Arrow />
+              </ButtonLink>
+            </Magnetic>
             <ButtonLink href="#schedule" variant="inverse" size="lg">
               See the schedule
             </ButtonLink>
           </div>
-          <Reveal
-            as="dl"
-            delay={150}
-            className="mt-12 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-3"
-          >
-            <Fact label="Dates" value="[DATE]" />
-            <Fact label="Time" value="[TIME]" />
-            <Fact label="Venue / Format" value="[VENUE / ONLINE]" accent />
-          </Reveal>
+          {FACTS.length > 0 ? (
+            <Reveal
+              as="dl"
+              delay={150}
+              className="mt-12 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-3"
+            >
+              {FACTS.map((fact) => (
+                <Fact key={fact.label} label={fact.label} value={fact.value} accent={fact.accent} />
+              ))}
+            </Reveal>
+          ) : null}
         </div>
       </section>
 
@@ -147,20 +158,15 @@ export default function SpiritualGrowthBootcampPage() {
           as="div"
           className="mx-auto grid max-w-[1400px] gap-10 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[280px_1fr]"
         >
-          <Eyebrow className="lg:pt-3">About the Bootcamp</Eyebrow>
-          <div>
-            <h2 className="text-[clamp(1.375rem,3vw,2rem)] font-medium leading-[1.35]">
-              The Spiritual Growth Bootcamp (SGB) is a transformative one-week intensive designed
-              to awaken spiritual hunger, establish strong spiritual foundations, and set you on a
-              purposeful journey of spiritual growth and destiny fulfilment.
-            </h2>
-            <p className="mt-8 max-w-3xl text-lg leading-relaxed text-ink-70">
+          <h2 className="eyebrow text-ink-45 lg:pt-3">About the Bootcamp</h2>
+          <LightLines>
+            <p className="text-[clamp(1.375rem,3vw,2rem)] font-medium leading-[1.35]">
               Through intentional sessions of prayer, in-depth study of God&apos;s Word, meditation,
               accountability, mentorship, and practical spiritual disciplines, you will be equipped
               to build a consistent walk with God, break free from spiritual complacency, and
               develop habits that sustain lifelong spiritual growth.
             </p>
-            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-ink-70">
+            <p className="mt-8 max-w-3xl text-lg leading-relaxed text-ink-70">
               This is more than a week of spiritual activities. It is an opportunity to reset your
               spiritual life, cultivate discipline, deepen your relationship with God, and build a
               personal growth structure that continues long after the Bootcamp.
@@ -171,7 +177,7 @@ export default function SpiritualGrowthBootcampPage() {
                 pursuing it with intentionality, discipline, and purpose.&rdquo;
               </blockquote>
             </figure>
-          </div>
+          </LightLines>
         </Reveal>
       </section>
 
@@ -204,26 +210,16 @@ export default function SpiritualGrowthBootcampPage() {
               Growth Bootcamp:
             </p>
           </Reveal>
-          <QuoteCards
-            darkCardIndexes={[1, 3]}
-            items={JOIN_STEPS.map((step, index) => ({
-              text: step.description,
-              reference: `${String(index + 1).padStart(2, "0")} · ${step.title}`,
-            }))}
-          />
+          <ol className="mt-12 grid gap-px border border-ink/12 bg-ink/12 sm:grid-cols-2 lg:grid-cols-5">
+            {JOIN_STEPS.map((step, index) => (
+              <Reveal as="li" key={step.title} delay={index * 80} className="bg-bone p-6">
+                <p className="display text-4xl text-brass">{String(index + 1).padStart(2, "0")}</p>
+                <h3 className="mt-4 text-lg font-semibold">{step.title}</h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-ink-70">{step.description}</p>
+              </Reveal>
+            ))}
+          </ol>
           <p className="mt-8 text-lg font-medium">Your journey begins with registration. Take that first step today!</p>
-        </div>
-      </section>
-
-      <section id="register" className="scroll-mt-24 border-b border-ink/12 bg-brass-soft">
-        <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
-          <Reveal className="mx-auto max-w-xl border border-ink/12 bg-paper p-6 sm:p-7">
-            <Eyebrow>Registration</Eyebrow>
-            <h2 className="display mt-3 text-3xl">Register for the Spiritual Growth Bootcamp</h2>
-            <div className="mt-6">
-              <SgbRegistrationForm />
-            </div>
-          </Reveal>
         </div>
       </section>
 
@@ -246,8 +242,14 @@ export default function SpiritualGrowthBootcampPage() {
                   key={item.title}
                   className="grid gap-x-6 gap-y-1 border-b border-ink/12 py-5 sm:grid-cols-[110px_1fr]"
                 >
-                  <p className="font-mono text-sm font-semibold tracking-wide text-ink">
-                    {item.time}
+                  <p
+                    className={
+                      item.time
+                        ? "font-mono text-sm font-semibold tracking-wide text-ink"
+                        : "font-mono text-[11px] uppercase tracking-[0.14em] text-ink-45 sm:pt-0.5"
+                    }
+                  >
+                    {item.time || "During the week"}
                   </p>
                   <div>
                     <h3 className="text-base font-semibold">{item.title}</h3>
@@ -263,6 +265,18 @@ export default function SpiritualGrowthBootcampPage() {
             Participants are expected to follow the schedule, remain actively engaged, and approach
             every session with a heart ready to learn and grow.
           </p>
+        </div>
+      </section>
+
+      <section id="register" className="scroll-mt-24 border-b border-ink/12 bg-brass-soft">
+        <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
+          <Reveal className="mx-auto max-w-xl border border-ink/12 bg-paper p-6 sm:p-7">
+            <Eyebrow>Registration</Eyebrow>
+            <h2 className="display mt-3 text-3xl">Register for the Spiritual Growth Bootcamp</h2>
+            <div className="mt-6">
+              <SgbRegistrationForm />
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -285,9 +299,11 @@ export default function SpiritualGrowthBootcampPage() {
               begins with a decision. Make that decision today.
             </p>
           </div>
-          <ButtonLink href="#register" variant="sky" size="lg" className="shrink-0">
-            REGISTER FOR THE BOOTCAMP <Arrow />
-          </ButtonLink>
+          <Magnetic className="shrink-0">
+            <ButtonLink href="#register" variant="sky" size="lg" className="shine">
+              Register for the Bootcamp <Arrow />
+            </ButtonLink>
+          </Magnetic>
         </Reveal>
       </section>
 

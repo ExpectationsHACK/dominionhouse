@@ -29,6 +29,7 @@ import { getPublicLegacyRaised } from "@/lib/public-data";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/give" },
   title: "Become an Angel Partner",
   description:
     "Join 500 Angel Partners giving at least ₦20,000 or $20 a month to build Legacy Place, a missions training hub raising a generation to reach 1,000,000 young people.",

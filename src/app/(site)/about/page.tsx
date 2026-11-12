@@ -16,6 +16,7 @@ import {
 } from "@/lib/church";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/about" },
   title: "About us",
   description:
     "Who Dominion House is: our vision, our mandate, our foundational scriptures, our culture, and what we believe.",

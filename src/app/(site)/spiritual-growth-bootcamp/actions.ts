@@ -2,6 +2,7 @@
 
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
+import { rateLimit, requestIp } from "@/lib/rate-limit";
 import { fieldErrors } from "@/lib/validation";
 import { z } from "zod";
 
@@ -44,8 +45,19 @@ export async function registerForSgb(
   }
 
   const input = parsed.data;
-  const existing = await db.sgbRegistration.findUnique({
-    where: { phone: input.phone },
+
+  // Its own limits, not the sign-in ones: a leader may register a whole group
+  // from one phone or the church Wi-Fi, so the address limit is generous.
+  const byPhone = rateLimit(`sgb-phone:${input.phone.slice(-9)}`, { max: 5, windowMs: 60 * 60 * 1000 });
+  const byIp = rateLimit(`sgb-ip:${await requestIp()}`, { max: 30, windowMs: 60 * 60 * 1000 });
+  if (!byPhone.ok || !byIp.ok) {
+    return { error: "Too many attempts. Wait a few minutes and try again." };
+  }
+
+  // The same number typed as 0803…, +234803… or 234803…: match on the last
+  // nine digits, as camp sign-in does (phonesMatch in src/lib/utils.ts).
+  const existing = await db.sgbRegistration.findFirst({
+    where: { phone: { endsWith: input.phone.slice(-9) } },
     select: { id: true },
   });
   if (existing) {

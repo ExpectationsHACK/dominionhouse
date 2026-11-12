@@ -16,6 +16,11 @@ the camp flows; this file records what's true now and the traps.
   `RESEND_API_KEY` blank, payments are simulated (`/camp/payment/simulate`,
   `/give/simulate`) and email is logged instead of sent.
 - Per-request nonce CSP in `src/proxy.ts`. Env vars: see `.env.example`.
+- Search: `src/app/sitemap.ts` (/sitemap.xml) lists the public pages and
+  `src/app/robots.ts` (/robots.txt) keeps crawlers out of the Admin desk,
+  camp profiles, payment and thank-you pages. **Add every new public page to
+  the sitemap**, and give it `alternates: { canonical: "/path" }` in its
+  metadata. Both use `APP_URL`, which is https://dominionhouse.org live.
 
 ## Route groups
 

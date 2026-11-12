@@ -14,6 +14,7 @@ import {
 } from "@/lib/giving-rules";
 import { cn } from "@/lib/utils";
 import { KeepValuesForm } from "@/components/ui/keep-values-form";
+import { NextFieldHint } from "@/components/site/motion";
 
 /** A pair of buttons that behave as one choice, sent as a hidden field. */
 function Toggle<T extends string>({
@@ -66,6 +67,7 @@ export function GiveForm() {
 
   return (
     <KeepValuesForm action={formAction} className="space-y-5">
+      <NextFieldHint />
       <FormError message={state.error} />
 
       <Toggle
