@@ -10,7 +10,7 @@ type Mode = "slam" | "rise" | "soft";
  * - slam: each word drops in large and sharpens (headlines).
  * - rise: each word rises out of its own mask (titles).
  * - soft: words fade up through a blur (quiet lines).
- * Words listed in `accent` are drawn in ember with a glow.
+ * Words listed in `accent` are drawn in `accentColor` (ember with a glow by default).
  */
 export function KineticText({
   text,
@@ -23,6 +23,7 @@ export function KineticText({
   weight,
   color = COLORS.white,
   accent = [],
+  accentColor,
   align = "center",
   exitAt,
   maxWidth,
@@ -38,6 +39,8 @@ export function KineticText({
   weight?: number;
   color?: string;
   accent?: string[];
+  /** Flat accent colour (no glow); defaults to the ember glow. */
+  accentColor?: string;
   align?: "center" | "left";
   /** Local frame at which the line fades away (optional). */
   exitAt?: number;
@@ -80,9 +83,11 @@ export function KineticText({
           extrapolateRight: "clamp",
           easing: expo,
         });
-        const isAccent = accent.some((a) => word.replace(/[.,!?]/g, "").toUpperCase() === a.toUpperCase());
+        const isAccent = accent.some((a) => word.replace(/[.,!?"“”—]/g, "").toUpperCase() === a.toUpperCase());
         const wordStyle: CSSProperties = isAccent
-          ? { color: COLORS.ember, textShadow: `0 0 ${size * 0.35}px ${COLORS.emberGlow}` }
+          ? accentColor
+            ? { color: accentColor }
+            : { color: COLORS.ember, textShadow: `0 0 ${size * 0.35}px ${COLORS.emberGlow}` }
           : {};
 
         if (mode === "rise") {

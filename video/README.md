@@ -40,3 +40,21 @@ clock ticks, and a resolve at the CTA. Its sync points are `SYNC` in
 composed in `src/Teaser.tsx` with `<Series>`. Shared pieces are in
 `src/components/`: KineticText, EmberParticles, LightLeak (and Flare),
 IconCard, ProgressLine (the rising ember line), Backdrop and Stage.
+
+## Campaign teaser (poster style)
+
+A second film, 27 s, in the look of the Bootcamp poster series: `SGB-Campaign-Vertical`
+and `SGB-Campaign-Wide`. Six scenes, each opening over the last with a round
+wipe: the Sunday–Tuesday loop, the betting slip, the fuel gauge, the New Year
+checklist, the key visual (dates, ages 20–27, the two pills) and the sign-up
+card. The posters' "Sign up for the … Bootcamp" bar rides along scenes 2–4.
+
+```bash
+npm run render:campaign:vertical   # out/sgb-campaign-vertical.mp4
+npm run render:campaign:wide       # out/sgb-campaign-wide.mp4
+```
+
+Copy, colours, dates and timing: `src/campaign/config.ts`. The placeholder
+bed (`public/audio/sgb-campaign-bed.wav`, 120 bpm, not in git) is built by
+`scripts/make-campaign-audio.mjs`; every scene starts on a beat, so a real
+120 bpm track starting at frame 0 lines up with the cuts.

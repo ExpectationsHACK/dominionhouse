@@ -138,7 +138,7 @@ export default function SpiritualGrowthBootcampPage() {
             <StaggerLetters text="Spiritual Growth Bootcamp" start={120} />
           </h1>
           <div className="rise-in mt-8 max-w-2xl" style={{ animationDelay: "260ms" }}>
-            <QuestionRotator sets={[QUESTIONS.slice(0, 4), QUESTIONS.slice(4)]} />
+            <QuestionRotator sets={[QUESTIONS.slice(0, 3), QUESTIONS.slice(3, 6), QUESTIONS.slice(6)]} />
             <p className="mt-6 text-lg font-medium leading-relaxed text-white">
               If the answer to any of these questions is YES, then the Spiritual Growth Bootcamp
               is for you, and you are in the right place.

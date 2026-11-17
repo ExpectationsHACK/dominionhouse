@@ -19,7 +19,7 @@ site: dominionhs@gmail.com.
 | Payment | `/camp/payment` | Paystack checkout; instalments from ₦10,000 (lower for cheap tickets, up to 5 parts) |
 | Camp profile | `/portal` | Sign in with email + phone, no password. Ticket, payments, room, schedule, announcements |
 | Giving | `/give` | Legacy Place, Angel Partner monthly giving (Paystack subscriptions), and "Register your interest" (the Angel Partners form, no payment; answers in the Admin desk under Partners) |
-| Spiritual Growth Bootcamp | `/spiritual-growth-bootcamp` | One-week intensive program, 29 Nov – 6 Dec 2026, online (YouTube and WhatsApp). Hero questions, about, what to expect, how to join, schedule, registration (name, WhatsApp number with a country-code picker that refuses incomplete numbers, email, gender, Lighthouse location, or "Others" with an exact location and country of residence; no payment). Hero questions rotate four at a time every 6 s. Locations live in `spiritual-growth-bootcamp/locations.ts`; dates and venue in `src/lib/bootcamp.ts`. Linked from Events and the footer. Sign-ups on the Bootcamp desk (`/admin/bootcamp`) |
+| Spiritual Growth Bootcamp | `/spiritual-growth-bootcamp` | One-week intensive program, 29 Nov – 6 Dec 2026, online (YouTube and WhatsApp). Hero questions, about, what to expect, how to join, schedule, registration (name, WhatsApp number with a country-code picker that refuses incomplete numbers, email, gender, Lighthouse location, or "Others" with an exact location and country of residence; no payment). Hero questions rotate three at a time every 3 s. Locations live in `spiritual-growth-bootcamp/locations.ts`; dates and venue in `src/lib/bootcamp.ts`. Linked from Events and the footer. Sign-ups on the Bootcamp desk (`/admin/bootcamp`) |
 | Admin | `/admin` ("DH Global Admin") | Overview of every area. **Camp desk** (`/admin/camp`): Fresh Fire dashboard, registrants, payments, rooms, tickets, check-in scanner, schedule, announcements. **Bootcamp desk** (`/admin/bootcamp`): sign-ups, analytics (per day, location, country, gender), all emails to copy or download, CSV export, remove. Also visitors, partners, content, staff |
 
 Ticket prices: Adult ₦50,000 · Campus Student ₦35,000 · Teenager ₦20,000 ·
@@ -78,6 +78,11 @@ ESLint): a 25 s Spiritual Growth Bootcamp teaser, 9:16 and 16:9.
 `npm install` inside `video/` first). Copy, dates and sound sync points are in
 `video/src/config.ts`; the sound is a generated placeholder until a real track
 replaces `video/public/audio/sgb-bed.wav`. See `video/README.md`.
+
+A second, poster-style campaign teaser (27 s, from the five campaign posters)
+lives in `video/src/campaign/`; copy, colours and timing are in
+`video/src/campaign/config.ts`. Render it from `video/` with
+`npm run render:campaign:vertical` / `render:campaign:wide`.
 
 ## Explainer videos
 

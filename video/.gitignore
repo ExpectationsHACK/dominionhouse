@@ -2,3 +2,4 @@ node_modules/
 out/
 # Rebuilt by `npm run audio` when missing; a real track replaces it locally.
 public/audio/sgb-bed.wav
+public/audio/sgb-campaign-bed.wav

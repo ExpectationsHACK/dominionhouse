@@ -4,11 +4,13 @@
   "version": "1.0.0",
   "description": "Spiritual Growth Bootcamp teaser (Remotion). Separate from the Next.js site.",
   "scripts": {
-    "preview": "node scripts/make-audio.mjs && remotion studio src/index.ts",
-    "audio": "node scripts/make-audio.mjs --force",
+    "preview": "node scripts/make-audio.mjs && node scripts/make-campaign-audio.mjs && remotion studio src/index.ts",
+    "audio": "node scripts/make-audio.mjs --force && node scripts/make-campaign-audio.mjs --force",
     "render:vertical": "node scripts/make-audio.mjs && remotion render src/index.ts SGB-Vertical out/sgb-teaser-vertical.mp4 --codec=h264",
     "render:wide": "node scripts/make-audio.mjs && remotion render src/index.ts SGB-Wide out/sgb-teaser-wide.mp4 --codec=h264",
-    "still": "remotion still src/index.ts"
+    "still": "remotion still src/index.ts",
+    "render:campaign:vertical": "node scripts/make-campaign-audio.mjs && remotion render src/index.ts SGB-Campaign-Vertical out/sgb-campaign-vertical.mp4 --codec=h264",
+    "render:campaign:wide": "node scripts/make-campaign-audio.mjs && remotion render src/index.ts SGB-Campaign-Wide out/sgb-campaign-wide.mp4 --codec=h264"
   },
   "dependencies": {
     "@remotion/cli": "4.0.536",
