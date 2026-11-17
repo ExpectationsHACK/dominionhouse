@@ -10,28 +10,31 @@ type NavItem = { href: string; label: string; roles?: AdminRole[] };
 
 const SECTIONS: { heading: string; items: NavItem[] }[] = [
   {
-    heading: "Camp",
+    heading: "DH Global",
+    items: [{ href: "/admin", label: "Overview" }],
+  },
+  {
+    heading: "Fresh Fire Camp",
     items: [
-      { href: "/admin", label: "Dashboard" },
+      { href: "/admin/camp", label: "Camp desk" },
       { href: "/admin/registrants", label: "Registrants" },
       { href: "/admin/payments", label: "Payments", roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"] },
-      { href: "/admin/partners", label: "Angel Partners", roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"] },
       { href: "/admin/rooms", label: "Rooms" },
       { href: "/admin/tickets", label: "Tickets" },
       { href: "/admin/check-in", label: "Check-in" },
-    ],
-  },
-  {
-    heading: "Programme",
-    items: [
       { href: "/admin/schedule", label: "Schedule" },
       { href: "/admin/announcements", label: "Announcements" },
     ],
   },
   {
+    heading: "Spiritual Growth Bootcamp",
+    items: [{ href: "/admin/bootcamp", label: "Bootcamp desk" }],
+  },
+  {
     heading: "Church",
     items: [
       { href: "/admin/visitors", label: "Visitors" },
+      { href: "/admin/partners", label: "Angel Partners", roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"] },
       { href: "/admin/content", label: "Website content", roles: ["SUPER_ADMIN", "ADMIN"] },
     ],
   },
@@ -64,7 +67,7 @@ export function AdminNav({ role }: { role: AdminRole }) {
       >
         <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-brass">Menu</span>
         <span className="text-sm font-semibold text-white">
-          {visible.flatMap((s) => s.items).find((item) => item.href === pathname)?.label ?? "Admin desk"}
+          {visible.flatMap((s) => s.items).find((item) => item.href === pathname)?.label ?? "DH Global Admin"}
         </span>
       </button>
 

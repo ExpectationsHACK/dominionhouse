@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     // Cloudflare build output.
     ".open-next/**",
     ".wrangler/**",
+    // The Remotion teaser is its own project (video/package.json).
+    "video/**",
   ]),
   {
     rules: {

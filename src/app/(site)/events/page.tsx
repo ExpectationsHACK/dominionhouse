@@ -159,10 +159,10 @@ export default async function EventsPage() {
       <section className="border-b border-ink/12 bg-ink text-white">
         <Reveal className="mx-auto grid max-w-[1400px] gap-8 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <Eyebrow className="text-brass">One-week intensive</Eyebrow>
+            <Eyebrow className="text-brass">One-week intensive program · 29 Nov – 6 Dec 2026 · Online</Eyebrow>
             <h2 className="display mt-4 text-[clamp(2.25rem,6vw,4.5rem)]">Spiritual Growth Bootcamp</h2>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/70">
-              A transformative one-week intensive designed to awaken spiritual hunger, establish
+              A transformative one-week intensive program designed to awaken spiritual hunger, establish
               strong spiritual foundations, and set you on a purposeful journey of spiritual growth
               and destiny fulfilment.
             </p>

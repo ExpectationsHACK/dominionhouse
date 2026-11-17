@@ -687,3 +687,14 @@
     animation: none;
   }
 }
+
+/* motion: Bootcamp hero question sets, the bar under them fills while a set shows */
+@keyframes sgb-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+.sgb-progress {
+  animation-name: sgb-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}

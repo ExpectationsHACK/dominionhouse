@@ -27,7 +27,9 @@ the camp flows; this file records what's true now and the traps.
 - `src/app/(site)`: public pages, `/camp/*`, `/give`.
 - `src/app/(portal)/portal`: camp profile. Sign-in is **email + phone
   number**, no password or code; `0803…` and `+234803…` both match.
-- `src/app/(admin)/admin`: staff, bcrypt passwords, roles `SUPER_ADMIN`,
+- `src/app/(admin)/admin`: "DH Global Admin". `/admin` is the overview,
+  `/admin/camp` the Fresh Fire Camp desk, `/admin/bootcamp` the Bootcamp desk.
+  Staff, bcrypt passwords, roles `SUPER_ADMIN`,
   `ADMIN`, `FINANCE`, `REGISTRATION`, `LOGISTICS`, `USHER`. `GATE_ROLES`
   (super admin, admin, registration, logistics, usher; not finance) can use
   check-in.

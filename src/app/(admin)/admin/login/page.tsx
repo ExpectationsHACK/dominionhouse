@@ -21,9 +21,9 @@ export default async function AdminLoginPage() {
       <div className="relative w-full max-w-sm">
         <Logo className="h-12 w-auto" />
         <Eyebrow className="mt-5 text-brass">Dominion House</Eyebrow>
-        <h1 className="display mt-4 text-5xl">Admin desk</h1>
+        <h1 className="display mt-4 text-5xl">DH Global Admin</h1>
         <p className="mt-3 text-sm leading-relaxed text-white/55">
-          The management system for Fresh Fire Camp Meeting 2027. Staff only.
+          Dominion House administration: Fresh Fire Camp, the Spiritual Growth Bootcamp, partners and visitors. Staff only.
         </p>
 
         <div className="mt-9 bg-paper p-6 text-ink">

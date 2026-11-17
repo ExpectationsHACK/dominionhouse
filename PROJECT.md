@@ -19,8 +19,8 @@ site: dominionhs@gmail.com.
 | Payment | `/camp/payment` | Paystack checkout; instalments from ₦10,000 (lower for cheap tickets, up to 5 parts) |
 | Camp profile | `/portal` | Sign in with email + phone, no password. Ticket, payments, room, schedule, announcements |
 | Giving | `/give` | Legacy Place, Angel Partner monthly giving (Paystack subscriptions), and "Register your interest" (the Angel Partners form, no payment; answers in the Admin desk under Partners) |
-| Spiritual Growth Bootcamp | `/spiritual-growth-bootcamp` | One-week intensive: about, what to expect, how to join, schedule, registration (name, WhatsApp number, gender, age, location; no payment). Linked from Events and the footer. Sign-ups in the Admin desk under Visitors |
-| Admin | `/admin` ("Admin desk") | Registrants, payments, rooms, tickets, check-in scanner, schedule, announcements, content, partners, staff |
+| Spiritual Growth Bootcamp | `/spiritual-growth-bootcamp` | One-week intensive program, 29 Nov – 6 Dec 2026, online (YouTube and WhatsApp). Hero questions, about, what to expect, how to join, schedule, registration (name, WhatsApp number with a country-code picker that refuses incomplete numbers, email, gender, Lighthouse location, or "Others" with an exact location and country of residence; no payment). Hero questions rotate four at a time every 6 s. Locations live in `spiritual-growth-bootcamp/locations.ts`; dates and venue in `src/lib/bootcamp.ts`. Linked from Events and the footer. Sign-ups on the Bootcamp desk (`/admin/bootcamp`) |
+| Admin | `/admin` ("DH Global Admin") | Overview of every area. **Camp desk** (`/admin/camp`): Fresh Fire dashboard, registrants, payments, rooms, tickets, check-in scanner, schedule, announcements. **Bootcamp desk** (`/admin/bootcamp`): sign-ups, analytics (per day, location, country, gender), all emails to copy or download, CSV export, remove. Also visitors, partners, content, staff |
 
 Ticket prices: Adult ₦50,000 · Campus Student ₦35,000 · Teenager ₦20,000 ·
 Children ₦15,000 (free under 5). Adults can add children to their own
@@ -45,10 +45,7 @@ registration ("I'm coming with children": under 5 free, 5–11 ₦15,000 each).
 
 ## Open items
 
-- **Bootcamp dates, time and venue** aren't set: the hero's facts row stays
-  hidden until they're added to `FACTS` in
-  `src/app/(site)/spiritual-growth-bootcamp/page.tsx`. Three schedule items
-  have no time yet and read "During the week".
+- **Bootcamp schedule:** three items have no time yet and read "During the week".
 - **Flip cards (animation #12) waiting on content:** Lighthouse service
   times and a scripture for each "What we believe" line. Not in
   `src/lib/church.ts`; don't invent them.
@@ -72,6 +69,15 @@ registration ("I'm coming with children": under 5 free, 5–11 ₦15,000 each).
   Hero films are 1080p (~5–6 MB each); R2 would take them off Netlify's
   bandwidth.
 - The old Cloudflare Worker `dominion-house` is unused and can be deleted.
+
+## Bootcamp teaser
+
+`video/` (in git; its own Remotion project, excluded from the site's tsc and
+ESLint): a 25 s Spiritual Growth Bootcamp teaser, 9:16 and 16:9.
+`npm run video:preview`, `video:render:vertical`, `video:render:wide` (run
+`npm install` inside `video/` first). Copy, dates and sound sync points are in
+`video/src/config.ts`; the sound is a generated placeholder until a real track
+replaces `video/public/audio/sgb-bed.wav`. See `video/README.md`.
 
 ## Explainer videos
 

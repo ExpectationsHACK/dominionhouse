@@ -89,5 +89,5 @@ live in `src/app/globals.css`; use them, not raw hex values.
 ## Copy
 
 Plain and warm, one idea per sentence. Use the owner's wording for church
-copy exactly. Labels are short; "Admin desk" in the admin, "camp desk" in
-messages to registrants.
+copy exactly. Labels are short; the admin is "DH Global Admin" (its areas are the "Camp
+desk" and "Bootcamp desk"), "camp desk" in messages to registrants.

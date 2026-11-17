@@ -512,8 +512,10 @@ model SgbRegistration {
   lastName  String   @map("last_name")
   phone     String   @unique
   gender    String
-  age       Int
+  age       Int?
   location  String
+  country   String?
+  email     String?
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("sgb_registrations")

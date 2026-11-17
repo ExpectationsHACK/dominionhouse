@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BOOTCAMP } from "@/lib/bootcamp";
 import { HillContours } from "@/components/site/hill-contours";
 import { NumberedCardsCarousel } from "@/components/site/house-cards";
 import { Reveal } from "@/components/site/reveal";
@@ -6,9 +7,10 @@ import { LightLines, Magnetic, StaggerLetters, Timeline } from "@/components/sit
 import { Arrow, ButtonLink, Eyebrow } from "@/components/ui";
 import { SgbRegistrationForm } from "./registration-form";
 import { MobileRegisterButton } from "./mobile-register-button";
+import { QuestionRotator } from "./question-rotator";
 
 const description =
-  "The Spiritual Growth Bootcamp (SGB) is a transformative one-week intensive designed to awaken spiritual hunger, establish strong spiritual foundations, and set you on a purposeful journey of spiritual growth and destiny fulfilment.";
+  "The Spiritual Growth Bootcamp (SGB) is a transformative one-week intensive program designed to awaken spiritual hunger, establish strong spiritual foundations, and set you on a purposeful journey of spiritual growth and destiny fulfilment.";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/spiritual-growth-bootcamp" },
@@ -28,12 +30,24 @@ export const metadata: Metadata = {
   },
 };
 
-/**
- * Dates, time and venue for the hero. Add them as they're announced, e.g.
- * { label: "Dates", value: "1–7 December" }; the row stays hidden while empty
- * so the page never shows a placeholder.
- */
-const FACTS: { label: string; value: string; accent?: boolean }[] = [];
+/** Dates and venue for the hero (the owner asked for no time here). */
+const FACTS: { label: string; value: string; accent?: boolean }[] = [
+  { label: "Dates", value: BOOTCAMP.dateLabel, accent: true },
+  { label: "Venue", value: BOOTCAMP.venue },
+];
+
+/** The hero's questions, in the owner's words. */
+const QUESTIONS = [
+  "Do you want to reignite your prayer life?",
+  "Do you desire to know God?",
+  "Do you yearn for a consistent relationship with God's Word?",
+  "Do you want to understand God's plan for your life clearly?",
+  "Do you feel like God is condemning you?",
+  "Have you been feeling like God is far from you?",
+  "Do you desire to hear God's voice and guidance?",
+  "Are you struggling with addictions?",
+  "Do you want a fresh start with God?",
+] as const;
 
 const EXPECTATIONS = [
   {
@@ -119,16 +133,17 @@ export default function SpiritualGrowthBootcampPage() {
       <section id="sgb-hero" className="relative overflow-hidden border-b border-ink/12 bg-ink text-white">
         <HillContours className="absolute inset-x-0 bottom-0 h-full w-full text-brass" lines={16} />
         <div className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
-          <Eyebrow className="rise-in text-brass">One-week intensive</Eyebrow>
+          <Eyebrow className="rise-in text-brass">One-week intensive program</Eyebrow>
           <h1 className="display mt-5 max-w-5xl text-[clamp(2.5rem,9vw,7.5rem)]">
             <StaggerLetters text="Spiritual Growth Bootcamp" start={120} />
           </h1>
-          <p
-            className="rise-in mt-8 max-w-2xl text-lg leading-relaxed text-white/70"
-            style={{ animationDelay: "260ms" }}
-          >
-            {description}
-          </p>
+          <div className="rise-in mt-8 max-w-2xl" style={{ animationDelay: "260ms" }}>
+            <QuestionRotator sets={[QUESTIONS.slice(0, 4), QUESTIONS.slice(4)]} />
+            <p className="mt-6 text-lg font-medium leading-relaxed text-white">
+              If the answer to any of these questions is YES, then the Spiritual Growth Bootcamp
+              is for you, and you are in the right place.
+            </p>
+          </div>
           <div className="rise-in mt-8 flex flex-wrap gap-2.5" style={{ animationDelay: "340ms" }}>
             <Magnetic>
               <ButtonLink href="#register" variant="brass" size="lg" className="shine">
@@ -143,7 +158,7 @@ export default function SpiritualGrowthBootcampPage() {
             <Reveal
               as="dl"
               delay={150}
-              className="mt-12 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-3"
+              className="mt-12 grid gap-x-8 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-2"
             >
               {FACTS.map((fact) => (
                 <Fact key={fact.label} label={fact.label} value={fact.value} accent={fact.accent} />
@@ -173,7 +188,7 @@ export default function SpiritualGrowthBootcampPage() {
             </p>
             <figure className="mt-10 max-w-3xl border-l-2 border-brass pl-6">
               <blockquote className="text-lg leading-relaxed italic text-ink-70">
-                &ldquo;Our goal is to move you from merely desiring spiritual growth to actively
+                &ldquo;The goal is to move you from merely desiring spiritual growth to actively
                 pursuing it with intentionality, discipline, and purpose.&rdquo;
               </blockquote>
             </figure>

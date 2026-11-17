@@ -4,7 +4,11 @@ import { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
 import { rateLimit, requestIp } from "@/lib/rate-limit";
 import { fieldErrors } from "@/lib/validation";
+import { isValidPhoneNumber, parsePhoneNumberFromString } from "libphonenumber-js";
 import { z } from "zod";
+import { OTHER_LOCATION, SGB_LOCATIONS } from "./locations";
+
+const LOCATION_NAMES: [string, ...string[]] = [OTHER_LOCATION, ...SGB_LOCATIONS.map((place) => place.name)];
 
 export type SgbRegistrationState = {
   ok?: boolean;
@@ -15,18 +19,28 @@ export type SgbRegistrationState = {
 const sgbRegistrationSchema = z.object({
   firstName: z.string().trim().min(2, "Enter your first name").max(60),
   lastName: z.string().trim().min(2, "Enter your last name").max(60),
+  // The form posts the full international number (+2348031234567); it must
+  // be complete for its country, not just the right characters.
   phone: z
     .string()
     .trim()
-    .min(7, "Enter your phone number")
-    .max(30, "Enter a valid phone number")
-    .regex(/^\+?[\d\s()-]+$/, "Enter a valid phone number")
-    .transform((value) => value.replace(/\D/g, ""))
-    .refine((value) => value.length >= 7, "Enter a valid phone number"),
+    .min(1, "Enter your WhatsApp number")
+    .refine((value) => isValidPhoneNumber(value), "Enter the full number, including the country code")
+    .transform((value) => parsePhoneNumberFromString(value)!.number),
+  email: z.string().trim().toLowerCase().email("Enter a valid email address").max(120),
   gender: z.enum(["Male", "Female"], { message: "Choose your gender" }),
-  age: z.coerce.number().int().min(10, "You must be at least 10").max(100, "Enter an age of 100 or below"),
-  location: z.string().trim().min(2, "Enter your city and country").max(120),
-});
+  location: z.enum(LOCATION_NAMES, { message: "Choose your location" }),
+  otherLocation: z.string().trim().max(120).optional(),
+  country: z.string().trim().max(60).optional(),
+})
+  .refine((value) => value.location !== OTHER_LOCATION || (value.otherLocation ?? "").length >= 2, {
+    message: "Enter your exact location",
+    path: ["otherLocation"],
+  })
+  .refine((value) => value.location !== OTHER_LOCATION || (value.country ?? "").length >= 2, {
+    message: "Enter your country of residence",
+    path: ["country"],
+  });
 
 export async function registerForSgb(
   _previous: SgbRegistrationState,
@@ -70,9 +84,15 @@ export async function registerForSgb(
         firstName: input.firstName,
         lastName: input.lastName,
         phone: input.phone,
+        email: input.email,
         gender: input.gender,
-        age: input.age,
-        location: input.location,
+        location:
+          input.location === OTHER_LOCATION ? `${OTHER_LOCATION}: ${input.otherLocation}` : input.location,
+        // A Lighthouse brings its own country; "Others" gives one.
+        country:
+          input.location === OTHER_LOCATION
+            ? input.country
+            : SGB_LOCATIONS.find((place) => place.name === input.location)?.country,
       },
     });
   } catch (error) {

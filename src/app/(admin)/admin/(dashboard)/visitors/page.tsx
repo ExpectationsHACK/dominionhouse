@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { FilterBar, FilterSelect } from "@/components/admin/filter-bar";
 import { ActionForm } from "@/components/admin/action-form";
@@ -69,10 +70,9 @@ export default async function VisitorsPage({
   if (filters.status && STATUSES.has(filters.status)) and.push({ status: filters.status as never });
   if (and.length) where.AND = and;
 
-  const [visitors, counts, sgbRegistrations] = await Promise.all([
+  const [visitors, counts] = await Promise.all([
     db.visitor.findMany({ where, orderBy: { createdAt: "desc" }, take: 100 }),
     db.visitor.groupBy({ by: ["status"], _count: { _all: true } }),
-    db.sgbRegistration.findMany({ orderBy: { createdAt: "desc" }, take: 100 }),
   ]);
 
   const countOf = (status: string) =>
@@ -190,49 +190,13 @@ export default async function VisitorsPage({
         </tbody>
       </TableWrap>
 
-      <section className="space-y-4 pt-8">
-        <header>
-          <Eyebrow>Spiritual Growth Bootcamp forms</Eyebrow>
-          <h2 className="display mt-2 text-3xl">Bootcamp registrations</h2>
-        </header>
-        <TableWrap>
-          <thead>
-            <tr>
-              <Th>Participant</Th>
-              <Th>Phone</Th>
-              <Th>Gender &amp; age</Th>
-              <Th>Location</Th>
-            </tr>
-          </thead>
-          <tbody>
-            {sgbRegistrations.length === 0 ? (
-              <TableEmpty colSpan={4} message="No Bootcamp registrations yet." />
-            ) : (
-              sgbRegistrations.map((registration) => (
-                <Tr key={registration.id}>
-                  <Td className="align-top">
-                    <p className="font-semibold">
-                      {registration.firstName} {registration.lastName}
-                    </p>
-                    <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-45">
-                      {dateTimeLabel.format(registration.createdAt)}
-                    </p>
-                  </Td>
-                  <Td className="align-top">
-                    <a className="underline underline-offset-4" href={`tel:${registration.phone}`}>
-                      {registration.phone}
-                    </a>
-                  </Td>
-                  <Td className="align-top">
-                    {registration.gender}, {registration.age}
-                  </Td>
-                  <Td className="align-top">{registration.location}</Td>
-                </Tr>
-              ))
-            )}
-          </tbody>
-        </TableWrap>
-      </section>
+      <p className="pt-6 text-sm text-ink-45">
+        Spiritual Growth Bootcamp sign-ups are on the{" "}
+        <Link href="/admin/bootcamp" className="font-semibold text-ink underline underline-offset-4">
+          Bootcamp desk
+        </Link>
+        .
+      </p>
     </div>
   );
 }

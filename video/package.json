@@ -1,0 +1,28 @@
+{
+  "name": "sgb-teaser",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Spiritual Growth Bootcamp teaser (Remotion). Separate from the Next.js site.",
+  "scripts": {
+    "preview": "node scripts/make-audio.mjs && remotion studio src/index.ts",
+    "audio": "node scripts/make-audio.mjs --force",
+    "render:vertical": "node scripts/make-audio.mjs && remotion render src/index.ts SGB-Vertical out/sgb-teaser-vertical.mp4 --codec=h264",
+    "render:wide": "node scripts/make-audio.mjs && remotion render src/index.ts SGB-Wide out/sgb-teaser-wide.mp4 --codec=h264",
+    "still": "remotion still src/index.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.536",
+    "@remotion/google-fonts": "4.0.536",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.536"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "typescript": "5.9.3"
+  },
+  "optionalDependencies": {
+    "@remotion/compositor-win32-x64-msvc": "4.0.536",
+    "@rspack/binding-win32-x64-msvc": "1.7.11"
+  }
+}

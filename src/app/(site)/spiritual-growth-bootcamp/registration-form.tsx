@@ -1,17 +1,23 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { NextFieldHint, SuccessBurst } from "@/components/site/motion";
 import { Eyebrow } from "@/components/ui";
 import { Field, FormError, Input, Select } from "@/components/ui/form";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { KeepValuesForm } from "@/components/ui/keep-values-form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { registerForSgb, type SgbRegistrationState } from "./actions";
+import { OTHER_LOCATION, SGB_LOCATIONS } from "./locations";
 
 const initialState: SgbRegistrationState = {};
 
+/** Suggestions for Country of residence; people can type any other. */
+const COUNTRIES = ["Nigeria", "United Kingdom", "Canada", "Trinidad and Tobago", "United States", "Ghana"];
+
 export function SgbRegistrationForm() {
   const [state, formAction] = useActionState(registerForSgb, initialState);
+  const [location, setLocation] = useState("");
 
   if (state.ok) {
     return (
@@ -62,17 +68,11 @@ export function SgbRegistrationForm() {
         hint="Your confirmation and access information come here."
         error={state.errors?.phone}
       >
-        <Input
-          id="phone"
-          name="phone"
-          type="tel"
-          required
-          minLength={7}
-          maxLength={30}
-          pattern="[\+0-9\(\)\s\-]{7,30}"
-          title="Enter a valid phone number"
-          autoComplete="tel"
-        />
+        <PhoneInput id="phone" name="phone" required invalid={Boolean(state.errors?.phone)} />
+      </Field>
+
+      <Field label="Email" htmlFor="email" required error={state.errors?.email}>
+        <Input id="email" name="email" type="email" required maxLength={120} autoComplete="email" />
       </Field>
 
       <Field label="Gender" htmlFor="gender" required error={state.errors?.gender}>
@@ -85,21 +85,69 @@ export function SgbRegistrationForm() {
         </Select>
       </Field>
 
-      <Field label="Age" htmlFor="age" required error={state.errors?.age}>
-        <Input id="age" name="age" type="number" required min={10} max={100} step={1} inputMode="numeric" />
-      </Field>
-
-      <Field label="Location" htmlFor="location" required error={state.errors?.location}>
-        <Input
+      <Field
+        label="Location"
+        htmlFor="location"
+        required
+        hint="Choose the Lighthouse closest to you."
+        error={state.errors?.location}
+      >
+        <Select
           id="location"
           name="location"
           required
-          minLength={2}
-          maxLength={120}
-          placeholder="City, Country"
-          autoComplete="address-level2"
-        />
+          value={location}
+          onChange={(event) => setLocation(event.target.value)}
+        >
+          <option value="" disabled>
+            Choose your location
+          </option>
+          {SGB_LOCATIONS.map((place) => (
+            <option key={place.name} value={place.name}>
+              {place.areas ? `${place.name}: ${place.areas}` : place.name}
+            </option>
+          ))}
+          <option value={OTHER_LOCATION}>{OTHER_LOCATION}</option>
+        </Select>
       </Field>
+
+      {location === OTHER_LOCATION ? (
+        <>
+          <Field
+            label="Your exact location"
+            htmlFor="otherLocation"
+            required
+            error={state.errors?.otherLocation}
+          >
+            <Input
+              id="otherLocation"
+              name="otherLocation"
+              required
+              minLength={2}
+              maxLength={120}
+              placeholder="Area and city"
+              autoComplete="address-level2"
+            />
+          </Field>
+          <Field label="Country of residence" htmlFor="country" required error={state.errors?.country}>
+            <Input
+              id="country"
+              name="country"
+              required
+              minLength={2}
+              maxLength={60}
+              list="sgb-countries"
+              autoComplete="country-name"
+            />
+            <datalist id="sgb-countries">
+              {COUNTRIES.map((country) => (
+                <option key={country} value={country} />
+              ))}
+            </datalist>
+          </Field>
+        </>
+      ) : null}
+
 
       <div
         aria-hidden="true"
