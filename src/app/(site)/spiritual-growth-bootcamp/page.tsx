@@ -176,6 +176,11 @@ export default function SpiritualGrowthBootcampPage() {
           <h2 className="eyebrow text-ink-45 lg:pt-3">About the Bootcamp</h2>
           <LightLines>
             <p className="text-[clamp(1.375rem,3vw,2rem)] font-medium leading-[1.35]">
+              The Spiritual Growth Bootcamp (SGB) is a transformative one-week intensive designed
+              to awaken spiritual hunger, establish strong spiritual foundations, and set you on a
+              purposeful journey of spiritual growth and destiny fulfilment.
+            </p>
+            <p className="mt-8 max-w-3xl text-lg leading-relaxed text-ink-70">
               Through intentional sessions of prayer, in-depth study of God&apos;s Word, meditation,
               accountability, mentorship, and practical spiritual disciplines, you will be equipped
               to build a consistent walk with God, break free from spiritual complacency, and

@@ -8,10 +8,10 @@ export const SGB_LOCATIONS: { name: string; areas?: string; country: string }[] 
   { name: "Ijegun", areas: "Ijegun, Ikotun, Alimosho", country: "Nigeria" },
   { name: "Bode Thomas", areas: "Surulere, Okota, Yaba", country: "Nigeria" },
   { name: "Lekki", areas: "Lekki, VI", country: "Nigeria" },
-  { name: "Jumofak", areas: "Jumofak, Benson, Ikorodu Garage", country: "Nigeria" },
-  { name: "Agric", country: "Nigeria" },
-  { name: "London", country: "United Kingdom" },
-  { name: "Calgary", country: "Canada" },
+  { name: "Jumofak Ikorodu", areas: "Jumofak, Benson, Ikorodu Garage", country: "Nigeria" },
+  { name: "Agric Ikorodu", country: "Nigeria" },
+  { name: "London United Kingdom", country: "United Kingdom" },
+  { name: "Calgary Canada", country: "Canada" },
   { name: "Trinidad", areas: "Diego Martin", country: "Trinidad and Tobago" },
 ];
 
